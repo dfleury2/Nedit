@@ -1,0 +1,121 @@
+# Requires version 5.4RC*2* (not RC1) or above of NEdit.
+# Add the file to autoload.nm or load it from there
+# Make a menu entry with the call jf_find_all() and another one with 
+# jf_clear_find_all()
+
+
+# Takes a string as unique name of a rangeset
+# If a single rangeset with name exists in window, returns its id.
+# If no rangeset with name exists in window, creates one and returns its id.
+# If more than one rangesets with name exist already in window, returns -1.
+
+define jf_init_rangeset {
+rname = $1
+test = rangeset_get_by_name(rname)
+if (test[] > 1) {
+    return -1
+    }
+if (test[] == 1) {
+    return(test[0])
+    }
+if (test[] == 0) {
+    a = rangeset_create()
+    rangeset_set_name(a, rname)
+    return(a)
+    }
+}
+
+define jf_find_all {
+rbasename = "jf_find_all"
+find_types[1] = "literal"
+find_types[2] = "case"
+find_types[3] = "word"
+find_types[4] = "caseWord"
+find_types[5] = "regexNoCase"
+find_types[6] = "regex"
+
+find_from = 0
+find_to = $text_length
+
+if ($selection_start == -1) { 
+  if ($selection_start != -1) { 
+      find_from = 0
+      }
+      else {
+      find_from = $selection_start
+      }
+
+  if ($selection_end   == -1) {
+      find_to   = $text_length
+    }
+    else { 
+    find_to   = $selection_end
+    }
+
+  search_for = string_dialog( "Find", "Literal", "Cased Literal", "Word","Cased Word", "RegEx", "Cased RegEx")
+  if ($string_dialog_button == 0) return
+
+  find_type = find_types[$string_dialog_button]
+}
+else {
+  search_for = get_range( $selection_start, $selection_end )
+  find_type = find_types[1]
+}
+
+color = jf_get_available_color()
+
+# snap color
+rangeset = jf_init_rangeset( rbasename ":" color)
+rangeset_set_color( rangeset, color)
+find_at   = search( search_for, find_from, find_type)
+find_thru = $search_end
+while (find_at >= find_from & find_thru <= find_to) {
+    rangeset_add( rangeset, find_at, find_thru )
+    find_from = find_thru + 1
+    find_at   = search( search_for, find_from, find_type)
+    find_thru = $search_end
+    }
+
+}
+
+
+define jf_clear_find_all {
+active_rangesets = $rangeset_list
+for (i = 0; i < active_rangesets[]; i++) {
+    a = rangeset_info(active_rangesets[i]) 
+    pos = search_string(a["name"], "jf_find_all", 0)
+    if (pos == 0) {
+        rangeset_destroy(active_rangesets[i])
+        }
+    }
+}
+
+define jf_get_available_color {
+used_colors = $empty_array
+rgb_colors =\
+"SkyBlue1 yellow Orange Coral1  Orchid1 SpringGreen2 #f0f050 Gold1 LightPink1 \
+Plum1 CadetBlue2 PaleGreen1 khaki1 LightSalmon1 PaleVioletRed1 #D8A9FF \
+aquamarine2 DarkOliveGreen1 "
+active_rangesets = $rangeset_list
+for (i = 0, j = 0; i < active_rangesets[]; i++) {
+    a = rangeset_info(active_rangesets[i]) 
+    pos = search_string(a["name"], "jf_find_all:", 0)
+    if (pos == 0) {
+        used_colors[j++] = substring(a["name"], $search_end, length(a["name"]))
+        }
+    }
+for (i = 0; i < used_colors[]; i++) {
+    pos = search_string(rgb_colors, used_colors[i], 0)
+    if (pos != -1) {
+        rgb_colors = substring(rgb_colors, $search_end + 1, length(rgb_colors))
+        }
+    }
+pos = search_string(rgb_colors, " ", 0)
+if (pos != -1) {
+    return(substring(rgb_colors, 0, pos))
+    }
+    else {# failed
+    return -1
+    }
+}
+

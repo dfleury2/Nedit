@@ -1,0 +1,927 @@
+! Preferences file for NEdit
+! (User settings in X "application defaults" format)
+!
+! This file is overwritten by the "Save Defaults..." command in NEdit
+! and serves only the interactively settable options presented in the NEdit
+! "Preferences" menu.  To modify other options, such as key bindings, use
+! the .Xdefaults file in your home directory (or the X resource
+! specification method appropriate to your system).  The contents of this
+! file can be moved into an X resource file, but since resources in this file
+! override their corresponding X resources, either this file should be 
+! deleted or individual resource lines in the file should be deleted for the
+! moved lines to take effect.
+
+nedit.fileVersion: 5.6
+nedit.shellCommands: \
+	spell:Alt+B:s:ED:\n\
+		(cat;echo "") | spell\n\
+	wc::w:ED:\n\
+		wc | awk '{print $1 " lines, " $2 " words, " $3 " characters"}'\n\
+	sort::o:EX:\n\
+		sort\n\
+	number lines::n:AW:\n\
+		nl -ba\n\
+	make:Alt+Z:m:W:\n\
+		make\n\
+	expand::p:EX:\n\
+		expand\n\
+	unexpand::u:EX:\n\
+		unexpand\n
+nedit.macroCommands: \
+	Complete Word:Ctrl+Space::: {\n\
+		# Tuning parameters\n\
+		ScanDistance = 200\n\
+		\n\
+		# Search back to a word boundary to find the word to complete\n\
+		startScan = max(0, $cursor - ScanDistance)\n\
+		endScan = min($text_length, $cursor + ScanDistance)\n\
+		scanString = get_range(startScan, endScan)\n\
+		keyEnd = $cursor-startScan\n\
+		keyStart = search_string(scanString, "<", keyEnd, "backward", "regex")\n\
+		if (keyStart == -1)\n\
+		    return\n\
+		keyString = "<" substring(scanString, keyStart, keyEnd)\n\
+		\n\
+		# search both forward and backward from the cursor position.  Note that\n\
+		# using a regex search can lead to incorrect results if any of the special\n\
+		# regex characters is encountered, which is not considered a delimiter\n\
+		backwardSearchResult = search_string(scanString, keyString, keyStart-1, \\\n\
+		    	"backward", "regex")\n\
+		forwardSearchResult = search_string(scanString, keyString, keyEnd, "regex")\n\
+		if (backwardSearchResult == -1 && forwardSearchResult == -1) {\n\
+		    beep()\n\
+		    return\n\
+		}\n\
+		\n\
+		# if only one direction matched, use that, otherwise use the nearest\n\
+		if (backwardSearchResult == -1)\n\
+		    matchStart = forwardSearchResult\n\
+		else if (forwardSearchResult == -1)\n\
+		    matchStart = backwardSearchResult\n\
+		else {\n\
+		    if (keyStart - backwardSearchResult <= forwardSearchResult - keyEnd)\n\
+		    	matchStart = backwardSearchResult\n\
+		    else\n\
+		    	matchStart = forwardSearchResult\n\
+		}\n\
+		\n\
+		# find the complete word\n\
+		matchEnd = search_string(scanString, ">", matchStart, "regex")\n\
+		completedWord = substring(scanString, matchStart, matchEnd)\n\
+		\n\
+		# replace it in the window\n\
+		replace_range(startScan + keyStart, $cursor, completedWord)\n\
+	}\n\
+	Fill Sel. w/Char:::R: {\n\
+		if ($selection_start == -1) {\n\
+		    beep()\n\
+		    return\n\
+		}\n\
+		\n\
+		# Ask the user what character to fill with\n\
+		fillChar = string_dialog("Fill selection with what character?", "OK", "Cancel")\n\
+		if ($string_dialog_button == 2)\n\
+		    return\n\
+		\n\
+		# Count the number of lines in the selection\n\
+		nLines = 0\n\
+		for (i=$selection_start; i<$selection_end; i++)\n\
+		    if (get_character(i) == "\\n")\n\
+		    	nLines++\n\
+		\n\
+		# Create the fill text\n\
+		rectangular = $selection_left != -1\n\
+		line = ""\n\
+		fillText = ""\n\
+		if (rectangular) {\n\
+		    for (i=0; i<$selection_right-$selection_left; i++)\n\
+			line = line fillChar\n\
+		    for (i=0; i<nLines; i++)\n\
+			fillText = fillText line "\\n"\n\
+		    fillText = fillText line\n\
+		} else {\n\
+		    if (nLines == 0) {\n\
+		    	for (i=$selection_start; i<$selection_end; i++)\n\
+		    	    fillText = fillText fillChar\n\
+		    } else {\n\
+		    	startIndent = 0\n\
+		    	for (i=$selection_start-1; i>=0 && get_character(i)!="\\n"; i--)\n\
+		    	    startIndent++\n\
+		    	for (i=0; i<$wrap_margin-startIndent; i++)\n\
+		    	    fillText = fillText fillChar\n\
+		    	fillText = fillText "\\n"\n\
+			for (i=0; i<$wrap_margin; i++)\n\
+			    line = line fillChar\n\
+			for (i=0; i<nLines-1; i++)\n\
+			    fillText = fillText line "\\n"\n\
+			for (i=$selection_end-1; i>=$selection_start && get_character(i)!="\\n"; \\\n\
+			    	i--)\n\
+			    fillText = fillText fillChar\n\
+		    }\n\
+		}\n\
+		\n\
+		# Replace the selection with the fill text\n\
+		replace_selection(fillText)\n\
+	}\n\
+	Quote Mail Reply:::: {\n\
+		if ($selection_start == -1)\n\
+		    replace_all("^.*$", "\\\\> &", "regex")\n\
+		else\n\
+		    replace_in_selection("^.*$", "\\\\> &", "regex")\n\
+	}\n\
+	Unquote Mail Reply:::: {\n\
+		if ($selection_start == -1)\n\
+		    replace_all("(^\\\\> )(.*)$", "\\\\2", "regex")\n\
+		else\n\
+		    replace_in_selection("(^\\\\> )(.*)$", "\\\\2", "regex")\n\
+	}\n\
+	C Comments>Comment Out Sel.@C@C++:::R: {\n\
+		selStart = $selection_start\n\
+		selEnd = $selection_end\n\
+		replace_range(selStart, selEnd, "/* " get_selection() " */")\n\
+		select(selStart, selEnd + 6)\n\
+	}\n\
+	C Comments>C Uncomment Sel.@C@C++:::R: {\n\
+		sel = get_selection()\n\
+		selStart = $selection_start\n\
+		selEnd = $selection_end\n\
+		commentStart = search_string(sel, "/*", 0)\n\
+		if (substring(sel, commentStart+2, commentStart+3) == " ")\n\
+		    keepStart = commentStart + 3\n\
+		else\n\
+		    keepStart = commentStart + 2\n\
+		keepEnd = search_string(sel, "*/", length(sel), "backward")\n\
+		commentEnd = keepEnd + 2\n\
+		if (substring(sel, keepEnd - 1, keepEnd) == " ")\n\
+		    keepEnd = keepEnd - 1\n\
+		replace_range(selStart + commentStart, selStart + commentEnd, \\\n\
+			substring(sel, keepStart, keepEnd))\n\
+		select(selStart, selEnd - (keepStart-commentStart) - \\\n\
+			(commentEnd - keepEnd))\n\
+	}\n\
+	C Comments>+ C++ Comment:Ctrl+KP_Add::R: {\n\
+		replace_in_selection("^.*$", "// &", "regex")\n\
+	}\n\
+	C Comments>- C++ Comment:Ctrl+KP_Subtract::R: {\n\
+		replace_in_selection("(^[ \\\\t]*// ?)(.*)$", "\\\\2", "regex")\n\
+	}\n\
+	C Comments>+ C Bar Comment 1@C:::R: {\n\
+		if ($selection_left != -1) {\n\
+		    dialog("Selection must not be rectangular")\n\
+		    return\n\
+		}\n\
+		start = $selection_start\n\
+		end = $selection_end-1\n\
+		origText = get_range($selection_start, $selection_end-1)\n\
+		newText = "/*\\n" replace_in_string(get_range(start, end), \\\n\
+			"^", " * ", "regex") "\\n */\\n"\n\
+		replace_selection(newText)\n\
+		select(start, start + length(newText))\n\
+	}\n\
+	C Comments>- C Bar Comment 1@C:::R: {\n\
+		selStart = $selection_start\n\
+		selEnd = $selection_end\n\
+		newText = get_range(selStart+3, selEnd-4)\n\
+		newText = replace_in_string(newText, "^ \\\\* ", "", "regex")\n\
+		replace_range(selStart, selEnd, newText)\n\
+		select(selStart, selStart + length(newText))\n\
+	}\n\
+	Make C Prototypes@C@C++:::: {\n\
+		# simplistic extraction of C function prototypes, usually good enough\n\
+		if ($selection_start == -1) {\n\
+		    start = 0\n\
+		    end = $text_length\n\
+		} else {\n\
+		    start = $selection_start\n\
+		    end = $selection_end\n\
+		}\n\
+		string = get_range(start, end)\n\
+		# remove all C++ and C comments, then all blank lines in the extracted range\n\
+		string = replace_in_string(string, "//.*$", "", "regex", "copy")\n\
+		string = replace_in_string(string, "(?n/\\\\*.*?\\\\*/)", "", "regex", "copy")\n\
+		string = replace_in_string(string, "^\\\\s*\\n", "", "regex", "copy")\n\
+		nDefs = 0\n\
+		searchPos = 0\n\
+		prototypes = ""\n\
+		staticPrototypes = ""\n\
+		for (;;) {\n\
+		    headerStart = search_string(string, "^[a-zA-Z]([^;#\\"'{}=><!/]|\\n)*\\\\)[ \\t]*\\n?[ \\t]*\\\\{", searchPos, "regex")\n\
+		    if (headerStart == -1) {\n\
+			break\n\
+		    }\n\
+		    headerEnd = search_string(string, ")", $search_end,"backward") + 1\n\
+		    prototype = substring(string, headerStart, headerEnd) ";\\n"\n\
+		    if (substring(string, headerStart, headerStart+6) == "static")\n\
+			staticPrototypes = staticPrototypes prototype\n\
+		    else\n\
+		    	prototypes = prototypes prototype\n\
+		    searchPos = headerEnd\n\
+		    nDefs++\n\
+		}\n\
+		if (nDefs == 0) {\n\
+		    dialog("No function declarations found")\n\
+		    return\n\
+		}\n\
+		new()\n\
+		focus_window("last")\n\
+		replace_range(0, 0, prototypes staticPrototypes)\n\
+	}\n\
+	Supprimer Espaces > Debut:Ctrl+F1::: {\n\
+		replace_in_selection( "^[ \\t]*", "", "regex")\n\
+	}\n\
+	Supprimer Espaces > Fin:Ctrl+F2::: {\n\
+		replace_in_selection( "[ \\t]*$", "", "regex")\n\
+	}\n\
+	Tabulations > Supprimer:Ctrl+F3::: {\n\
+		replace_in_selection( "^    ", "", "regex")\n\
+	}\n\
+	Tabulations > Ajouter:Ctrl+F4::: {\n\
+		replace_in_selection( "^", "    ", "regex")\n\
+	}\n\
+	Afficher MAN:Shift+Ctrl+Comma::: {\n\
+		if ($selection_start == -1)\n\
+		        c = string_dialog("man page for:")\n\
+		else\n\
+		        c = get_selection()\n\
+		p = shell_command("man "c, "")\n\
+		p = replace_in_string(p, ".\\b", "", "regex")\n\
+		p = replace_in_string(p, "\\n\\n\\n.*$\\n\\n\\n\\n\\n\\n.*$\\n\\n", "", "regex")\n\
+		p = substring(p, 2, length(p))\n\
+		write_file(p, "/tmp/man "c)\n\
+		open("/tmp/man "c)\n\
+	}\n\
+	isql > IRSA_DEV:Ctrl+F8::: {\n\
+		write_file("SPOOL /tmp/DF_tmpsqlplus.txt;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET LINESIZE 7000;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET PAGESIZE 50000;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET HEADSEP '|';\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET COLSEP '|';\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET TRIMSPOOL ON;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file(get_selection(), "/tmp/DF_tmpRequete.txt" )\n\
+		\n\
+		shell_command("sqlplus -S MAG_DEV/MAG_DEV@IRSADEV.WORLD @/tmp/DF_tmpRequete.txt", "" )\n\
+		\n\
+		open("/tmp/DF_tmpsqlplus.txt")\n\
+	}\n\
+	isql > IRSA_PRD:Shift+Ctrl+F8::: {\n\
+		write_file("SPOOL /tmp/DF_tmpsqlplus.txt;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET LINESIZE 7000;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET PAGESIZE 50000;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET HEADSEP '|';\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET COLSEP '|';\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET TRIMSPOOL ON;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file(get_selection(), "/tmp/DF_tmpRequete.txt" )\n\
+		\n\
+		shell_command("sqlplus -S ut0tyb_ro/azerqsdf@IRSA_PRD.WORLD @/tmp/DF_tmpRequete.txt", "" )\n\
+		\n\
+		open("/tmp/DF_tmpsqlplus.txt")\n\
+	}\n\
+	isql NEXTSTEP > Development:Ctrl+F9::: {\n\
+		write_file("SPOOL /tmp/DF_tmpsqlplus.txt;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET LINESIZE 3000;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET PAGESIZE 50000;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET HEADSEP '|';\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET COLSEP '|';\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET TRIMSPOOL ON;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file(get_selection(), "/tmp/DF_tmpRequete.txt" )\n\
+		\n\
+		timestart = shell_command( "date '+%F %T-%N'", "" )\n\
+		\n\
+		shell_command("sqlplus -S mid/nextstep@VOLOXDEV.WORLD @/tmp/DF_tmpRequete.txt", "" )\n\
+		\n\
+		timestop = shell_command( "date '+%F %T-%N'", "" )\n\
+		\n\
+		append_file( timestart, "/tmp/DF_tmpsqlplus.txt" )\n\
+		append_file( timestop, "/tmp/DF_tmpsqlplus.txt" )\n\
+		\n\
+		open("/tmp/DF_tmpsqlplus.txt" )\n\
+	}\n\
+	isql NEXTSTEP > Integration:Shift+Ctrl+F9::: {\n\
+		write_file("SPOOL /tmp/DF_tmpsqlplus.txt;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET LINESIZE 3000;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET PAGESIZE 50000;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET HEADSEP '|';\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET COLSEP '|';\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET TRIMSPOOL ON;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file(get_selection(), "/tmp/DF_tmpRequete.txt" )\n\
+		\n\
+		shell_command("sqlplus -S mid/nextstep@VOLOXINT.WORLD @/tmp/DF_tmpRequete.txt", "" )\n\
+		\n\
+		open("/tmp/DF_tmpsqlplus.txt")\n\
+	}\n\
+	isql MID > pprd:Ctrl+F10::: {\n\
+		write_file("SPOOL /tmp/DF_tmpsqlplus.txt;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET LINESIZE 3000;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET PAGESIZE 50000;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET HEADSEP '|';\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET COLSEP '|';\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET TRIMSPOOL ON;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file(get_selection(), "/tmp/DF_tmpRequete.txt" )\n\
+		\n\
+		timestart = shell_command( "date '+%F %T-%N'", "" )\n\
+		\n\
+		shell_command("sqlplus -S MID_RO/MIDCALYON@UMTPINT.WORLD @/tmp/DF_tmpRequete.txt", "" )\n\
+		\n\
+		timestop = shell_command( "date '+%F %T-%N'", "" )\n\
+		\n\
+		append_file( timestart, "/tmp/DF_tmpsqlplus.txt" )\n\
+		append_file( timestop, "/tmp/DF_tmpsqlplus.txt" )\n\
+		\n\
+		open("/tmp/DF_tmpsqlplus.txt" )\n\
+	}\n\
+	isql MID > prod:Shift+Ctrl+F10::: {\n\
+		write_file("SPOOL /tmp/DF_tmpsqlplus.txt;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET LINESIZE 3000;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET PAGESIZE 50000;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET HEADSEP '|';\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET COLSEP '|';\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file("SET TRIMSPOOL ON;\\n", "/tmp/DF_tmpRequete.txt" )\n\
+		append_file(get_selection(), "/tmp/DF_tmpRequete.txt" )\n\
+		\n\
+		timestart = shell_command( "date '+%F %T-%N'", "" )\n\
+		\n\
+		shell_command("sqlplus -S MID/MIDCALYON@UMTPPRD.WORLD @/tmp/DF_tmpRequete.txt", "" )\n\
+		\n\
+		timestop = shell_command( "date '+%F %T-%N'", "" )\n\
+		\n\
+		append_file( timestart, "/tmp/DF_tmpsqlplus.txt" )\n\
+		append_file( timestop, "/tmp/DF_tmpsqlplus.txt" )\n\
+		\n\
+		open("/tmp/DF_tmpsqlplus.txt" )\n\
+		\n\
+	}\n\
+	SQL Extract:Ctrl+F12::: {\n\
+		if ( $selection_start == -1 ) {\n\
+		    start = 0\n\
+		    end = $text_length\n\
+		} else {\n\
+		    start = $selection_start\n\
+		    end = $selection_end\n\
+		}\n\
+		\n\
+		sqlSelection = get_range( start, end )\n\
+		sqlPosition = 0\n\
+		sqlScript = ""\n\
+		withoutFxTrace = 0\n\
+		for(;;)\n\
+		{\n\
+		    sqlBegin = search_string( sqlSelection, "SQL Query : <", sqlPosition, "case" )\n\
+		    if ( sqlBegin == -1 ) {\n\
+		        sqlBegin = search_string( sqlSelection, "SQL Query [", sqlPosition, "case" )\n\
+			if ( sqlBegin == -1 ) {\n\
+		            break\n\
+		        }\n\
+		        else withoutFxTrace = 1\n\
+		    }\n\
+		    sqlEnd = search_string( sqlSelection, "> ]\\n", sqlBegin, "case" )\n\
+		    if ( sqlEnd == -1 )\n\
+		        sqlEnd = search_string( sqlSelection, "]\\n", sqlBegin, "case" )\n\
+		\n\
+		    sqlPosition = sqlEnd\n\
+		\n\
+		    if ( length( sqlScript ) != 0 ) sqlScript = sqlScript "\\n"\n\
+		    if ( withoutFxTrace == 1 )\n\
+		        sqlScript = sqlScript substring( sqlSelection, sqlBegin+11, sqlEnd ) "\\nGO\\n"\n\
+		    else\n\
+		        sqlScript = sqlScript substring( sqlSelection, sqlBegin+13, sqlEnd ) "\\nGO\\n"\n\
+		}\n\
+		\n\
+		sqlScript = sqlScript "\\n"\n\
+		if ( length( replace_in_string( sqlScript, " where ", "\\nwhere ", "regex" ) ) ) {\n\
+		    sqlScript = replace_in_string( sqlScript, " where ", "\\nwhere ", "regex" )\n\
+		}\n\
+		if ( length( replace_in_string( sqlScript, " WHERE ", "\\nWHERE ", "regex" ) ) ) {\n\
+		    sqlScript = replace_in_string( sqlScript, " WHERE ", "\\nWHERE ", "regex" )\n\
+		}\n\
+		  \n\
+		if ( length( replace_in_string( sqlScript, " into ", "\\ninto ", "regex" ) ) ) {\n\
+		    sqlScript = replace_in_string( sqlScript, " into ", "\\ninto ", "regex" )\n\
+		}\n\
+		if ( length( replace_in_string( sqlScript, " INTO ", "\\nINTO ", "regex" ) ) ) {\n\
+		    sqlScript = replace_in_string( sqlScript, " INTO ", "\\nINTO ", "regex" )\n\
+		}\n\
+		\n\
+		if ( length( replace_in_string( sqlScript, " from ", "\\nfrom ", "regex" ) ) ) {\n\
+		    sqlScript = replace_in_string( sqlScript, " from ", "\\nfrom ", "regex" )\n\
+		}\n\
+		if ( length( replace_in_string( sqlScript, " FROM ", "\\nFROM ", "regex" ) ) ) {\n\
+		    sqlScript = replace_in_string( sqlScript, " FROM ", "\\nFROM ", "regex" )\n\
+		}\n\
+		if ( length( replace_in_string( sqlScript, " and ", "\\n and ", "regex" ) ) ) {\n\
+		    sqlScript = replace_in_string( sqlScript, " and ", "\\n and ", "regex" )\n\
+		}\n\
+		if ( length( replace_in_string( sqlScript, " AND ", "\\n AND ", "regex" ) ) ) {\n\
+		    sqlScript = replace_in_string( sqlScript, " AND ", "\\n AND ", "regex" )\n\
+		}\n\
+		\n\
+		new()\n\
+		focus_window( "last" )\n\
+		replace_range( 0, 0, sqlScript )\n\
+	}\n\
+	cscope > Run:::: {\n\
+		run_cscope()\n\
+	}\n\
+	cscope > Recall:::: {\n\
+		show_cscope_results()\n\
+	}\n\
+	SVN ID keyword:Ctrl+Parenright::: {\n\
+		file_name = replace_in_string( $file_name, ".", "_" )\n\
+		file_name = "_" file_name\n\
+		\n\
+		goto_line_number(0)\n\
+		beginning_of_line()\n\
+		insert_string( "\\nstatic const char* " file_name " = \\"@(#) (MAG) $Id$\\";\\n\\n" )\n\
+	}\n\
+	cscope>search index:::: {\n\
+		cscope_search_index()\n\
+	}\n\
+	cscope>view last results:::: {\n\
+		cscope_view_last_results()\n\
+	}\n\
+	cscope>create index:::: {\n\
+		cscope_create_index()\n\
+	}\n\
+	cscope>delete index:::: {\n\
+		cscope_delete_index()\n\
+	}\n\
+	cscope>set current cscope directory:::: {\n\
+		cscope_set_current_directory()\n\
+	}\n\
+	cscope>rebuild:::: {\n\
+		cscope_rebuild_index()\n\
+	}\n\
+	Find All:::: {\n\
+		jf_find_all()\n\
+	}\n\
+	Clear Find All:::: {\n\
+		jf_clear_find_all()\n\
+	}\n
+nedit.bgMenuCommands: \
+	Undo:::: {\n\
+		undo()\n\
+	}\n\
+	Redo:::: {\n\
+		redo()\n\
+	}\n\
+	Cut:::R: {\n\
+		cut_clipboard()\n\
+	}\n\
+	Copy:::R: {\n\
+		copy_clipboard()\n\
+	}\n\
+	Paste:::: {\n\
+		paste_clipboard()\n\
+	}\n\
+	Cscope > Run:::: {\n\
+		run_cscope()\n\
+	}\n\
+	Cscope > Recall:::: {\n\
+		show_cscope_results()\n\
+	}\n\
+	Find All > Set:::: {\n\
+		jf_find_all()\n\
+	}\n\
+	Find All > Clear:::: {\n\
+		jf_clear_find_all()\n\
+	}\n\
+	Goto MAG source:::: {\n\
+		# Get the current line into selected_text\n\
+		c = $cursor\n\
+		beginning_of_line()\n\
+		begin = $cursor\n\
+		end_of_line()\n\
+		end = $cursor\n\
+		selected_text = get_range(begin, end)\n\
+		set_cursor_pos( c )\n\
+		\n\
+		begin = search_string( selected_text, "(", 0 ) + 1\n\
+		end = search_string( selected_text, ":", begin )\n\
+		end2 = search_string( selected_text, ")", end )\n\
+		\n\
+		filename = substring( selected_text, begin, end )\n\
+		linenumber = substring( selected_text, end + 1, end2)\n\
+		\n\
+		root=getenv( "MAG_ROOT" )\n\
+		filename = shell_command( "find " root " -name " filename, "" )\n\
+		filename = replace_in_string( filename, "\\n", "" )\n\
+		\n\
+		open( filename )\n\
+		focus_window("last")\n\
+		if ( linenumber != 0 )\n\
+		   goto_line_number( linenumber )\n\
+	}\n
+nedit.highlightPatterns: C:1:0{\n\
+		comment:"/\\*":"\\*/"::Comment::\n\
+		string:"""":"""":"\\n":String::\n\
+		preprocessor line:"^[ \\t]*#":"$"::Preprocessor::\n\
+		string escape chars:"\\\\(.|\\n)":::String1:string:\n\
+		preprocessor esc chars:"\\\\(.|\\n)":::Preprocessor1:preprocessor line:\n\
+		preprocessor comment:"/\\*":"\\*/"::Comment:preprocessor line:\n\
+		character constant:"'":"'":"[^\\\\][^']":Character Const::\n\
+		numeric constant:"<((0(x|X)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f)?>":::Numeric Const::D\n\
+		storage keyword:"<(const|extern|auto|register|static|unsigned|signed|volatile|char|double|float|int|long|short|void|typedef|struct|union|enum)>":::Storage Type::D\n\
+		keyword:"<(return|goto|if|else|case|default|switch|break|continue|while|do|for|sizeof)>":::Keyword::D\n\
+		braces:"[{}]":::Keyword::D\n\
+		Debug GB:"TRtrace|TRprintf":::Preprocessor::\n\
+	}\n\
+	C++:1:0{\n\
+		comment:"/\\*":"\\*/"::Comment::\n\
+		cplus comment:"//":"$"::Comment::\n\
+		string:"""":"""":"\\n":String::\n\
+		preprocessor line:"^[ \\t]*#":"$"::Preprocessor::\n\
+		string escape chars:"\\\\(.|\\n)":::String1:string:\n\
+		preprocessor esc chars:"\\\\(.|\\n)":::Preprocessor1:preprocessor line:\n\
+		preprocessor comment:"/\\*":"\\*/"::Comment:preprocessor line:\n\
+		preproc cplus comment:"//":"$"::Comment:preprocessor line:\n\
+		character constant:"'":"'":"[^\\\\][^']":Character Const::\n\
+		numeric constant:"<((0(x|X)[\\da-fA-F]*)|((\\d+\\.?\\d*)|(\\.\\d+))((e|E)(\\+|-)?\\d+)?)(L|LL|ll|l|UL|ULL|ul|ull|u|U|F|f)?>":::Numeric Const::D\n\
+		storage keyword:"<(class|typename|typeid|template|friend|virtual|inline|explicit|operator|overload|public|private|protected|const|extern|auto|register|static|mutable|unsigned|signed|volatile|char|double|float|int|long|short|bool|wchar_t|void|typedef|struct|union|enum)>":::Storage Type::D\n\
+		keyword:"<(new|delete|this|return|goto|if|else|case|default|switch|break|continue|while|do|for|try|catch|throw|sizeof|true|false|namespace|using|dynamic_cast|static_cast|reinterpret_cast|const_cast)>":::Keyword::D\n\
+		braces:"[{}]":::Keyword::D\n\
+		Ilog Views 4_02:"<(IlvInt|IlvDouble|IlvBoolean|IliString|IliValue|IliDate|IliSQLDataSource|IliTableBuffer|IlvGraphic|IliDataSource|IliName|IliTableComboBox|IlvMessageLabel|IliFieldItf)>":::Ilog Type::\n\
+		Debug Macro:"<(MAG_STACK|MAG_INFO|MAG_WARN|MAG_DEBUG|MAG_TRACE|MAG_ERROR|LogMessage|MAG_INFO1|MAG_WARN1|MAG_ERROR1|MAG_DEBUG1|MAG_TRACE1|MAG_INFO2|MAG_WARN2|MAG_ERROR2|MAG_DEBUG2|MAG_TRACE2|MAG_INFO3|MAG_WARN3|MAG_ERROR3|MAG_DEBUG3|MAG_TRACE3|MAG_INFO4|MAG_WARN4|MAG_ERROR4|MAG_DEBUG4|MAG_TRACE4|MAG_INFO5|MAG_WARN5|MAG_ERROR5|MAG_DEBUG5|MAG_TRACE5|MAG_INFO6|MAG_WARN6|MAG_ERROR6|MAG_DEBUG6|MAG_TRACE6|MAG_INFO7|MAG_WARN7|MAG_ERROR7|MAG_DEBUG7|MAG_TRACE7|MAG_FATAL|MAG_FATAL1|MAG_FATAL2)>":::Preprocessor::\n\
+		Debug GB:"TRtrace|TRprintf|TRfinish":::Preprocessor::\n\
+		Librairie FX:"<(dbtype|dbvoid|dbbit|dbbool|dbtiny|dbsmall|dbint|dbfloat|dbdouble|dbstring|dbdate|dbmonth|dbvalue|dbexception|fxexception|dbdatabase|dbrow|dbarray|dbobject|dbvector)>":::String2::\n\
+		STL:"<(string::npos|std::string::npos|tring|std::string|vector|std::vector|set|std::set|std::ofstream|ofstream|std::ifstream|ifstream|std::map|map|std::for_each|for_each|std::mem_fun|mem_fun)>":::Subroutine1::D\n\
+		ALU - DEDA:"<ERRchkGb|ERRchk|ERRend|ERRret|ERRass|ERRsetWarn>":::Text Key::\n\
+	}\n\
+	Java:Default\n\
+	JavaScript:Default\n\
+	Ada:Default\n\
+	Fortran:Default\n\
+	Pascal:Default\n\
+	Yacc:Default\n\
+	Perl:Default\n\
+	Python:Default\n\
+	Awk:Default\n\
+	Tcl:Default\n\
+	Sh Ksh Bash:1:0{\n\
+		escaped special characters:"\\\\[\\\\""$`']":::Keyword::\n\
+		single quoted string:"'":"'"::String1::\n\
+		double quoted string:"""":""""::String::\n\
+		double quoted escape:"\\\\[\\\\""$`]":::String2:double quoted string:\n\
+		dq command sub:"`":"`":"""":Subroutine:double quoted string:\n\
+		dq arithmetic expansion:"\\$\\(\\(":"\\)\\)":"""":String:double quoted string:\n\
+		dq new command sub:"\\$\\(":"\\)":"""":Subroutine:double quoted string:\n\
+		dq variables:"\\$([-*@#?$!0-9]|[a-zA-Z_][0-9a-zA-Z_]*)":::Identifier1:double quoted string:\n\
+		dq variables2:"\\$\\{":"}":"\\n":Identifier1:double quoted string:\n\
+		arithmetic expansion:"\\$\\(\\(":"\\)\\)"::String::\n\
+		ae escapes:"\\\\[\\\\$`""']":::String2:arithmetic expansion:\n\
+		ae single quoted string:"'":"'":"\\)\\)":String1:arithmetic expansion:\n\
+		ae command sub:"`":"`":"\\)\\)":Subroutine:arithmetic expansion:\n\
+		ae arithmetic expansion:"\\$\\(\\(":"\\)\\)"::String:arithmetic expansion:\n\
+		ae new command sub:"\\$\\(":"\\)":"\\)\\)":Subroutine:arithmetic expansion:\n\
+		ae variables:"\\$([-*@#?$!0-9]|[a-zA-Z_][0-9a-zA-Z_]*)":::Identifier1:arithmetic expansion:\n\
+		ae variables2:"\\$\\{":"}":"\\)\\)":Identifier1:arithmetic expansion:\n\
+		comments:"^[ \\t]*#":"$"::Comment::\n\
+		command substitution:"`":"`"::Subroutine::\n\
+		cs escapes:"\\\\[\\\\$`""']":::Subroutine1:command substitution:\n\
+		cs single quoted string:"'":"'":"`":String1:command substitution:\n\
+		cs variables:"\\$([-*@#?$!0-9]|[a-zA-Z_][0-9a-zA-Z_]*)":::Identifier1:command substitution:\n\
+		cs variables2:"\\$\\{":"}":"`":Identifier1:command substitution:\n\
+		new command substitution:"\\$\\(":"\\)"::Subroutine::\n\
+		ncs escapes:"\\\\[\\\\$`""']":::Subroutine1:new command substitution:\n\
+		ncs single quoted string:"'":"'"::String1:new command substitution:\n\
+		ncs variables:"\\$([-*@#?$!0-9]|[a-zA-Z_][0-9a-zA-Z_]*)":::Identifier1:new command substitution:\n\
+		ncs variables2:"\\$\\{":"}":"\\)":Identifier1:new command substitution:\n\
+		assignment:"[a-zA-Z_][0-9a-zA-Z_]*[ \\t]*=":::Identifier1::\n\
+		variables:"\\$([-*@#?$!0-9_]|[a-zA-Z_][0-9a-zA-Z_]*)":::Identifier1::\n\
+		variables2:"\\$\\{":"}"::Identifier1::\n\
+		comments in line:"#":"$"::Comment::\n\
+		numbers:"<((0(x|X)[0-9a-fA-F]*)|[0-9.]+((e|E)(\\+|-)?)?[0-9]*)(L|l|UL|ul|u|U|F|f)?>":::Numeric Const::D\n\
+		keywords:"<(if|fi|then|else|elif|case|esac|while|for|do|done|in|select|until|function|continue|break|return|exit)>":::Keyword::D\n\
+		command options:"[ \\t]-[^ \\t{}[\\],.()'""~!@#$%^&*|\\\\<>?]+":::Identifier1::D\n\
+		delimiters:"<[.]>|[{};<>&~=!|^%[\\]+*|]":::Text Key::D\n\
+		built ins:"<(:|\\\\.|\\\\[\\\\[|]]|source|alias|bg|bind|builtin|cd|chdir|command|declare|dirs|echo|enable|eval|exec|export|fc|fg|getopts|hash|help|history|jobs|kill|let|local|logout|popd|print|pushd|pwd|read|readonly|set|shift|stop|suspend|test|times|trap|type|typeset|ulimit|umask|unalias|unset|wait|whence)>":::Subroutine1::D\n\
+	}\n\
+	Csh:Default\n\
+	Makefile:8:0{\n\
+		Comment:"#":"$"::Comment::\n\
+		Assignment:"^( *| [ \\t]*)[\\w+]*[ \\t]*(\\+|:)?=":::Preprocessor::\n\
+		Dependency Line:"^ *([\\w./$(){} %+\\-]*)::?":"$|;"::String::\n\
+		Dep Target:"\\1":""::String:Dependency Line:C\n\
+		Dep Continuation:"\\\\\\n":::Keyword:Dependency Line:\n\
+		Dep Comment:"#":"$"::Comment:Dependency Line:\n\
+		Dep Macro:"\\$(\\w|\\([^)]*\\)|\\{[^}]*})":::Preprocessor:Dependency Line:\n\
+		Dep Internal Macro:"\\$([<@*?%]|\\$@)":::Plain:Dependency Line:\n\
+		Continuation:"\\\\$":::Keyword::\n\
+		Macro:"\\$(\\w|\\([^)]*\\)|\\{[^}]*})":::Plain::\n\
+		Internal Macro:"\\$([<@*?%]|\\$@)":::String::\n\
+		Escaped Dollar:"\\$\\$":::Comment::\n\
+		Include:"^include[ \\t]":::Keyword::\n\
+	}\n\
+	LaTeX:Default\n\
+	PostScript:Default\n\
+	Lex:Default\n\
+	SQL:1:0{\n\
+		keywords:",|%|\\<|\\>|:=|=|<(SELECT|ON|FROM|ORDER BY|DESC|WHERE|AND|OR|NOT|NULL|DELETE|INSERT|INTO|TRUE|FALSE|INSERT|GROUP BY|UPDATE|ADD|ALTER TABLE|GO|VALUES|DISTINCT|FOR|DECLARE|RAISERROR|ROLLBACK|DROP TABLE)>":::Keyword::\n\
+		comment:"--":"$"::Comment::\n\
+		data types:"<(CHAR|VARCHAR2\\([0-9]*\\)|INT[0-9]*|POINT|BOX|TEXT|BOOLEAN|VARCHAR2|VARCHAR|NUMBER\\([0-9]*\\)|NUMBER)>":::Storage Type::\n\
+		string:"'":"'"::String::\n\
+		keywords2:"END IF;|<(CREATE|REPLACE|BEGIN|END|FUNCTION|RETURN|FETCH|OPEN|CLOSE| IS|NOTFOUND|CURSOR|IF|ELSE|THEN|INTO|IS|IN|WHEN|OTHERS|GRANT|ON|TO|EXCEPTION|SHOW|SET|OUT|PRAGMA|AS|PACKAGE|COMMIT)>":::Preprocessor::\n\
+		comment2:"/\\*":"\\*/"::Comment::\n\
+		string2:"""":""""::String::\n\
+	}\n\
+	Matlab:Default\n\
+	VHDL:Default\n\
+	Verilog:Default\n\
+	X Resources:2:0{\n\
+		Preprocessor:"^\\s*#":"$"::Preprocessor::\n\
+		Preprocessor Wrap:"\\\\\\n":::Preprocessor1:Preprocessor:\n\
+		Comment:"^\\s*!":"$"::Comment::\n\
+		Comment Wrap:"\\\\\\n":::Comment:Comment:\n\
+		Resource Continued:"^(\\s*[^:\\s]+\\s*:)(?:(\\\\.)|.)*(\\\\)\\n":"$"::Plain::\n\
+		RC Space Warning:"\\\\\\s+$":::Flag:Resource Continued:\n\
+		RC Esc Chars:"\\\\.":::Text Arg2:Resource Continued:\n\
+		RC Esc Chars 2:"\\2":""::Text Arg2:Resource Continued:C\n\
+		RC Name:"\\1":""::Identifier:Resource Continued:C\n\
+		RC Wrap:"\\\\\\n":::Text Arg1:Resource Continued:\n\
+		RC Wrap2:"\\3":""::Text Arg1:Resource Continued:C\n\
+		Resource:"^\\s*[^:\\s]+\\s*:":"$"::Plain::\n\
+		Resource Space Warning:"\\S+\\s+$":::Flag:Resource:\n\
+		Resource Esc Chars:"\\\\.":::Text Arg2:Resource:\n\
+		Resource Name:"&":""::Numeric Const:Resource:C\n\
+		Free Text:"^.*$":::Flag::\n\
+	}\n\
+	NEdit Macro:Default\n\
+	SQR:1:0{\n\
+		comment:"!":"$"::Comment::\n\
+		sqr comment:"--":"$"::Comment::\n\
+		keyword:"(begin-( )*)|(end-( )*)|if|else|let|input":"$| "::Keyword::D\n\
+		sql code:",|%|\\<|\\>|:=|=|<(SELECT|ON|FROM|ORDER BY|DESC|WHERE|AND|OR|NOT|NULL|TRUE|FALSE|select|from|where|convert)>":::Preprocessor::\n\
+		macro:"^#":"$"::String2::\n\
+	}\n\
+	CSS:Default\n\
+	Regex:Default\n\
+	SGML HTML:6:0{\n\
+		markup declaration:"\\<!":"\\>"::Preprocessor::\n\
+		mdo-mdc:"&":"&"::Comment:markup declaration:C\n\
+		markup declaration dq string:"""":""""::String1:markup declaration:\n\
+		markup declaration sq string:"'":"'"::String1:markup declaration:\n\
+		entity declaration:"((?ientity))[ \\t\\n][ \\t]*\\n?[ \\t]*(%[ \\t\\n][ \\t]*\\n?[ \\t]*)?(\\l[\\l\\d\\-\\.]*|#((?idefault)))[ \\t\\n][ \\t]*\\n?[ \\t]*((?i[cs]data|pi|starttag|endtag|m[ds]))?":::Preprocessor:markup declaration:\n\
+		ed name:"\\2":""::String2:element declaration:C\n\
+		ed type:"\\4":""::Storage Type:entity declaration:C\n\
+		doctype declaration:"((?idoctype))[ \\t\\n][ \\t]*\\n?[ \\t]*(\\l[\\l\\d\\-\\.]*)":::Preprocessor:markup declaration:\n\
+		dt name:"\\2":""::String2:doctype declaration:C\n\
+		element declaration:"((?ielement))[ \\t\\n][ \\t]*\\n?[ \\t]*(\\l[\\l\\d\\-\\.]*)":::Preprocessor:markup declaration:\n\
+		attribute declaration:"((?iattlist))[ \\t\\n][ \\t]*\\n?[ \\t]*(\\l[\\l\\d\\-\\.]*)":::Preprocessor:markup declaration:\n\
+		ad name:"\\2":""::String2:attribute declaration:C\n\
+		notation declaration:"((?inotation))[ \\t\\n][ \\t]*\\n?[ \\t]*(\\l[\\l\\d\\-\\.]*)":::Preprocessor:markup declaration:\n\
+		nd name:"\\2":""::String2:notation declaration:C\n\
+		shortref declaration:"((?ishortref))[ \\t\\n][ \\t]*\\n?[ \\t]*(\\l[\\l\\d\\-\\.]*)":::Preprocessor1:markup declaration:\n\
+		sd name:"\\2":""::String2:shortref declaration:C\n\
+		comment:"\\-\\-":"\\-\\-"::Comment:markup declaration:\n\
+		pi:"\\<\\?[^\\>]*\\??\\>":::Label::\n\
+		stag:"(\\<)(\\(\\l[\\w\\-\\.:]*\\))?\\l[\\w\\-\\.:]*":"/?\\>"::Keyword::\n\
+		stago-tagc:"\\1":"&"::Preprocessor:stag:C\n\
+		Attribute:"([\\l\\-]+)[ \\t\\v]*\\n?[ \\t\\v]*=[ \\t\\v]*\\n?[ \\t\\v]*(""([^""]*\\n){,4}[^""]*""|'([^']*\\n){,4}[^']*'|\\&([^;]*\\n){,4}[^;]*;|[\\w\\-\\.:]+)":::Plain:stag:\n\
+		Attribute name:"\\1":""::Text Arg2:Attribute:C\n\
+		Attribute value:"\\2":""::String:Attribute:C\n\
+		Boolean Attribute:"([\\l\\-]+)":::Text Arg1:stag:\n\
+		etag:"(\\</)(\\(\\l[\\w\\-\\.:]*\\))?(\\l[\\w\\-\\.:]*[ \\t\\v]*\\n?[ \\t\\v]*)?(\\>)":::Keyword::\n\
+		etago-tagc:"\\1\\4":""::Preprocessor:etag:C\n\
+		Character reference:"\\&((\\(\\l[\\l\\d\\-\\.]*\\))?\\l[\\l\\d]*|#\\d+|#[xX][a-fA-F\\d]+);?":::Text Escape::\n\
+		parameter entity:"%(\\(\\l[\\l\\d\\-\\.]*\\))?\\l[\\l\\d\\-\\.]*;?":::Text Escape::\n\
+		md parameter entity:"%(\\(\\l[\\l\\d\\-\\.]*\\))?\\l[\\l\\d\\-\\.]*;?":::Text Escape:markup declaration:\n\
+		system-public id:"<(?isystem|public|cdata)>":::Storage Type:markup declaration:\n\
+	}\n\
+	XML XSL:1:0{\n\
+		comment:"\\<!--":"--\\>"::Comment::\n\
+		ignored section:"\\<!\\[\\s*IGNORE\\s*\\[":"\\]\\]\\>"::Text Comment::\n\
+		declaration:"\\<\\?(?ixml)":"\\?\\>"::Warning::\n\
+		declaration delims:"&":"&"::Keyword:declaration:C\n\
+		declaration attributes:"((?iversion|encoding|standalone))=":::Keyword:declaration:\n\
+		declaration attribute names:"\\1":""::Preprocessor:declaration attributes:C\n\
+		declaration sq string:"'":"'":"\\n\\n":String1:declaration:\n\
+		declaration sq string entity:"&((amp|lt|gt|quot|apos)|#x[\\da-fA-F]*|[\\l_]\\w*);":::Text Escape:declaration sq string:\n\
+		declaration dq string:"""":"""":"\\n\\n":String:declaration:\n\
+		declaration dq string entity:"&((amp|lt|gt|quot|apos)|#x[\\da-fA-F]*|[\\l_]\\w*);":::Text Escape:declaration dq string:\n\
+		doctype:"(\\<!(?idoctype))\\s+(\\<?(?!(?ixml))[\\l_][\\w:-]*\\>?)":"\\>":"\\[":Warning::\n\
+		doctype delims:"\\1":"&"::Keyword:doctype:C\n\
+		doctype root element:"\\2":::Identifier:doctype:C\n\
+		doctype keyword:"(SYSTEM|PUBLIC)":::Keyword:doctype:\n\
+		doctype sq string:"'":"'":"\\n\\n":String1:doctype:\n\
+		doctype dq string:"""":"""":"\\n\\n":String:doctype:\n\
+		processing instruction:"\\<\\?\\S+":"\\?\\>"::Preprocessor::\n\
+		processing instruction attribute:"[\\l_][\\w:-]*=((""[^""]*"")|('[^']*'))":::Preprocessor:processing instruction:\n\
+		processing instruction value:"\\1":::String:processing instruction attribute:C\n\
+		cdata:"\\<!\\[(?icdata)\\[":"\\]\\]\\>"::Text Comment::\n\
+		cdata delims:"&":"&"::Preprocessor:cdata:C\n\
+		element declaration:"\\<!ELEMENT":"\\>"::Warning::\n\
+		element declaration delims:"&":"&"::Keyword:element declaration:C\n\
+		element declaration entity ref:"%(?!(?ixml))[\\l_][\\w:-]*;":::Identifier1:element declaration:\n\
+		element declaration keyword:"<(ANY|#PCDATA|EMPTY)>":::Storage Type:element declaration:\n\
+		element declaration name:"<(?!(?ixml))[\\l_][\\w:-]*":::Identifier:element declaration:\n\
+		element declaration operator:"[(),?*+|]":::Keyword:element declaration:\n\
+		entity declaration:"\\<!ENTITY":"\\>"::Warning::\n\
+		entity declaration delims:"&":"&"::Keyword:entity declaration:C\n\
+		entity declaration sq string:"'":"'":"\\n\\n":String1:entity declaration:\n\
+		entity declaration sq string entity:"&((amp|lt|gt|quot|apos)|#x[\\da-fA-F]*|[\\l_]\\w*);":::Text Escape:entity declaration sq string:\n\
+		entity declaration dq string:"""":"""":"\\n\\n":String:entity declaration:\n\
+		entity declaration dq string entity:"&((amp|lt|gt|quot|apos)|#x[\\da-fA-F]*|[\\l_]\\w*);":::Text Escape:entity declaration dq string:\n\
+		entity declaration keyword:"SYSTEM|NDATA":::Keyword:entity declaration:\n\
+		entity declaration name:"<(?!(?ixml))[\\l_][\\w:-]*":::Identifier:entity declaration:\n\
+		parameter entity declaration:"%\\s+((?!(?ixml))[\\l_][\\w:-]*)>":::Keyword:entity declaration:\n\
+		parameter entity name:"\\1":""::Identifier:parameter entity declaration:C\n\
+		notation:"\\<!NOTATION":"\\>"::Warning::\n\
+		notation delims:"&":"&"::Keyword:notation:C\n\
+		notation sq string:"'":"'":"\\n\\n":String1:notation:\n\
+		notation sq string entity:"&((amp|lt|gt|quot|apos)|#x[\\da-fA-F]*|[\\l_]\\w*);":::Text Escape:notation sq string:\n\
+		notation dq string:"""":"""":"\\n\\n":String:notation:\n\
+		notation dq string entity:"&((amp|lt|gt|quot|apos)|#x[\\da-fA-F]*|[\\l_]\\w*);":::Text Escape:notation dq string:\n\
+		notation keyword:"SYSTEM":::Keyword:notation:\n\
+		notation name:"<(?!(?ixml))[\\l_][\\w:-]*":::Identifier:notation:\n\
+		attribute declaration:"\\<!ATTLIST":"\\>"::Warning::\n\
+		attribute declaration delims:"&":"&"::Keyword:attribute declaration:C\n\
+		attribute declaration sq string:"'":"'":"\\n\\n":String1:attribute declaration:\n\
+		attribute declaration sq string entity:"&((amp|lt|gt|quot|apos)|#x[\\da-fA-F]*|[\\l_]\\w*);":::Text Escape:attribute declaration sq string:\n\
+		attribute declaration dq string:"""":"""":"\\n\\n":String:attribute declaration:\n\
+		attribute declaration dq string entity:"&((amp|lt|gt|quot|apos)|#x[\\da-fA-F]*|[\\l_]\\w*);":::Text Escape:attribute declaration dq string:\n\
+		attribute declaration namespace:"(?ixmlns)(:[\\l_][\\w:]*)?":::Preprocessor:attribute declaration:\n\
+		attribute declaration default modifier:"#(REQUIRED|IMPLIED|FIXED)>":::Keyword:attribute declaration:\n\
+		attribute declaration data type:"<(CDATA|ENTIT(Y|IES)|ID(REFS?)?|NMTOKENS?|NOTATION)>":::Storage Type:attribute declaration:\n\
+		attribute declaration name:"<(?!(?ixml))[\\l_][\\w:-]*":::Identifier:attribute declaration:\n\
+		attribute declaration operator:"[(),?*+|]":::Keyword:attribute declaration:\n\
+		element:"(\\</?)((?!(?ixml))[\\l_][\\w:-]*)":"/?\\>"::Warning::\n\
+		element delims:"\\1":"&"::Keyword:element:C\n\
+		element name:"\\2":""::Preprocessor:element:C\n\
+		element assign:"=":::Keyword:element:\n\
+		element reserved attribute:"(?ixml:(lang|space|link|attribute))(?==)":::Text Key:element:\n\
+		element namespace:"(?ixmlns:[\\l_]\\w*)(?==)":::Preprocessor:element:\n\
+		element attribute:"[\\l_][\\w:-]*(?==)":::Text Key:element:\n\
+		element sq string:"'":"'":"\\n\\n":String1:element:\n\
+		element sq string entity:"&((amp|lt|gt|quot|apos)|#x[\\da-fA-F]*|[\\l_]\\w*);":::Text Escape:element sq string:\n\
+		element dq string:"""":"""":"\\n\\n":Numeric Const:element:\n\
+		element dq string entity:"&((amp|lt|gt|quot|apos)|#x[\\da-fA-F]*|[\\l_]\\w*);":::Text Escape:element dq string:\n\
+		entity:"&((amp|lt|gt|quot|apos)|#x[\\da-fA-F]*|[\\l_]\\w*);":::Text Escape::\n\
+		marked section:"\\<!\\[\\s*(?:INCLUDE|(%(?!(?ixml))[\\l_][\\w:-]*;))\\s*\\[|\\]\\]\\>":::Label::\n\
+		marked section entity ref:"\\1":::Identifier:marked section:C\n\
+		internal subset delims:"[\\[\\]>]":::Keyword::D\n\
+		info:"(?# version 0.1; author/maintainer: Joor Loohuis, joor@loohuis-consulting.nl)":::Comment::D\n\
+	}\n\
+	Doxygen:1:0{\n\
+		Link:"(\\\\link)( *)([^ ]*)( *)([^\\\\]*)":"\\\\endlink"::Keyword::D\n\
+		LinkName:"\\3":""::Preprocessor:Link:DC\n\
+		LinkLib:"\\5":""::String2:Link:DC\n\
+		Section:"(\\\\(section|subsection|subsubsection|code|endcode|msc|endmsc))( *)([^ ]*)([^\\n]*)":"\\n"::Keyword::D\n\
+		SectionName:"\\4":""::Preprocessor:Section:DC\n\
+		SectionLib:"\\5":""::String2:Section:DC\n\
+		Ref:"(\\\\(ref|page))( *)([^ ]*)":::Keyword::\n\
+		RefName:"\\4":""::Preprocessor:Ref:C\n\
+		Keyword:"\\\\(n)":::Keyword::D\n\
+		Verbatim:"\\\\(verbatim)(.)*":"\\\\endverbatim"::String1::\n\
+		VerbatimCode:"&":"&"::Keyword:Verbatim:C\n\
+	}\n\
+	PHP:1:0{\n\
+		line_comments:"#|//":"$"::Comment::\n\
+		multi_line_comment:"/\\*":"\\*/"::Comment::\n\
+		double quote strings:"""":""""::String::\n\
+		single quote strings:"'":"'"::String::\n\
+		dq string esc chars:"\\\\(.|\\n)":::String1:double quote strings:\n\
+		sq string esc chars:"\\\\(.|\\n)":::String1:single quote strings:\n\
+		subroutine header:"(class|function)[\\t| ]+(\\w+)[\\t| ]+":::Keyword::\n\
+		subr header coloring:"\\1":""::Flag:subroutine header:C\n\
+		ignore escaped chars:"\\\\[#""'\\$msytq]":::Plain::\n\
+		re matching:"<((m|q|qq)?/)(\\\\/|[^/])*(/[gimsox]?)>":::String::\n\
+		re match coloring:"\\1\\4":""::String2:re matching:C\n\
+		re substitution:"<((s|y|tr)/)(\\\\/|[^/])*(/)[^/]*(/[gimsox]?)":::String::\n\
+		re subs coloring:"\\1\\4\\5":""::String2:re substitution:C\n\
+		keywords:"<(class|break|my|local|new|if|until|while|elseif|else|eval|unless|for|foreach|continue|exit|die|last|goto|next|redo|return|local|exec|do|use|require|require_once|package|eval|BEGIN|END|eq|ne|not|\\|\\||\\&\\&|and|or|function)>":::Keyword::D\n\
+		library fns:"<(_include|abs|acos|ada_afetch|ada_autocommit|ada_close|ada_closeall|ada_commit|ada_connect|ada_exec|ada_fetchrow|ada_fieldlen|ada_fieldname|ada_fieldnum|ada_fieldtype|ada_freeresult|ada_numfields|ada_numrows|ada_result|ada_resultall|ada_rollback|addslashes|apache_lookup_uri|apache_note |array|array_keys|array_merge|array_pop|array_push|array_reverse|array_shift|array_slice|array_splice|array_unshift|array_values|array_walk|arsort|asin|asort|aspell_check|aspell_check-raw|aspell_new|aspell_suggest|atan|atan2|base64_decode|base64_encode|base_convert|basename|bcadd|bccomp|bcdiv|bcmod|bcmul|bcpow|bcscale|bcsqrt|bcsub|bin2hex|bindec|ceil|chdir|checkdate|checkdnsrr|chgrp|chmod|chop|chown|chr|chunk_split|clearstatcache|closedir|closelog|compact|connection_aborted|connection_status|connection_timeout|convert_cyr_string|copy|cos|count|cpdf_add_annotation|cpdf_add_outline|cpdf_arc|cpdf_begin_text|cpdf_circle|cpdf_clip|cpdf_close|cpdf_closepath|cpdf_closepath_fill_stroke|cpdf_closepath_stroke|cpdf_continue_text|cpdf_curveto|cpdf_end_text|cpdf_fill|cpdf_fill_stroke|cpdf_finalize|cpdf_finalize_page|cpdf_import_jpeg|cpdf_lineto|cpdf_moveto|cpdf_open|cpdf_output_buffer|cpdf_page_init|cpdf_place_inline_image|cpdf_rect|cpdf_restore|cpdf_rlineto|cpdf_rmoveto|cpdf_rotate|cpdf_save|cpdf_save_to_file|cpdf_scale|cpdf_set_char_spacing|cpdf_set_creator|cpdf_set_current_page|cpdf_set_font|cpdf_set_horiz_scaling|cpdf_set_keywords|cpdf_set_leading|cpdf_set_page_animation|cpdf_set_subject|cpdf_set_text_matrix|cpdf_set_text_pos|cpdf_set_text_rendering|cpdf_set_text_rise|cpdf_set_title|cpdf_set_word_spacing|cpdf_setdash|cpdf_setflat|cpdf_setgray|cpdf_setgray_fill|cpdf_setgray_stroke|cpdf_setlinecap|cpdf_setlinejoin|cpdf_setlinewidth|cpdf_setmiterlimit|cpdf_setrgbcolor|cpdf_setrgbcolor_fill|cpdf_setrgbcolor_stroke|cpdf_show|cpdf_show_xy|cpdf_stringwidth|cpdf_stroke|cpdf_text|cpdf_translate|crypt|curl_errno|curl_error|current|date|dba_close|dba_delete|dba_exists|dba_fetch|dba_firstkey|dba_insert|dba_nextkey|dba_open|dba_optimize|dba_popen|dba_replace|dba_sync|dbase_add_record|dbase_close|dbase_create|dbase_delete_record|dbase_get_record|dbase_get_record_with_names|dbase_numfields|dbase_numrecords|dbase_open|dbase_pack|dbase_replace_record|dblist|dbmclose|dbmdelete|dbmexists|dbmfetch|dbmfirstkey|dbminsert|dbmnextkey|dbmopen|dbmreplace|debugger_off|debugger_on|decbin|dechex|decoct|delete|die|dir|dirname |diskfreespace|dl|doubleval|each|easter_date|easter_days|echo|empty|end|ereg|ereg_replace|eregi|eregi_replace|error_log|error_reporting|escapeshellarg|escapeshellcmd|eval|exec|exit|exp|explode|extension_loaded|extract|fclose|fclose|fdf_close|fdf_create|fdf_get_file|fdf_get_status|fdf_get_value|fdf_next_field_name|fdf_open|fdf_save|fdf_set_ap|fdf_set_file|fdf_set_status|fdf_set_value|feof|fgetc|fgetcsv|fgets|fgetss|file|file_exists|fileatime|filectime|filegroup|fileinode|filemtime|fileowner|fileperms|filepro|filepro_fieldcount|filepro_fieldname|filepro_fieldtype|filepro_fieldwidth|filepro_retrieve|filepro_rowcount|filesize|filetype|flock|floor|flush|fopen|fpassthru|fputs|fread|frenchtojd|fseek|fsockopen|ftell|function_exists|fwrite|get_browser|get_cfg_var|get_current_user|get_magic_quotes_gpc|get_magic_quotes_runtime|get_meta_tags|getallheaders|getdate|getenv|gethostbyaddr|gethostbyname|gethostbynamel|getimagesize|getlastmod|getmxrr|getmyinode|getmypid|getmyuid|getrandmax|getrusage|gettimeofday|gettype|gmdate|gmdate|gmmktime|gmstrftime|gregoriantojd|gzclose|gzeof|gzfile|gzgetc|gzgets|gzgetss|gzopen|gzpassthru|gzputs|gzread|gzrewind|gzseek|gztell|gzwrite|header|hexdec|htmlentities|htmlspecialchars|hw_children|hw_childrenobj|hw_close|hw_connect|hw_cp|hw_deleteobject|hw_docbyanchor|hw_docbyanchorobj|hw_documentattributes|hw_documentbodytag|hw_documentcontent|hw_documentsetcontent|hw_documentsize|hw_edittext|hw_error|hw_errormsg|hw_free_document|hw_getanchors|hw_getanchorsobj|hw_getandlock|hw_getchildcoll|hw_getchildcollobj|hw_getchilddoccoll|hw_getchilddoccollobj|hw_getobject|hw_getobjectbyquery|hw_getobjectbyquerycoll|hw_getobjectbyquerycollobj|hw_getobjectbyqueryobj|hw_getparents|hw_getparentsobj|hw_getremote|hw_getremotechildren|hw_getsrcbydestobj|hw_gettext|hw_identify|hw_incollections|hw_info|hw_inscoll|hw_insdoc|hw_insertdocument|hw_insertobject|hw_modifyobject|hw_mv|hw_new_document|hw_objrec2array|hw_outputdocument|hw_pconnect|hw_pipedocument|hw_root|hw_unlock|hw_username|hw_who|ibase_bind|ibase_close|ibase_connect|ibase_execute|ibase_fetch_row|ibase_free_query|ibase_free_result|ibase_pconnect|ibase_prepare|ibase_query|ibase_timefmt|icap_close|icap_delete_event|icap_fetch_event|icap_list_alarms|icap_list_events|icap_open|icap_snooze|icap_store_event|ifx_affected_rows|ifx_blobinfile_mode|ifx_byteasvarchar|ifx_close|ifx_connect|ifx_copy_blob|ifx_create_blob|ifx_create_char|ifx_do|ifx_error|ifx_errormsg|ifx_fetch_row|ifx_fieldproperties|ifx_fieldtypes|ifx_free_blob|ifx_free_char|ifx_free_result|ifx_free_slob|ifx_get_blob|ifx_get_char|ifx_getsqlca|ifx_htmltbl_result|ifx_nullformat|ifx_num_fields|ifx_num_rows|ifx_pconnect|ifx_prepare|ifx_query|ifx_textasvarchar|ifx_update_blob|ifx_update_char|ifxus_close_slob|ifxus_create_slob|ifxus_open_slob|ifxus_read_slob|ifxus_seek_slob|ifxus_tell_slob|ifxus_write_slob|ignore_user_abort|imagearc|imagechar|imagecharup|imagecolorallocate|imagecolorat|imagecolorclosest|imagecolorexact|imagecolorresolve|imagecolorset|imagecolorsforindex|imagecolorstotal|imagecolortransparent|imagecopyresized|imagecreate|imagecreatefromgif|imagedashedline|imagedestroy|imagefill|imagefilledpolygon|imagefilledrectangle|imagefilltoborder|imagefontheight|imagefontwidth|imagegif|imageinterlace|imageline|imageloadfont|imagepolygon|imagepsbbox|imagepsencodefont|imagepsfreefont|imagepsloadfont|imagepstext|imagerectangle|imagesetpixel|imagestring|imagestringup|imagesx|imagesy|imagettfbbox|imagettftext|imagetypes|imap_8bit|imap_alerts|imap_append|imap_base64|imap_binary|imap_body|imap_check|imap_clearflag_full|imap_close|imap_createmailbox|imap_delete|imap_deletemailbox|imap_errors|imap_expunge|imap_fetchbody|imap_fetchheader|imap_fetchstructure|imap_getmailboxes|imap_getsubscribed|imap_header|imap_headers|imap_last_error|imap_listmailbox|imap_listsubscribed|imap_mail_copy|imap_mail_move|imap_mailboxmsginfo|imap_msgno|imap_num_msg|imap_num_recent|imap_open|imap_ping|imap_qprint|imap_renamemailbox|imap_reopen|imap_rfc822_parse_adrlist|imap_rfc822_write_address|imap_scanmailbox|imap_search|imap_setflag_full|imap_sort|imap_status|imap_subscribe|imap_uid|imap_undelete|imap_unsubscribe|implode|in_array|include|intval|iptcparse|is_array|is_dir|is_double|is_executable|is_file|is_float|is_int|is_integer|is_link|is_long|is_object|is_readable|is_real|is_string|is_uploaded_file|is_writeable|isset|jddayofweek|jdmonthname|jdtofrench|jdtogregorian|jdtojewish|jdtojulian|jewishtojd|juliantojd|key|ksort|ldap_add|ldap_bind|ldap_close|ldap_compare|ldap_connect|ldap_count_entries|ldap_delete|ldap_dn2ufn|ldap_explode_dn|ldap_first_attribute|ldap_first_entry|ldap_free_entry|ldap_free_result|ldap_get_attributes|ldap_get_dn|ldap_get_entries|ldap_get_values|ldap_list|ldap_mod_add|ldap_mod_del|ldap_mod_replace|ldap_modify|ldap_next_attribute|ldap_next_entry|ldap_read|ldap_search|ldap_unbind|leak|link|linkinfo|list|log|log10|lstat|ltrim|mail|max|mcrypt_cbc|mcrypt_cfb|mcrypt_create_iv|mcrypt_ecb|mcrypt_get_block_size|mcrypt_get_cipher_name|mcrypt_get_key_size|mcrypt_ofb|md5|mhash|mhash_count|mhash_get_block_size|mhash_get_hash_name|microtime|min|mkdir|mktime|mktime|move_uploaded_file|msql|msql_affected_rows|msql_close|msql_connect|msql_create_db|msql_createdb|msql_data_seek|msql_dbname|msql_drop_db|msql_dropdb|msql_error|msql_fetch_array|msql_fetch_field|msql_fetch_object|msql_fetch_row|msql_field_seek|msql_fieldflags|msql_fieldlen|msql_fieldname|msql_fieldtable|msql_fieldtype|msql_free_result|msql_freeresult|msql_list_dbs|msql_list_fields|msql_list_tables|msql_listdbs|msql_listfields|msql_listtables|msql_num_fields|msql_num_rows|msql_numfields|msql_numrows|msql_pconnect|msql_query|msql_regcase|msql_result|msql_select_db|msql_selectdb|msql_tablename|mssql_close|mssql_connect|mssql_data_seek|mssql_fetch_array|mssql_fetch_field|mssql_fetch_object|mssql_fetch_row|mssql_field_seek|mssql_free_result|mssql_num_fields|mssql_num_rows|mssql_pconnect|mssql_query|mssql_result|mssql_select_db|mt_getrandmax|mt_rand|mt_srand|mysql_affected_rows|mysql_close|mysql_connect|mysql_create_db|mysql_createdb|mysql_data_seek|mysql_db_query|mysql_dbname|mysql_drop_db|mysql_dropdb|mysql_errno|mysql_error|mysql_escape_string|mysql_fetch_array|mysql_fetch_field|mysql_fetch_lengths|mysql_fetch_object|mysql_fetch_row|mysql_field_flags|mysql_field_len|mysql_field_name|mysql_field_seek|mysql_field_table|mysql_field_type|mysql_fieldflags|mysql_fieldlen|mysql_fieldname|mysql_fieldtable|mysql_fieldtype|mysql_free_result|mysql_freeresult|mysql_insert_id|mysql_list_dbs|mysql_list_fields|mysql_list_tables|mysql_listdbs|mysql_listfields|mysql_listtables|mysql_num_fields|mysql_num_rows|mysql_numfields|mysql_numrows|mysql_pconnect|mysql_query|mysql_result|mysql_select_db|mysql_selectdb|mysql_tablename|next|nl2br|number_format|ob_get_length function|ocibindbyname|ocicolumnisnull|ocicolumnname|ocicolumnsize|ocicolumntype|ocicommit|ocidefinebyname|ocierror|ociexecute|ocifetch|ocifetchinto|ocifetchstatement|ocifreecursor|ocifreestatement|ociinternaldebug|ocilogoff|ocilogon|ocinewcursor|ocinewdescriptor|ocinlogon|ocinumcols|ociparse|ociplogon|ociresult|ocirollback|ocirowcount|ociserverversion|ocistatementtype|octdec|odbc_autocommit|odbc_binmode|odbc_close|odbc_close_all|odbc_commit|odbc_connect|odbc_cursor|odbc_do|odbc_exec|odbc_execute|odbc_fetch_into|odbc_fetch_row|odbc_field_len|odbc_field_name|odbc_field_type|odbc_free_result|odbc_longreadlen|odbc_num_fields|odbc_num_rows|odbc_pconnect|odbc_prepare|odbc_result|odbc_result_all|odbc_rollback|odbc_setoption|opendir|openlog|ora_bind|ora_close|ora_columnname|ora_columntype|ora_commit|ora_commitoff|ora_commiton|ora_error|ora_errorcode|ora_exec|ora_fetch|ora_getcolumn|ora_logoff|ora_logon|ora_open|ora_parse|ora_rollback|ord|pack|parse_str|parse_url|passthru|pathinfo|pclose|pdf_add_annotation|pdf_add_outline|pdf_arc|pdf_begin_page|pdf_circle|pdf_clip|pdf_close|pdf_close_image|pdf_closepath|pdf_closepath_fill_stroke|pdf_closepath_stroke|pdf_continue_text|pdf_curveto|pdf_end_page|pdf_endpath|pdf_execute_image|pdf_fill|pdf_fill_stroke|pdf_get_info|pdf_lineto|pdf_moveto|pdf_open|pdf_open_gif|pdf_open_jpeg|pdf_open_memory_image|pdf_place_image|pdf_put_image|pdf_rect|pdf_restore|pdf_rotate|pdf_save|pdf_scale|pdf_set_char_spacing|pdf_set_duration|pdf_set_font|pdf_set_horiz_scaling|pdf_set_info_author|pdf_set_info_creator|pdf_set_info_keywords|pdf_set_info_subject|pdf_set_info_title|pdf_set_leading|pdf_set_text_matrix|pdf_set_text_pos|pdf_set_text_rendering|pdf_set_text_rise|pdf_set_transition|pdf_set_word_spacing|pdf_setdash|pdf_setflat|pdf_setgray|pdf_setgray_fill|pdf_setgray_stroke|pdf_setlinecap|pdf_setlinejoin|pdf_setlinewidth|pdf_setmiterlimit|pdf_setrgbcolor|pdf_setrgbcolor_fill|pdf_setrgbcolor_stroke|pdf_show|pdf_show_xy|pdf_stringwidth|pdf_stroke|pdf_translate|pfsockopen|pg_close|pg_cmdtuples|pg_connect|pg_dbname|pg_end_copy|pg_errormessage|pg_exec|pg_fetch_array|pg_fetch_object|pg_fetch_row|pg_fieldisnull|pg_fieldname|pg_fieldnum|pg_fieldprtlen|pg_fieldsize|pg_fieldtype|pg_freeresult|pg_getlastoid|pg_host|pg_loclose|pg_locreate|pg_loopen|pg_loread|pg_loreadall|pg_lounlink|pg_lowrite|pg_numfields|pg_numrows|pg_options|pg_pconnect|pg_port|pg_put_line|pg_result|pg_tty|php_uname|phpinfo|phpversion|pi|popen|pos|pow|preg_grep|preg_match|preg_match_all|preg_quote|preg_replace|preg_split|prev|print|printf|putenv|quoted_printable_decode|quotemeta|rand|range|rawurldecode|rawurlencode|readdir|readfile|readgzfile|readlink|register_shutdown_function|rename|reset|rewind|rewinddir|rmdir|round|rsort|sem_acquire|sem_get|sem_release|serialize|session_cache_limiter|session_decode|session_destroy|session_encode|session_id|session_is_registered|session_module_name|session_name|session_register|session_save_path|session_start|session_unregister|set_file_buffer|set_magic_quotes_runtime|set_socket_blocking|set_time_limit|setcookie|setlocale|settype|shm_attach|shm_detach|shm_get_var|shm_put_var|shm_remove|shm_remove_var|short_tags|shuffle|similar_text|sin|sizeof|sleep|sleep						|snmp_get_quick_print|snmp_set_quick_print|snmpget|snmpset|snmpwalk|snmpwalkoid|solid_close|solid_connect|solid_exec|solid_fetchrow|solid_fieldname|solid_fieldnum|solid_freeresult|solid_numfields|solid_numrows|solid_result|sort|soundex|split|sprintf|sql_regcase|sqlconnect|sqldisconnect|sqlexecdirect|sqlfetch|sqlfree|sqlgetdata|sqlrowcount|sqrt|srand|stat|str_replace|strchr|strcmp|strcspn|strftime|strip_tags|stripslashes|strlen|strpos|strrchr|strrev|strrpos|strspn|strstr|strtok|strtolower|strtoupper|strtr|strval|substr|sybase_affected_rows|sybase_close|sybase_unbuffered_query|sybase_connect|sybase_data_seek|sybase_fetch_array|sybase_fetch_field|sybase_fetch_object|sybase_fetch_row|sybase_field_seek|sybase_free_result|sybase_get_last_message|sybase_num_fields|sybase_num_rows|sybase_pconnect|sybase_query|sybase_result|sybase_select_db|sybsql_checkconnect|sybsql_connect|sybsql_dbuse|sybsql_exit|sybsql_fieldname|sybsql_getfield|sybsql_isrow|sybsql_nextrow|sybsql_numfields|sybsql_numrows|sybsql_query|sybsql_result|sybsql_result_all|sybsql_seek|symlink|syslog|system|tan|tempnam|time|touch|trim|uasort|ucfirst|ucwords|uksort|umask|uniqid|unlink|unpack|unserialize|unset|urldecode|urlencode|usleep|usleep				|usort|utf8_decode|utf8_encode|virtual|vm_addalias|vm_adduser|vm_delalias|vm_deluser|vm_passwd|wddx_add_vars|wddx_deserialize|wddx_packet_end|wddx_packet_start|wddx_serialize_value|wddx_serialize_vars|wordwrap|xml_error_string|xml_get_current_byte_index|xml_get_current_column_number|xml_get_current_line_number|xml_get_error_code|xml_parse|xml_parser_create|xml_parser_free|xml_parser_get_option|xml_parser_set_option|xml_set_character_data_handler|xml_set_default_handler|xml_set_element_handler|xml_set_external_entity_ref_handler|xml_set_notation_decl_handler|xml_set_processing_instruction_handler|xml_set_unparsed_entity_decl_handler|yp_err_string|yp_errno|yp_first|yp_get_default_domain|yp_master|yp_match|yp_next|yp_order|rtrim)>":::Subroutine::D\n\
+		variables:"[$](\\{[^}]*}|[^\\w /\\t\\n\\.,\\\\[\\\\{\\\\(]|\\d+|[\\l_]\\w*)?":::Identifier1::\n\
+		variables in strings:"[$](\\{[^}]*}|[^\\w /\\t\\n\\.,\\\\[\\\\{\\\\(]|\\d+|[\\l_]\\w*)?":::Identifier1:double quote strings:\n\
+		braces and parens:"[\\[\\]{}\\(\\)]":::Keyword::\n\
+	}\n\
+	MAG:1:0{\n\
+		Timestamp:"^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{6} ":::Comment::\n\
+		TraceDebugLevel:"<TRACE|DEBUG>":::Text Arg::\n\
+		InfoLevel:"<INFO>":::Text Arg1::\n\
+		WarnErrorFatalLevel:"<WARN|ERROR|FATAL>":::Ada Attributes::\n\
+		Module:"\\[[a-zA-z.]*\\]":::Preprocessor::\n\
+		ThreadId:"\\[[0-9]*\\]":::Subroutine::\n\
+		Filename:"\\(.*:[0-9]+\\)":::Text Key::\n\
+	}
+nedit.languageModes: 	C:::None:None:::".,/\\`'!|@#%^&*()-=+{}[]"":;<>?~":\n\
+	C++:.cpp .cc .hh .C .H .i .h .c .hpp .cxx:"(C\\+\\+)":::::".,/\\`'!|@#%^&*()-=+{}[]"":;<>?~":\n\
+	Java:.java:::::::\n\
+	JavaScript:.js:::::::\n\
+	Ada:.ada .ad .ads .adb .a:::::::\n\
+	Fortran:.f .f77 .for:::::::\n\
+	Pascal:.pas .p .int:::::::\n\
+	Yacc:.y::::::".,/\\`'!|@#%^&*()-=+{}[]"":;<>?~":\n\
+	Perl:.pl .pm .p5 .PL:"^[ \\t]*#[ \\t]*!.*perl":Auto:None:::".,/\\\\`'!$@#%^&*()-=+{}[]"":;<>?~|":\n\
+	Python:.py:"^#!.*python":Auto:None:::"!""#$%&'()*+,-./:;<=>?@[\\\\]^`{|}~":\n\
+	Tcl:.tcl .tk .itcl .itk::Smart:None::::\n\
+	Awk:.awk:::::::\n\
+	Sh Ksh Bash:.sh .bash .ksh .profile .bashrc .bash_logout .bash_login .bash_profile:"^[ \\t]*#[ \\t]*![ \\t]*/.*bin/(sh|ksh|bash)"::::::\n\
+	Csh:.csh .cshrc .tcshrc .login .logout:"^[ \\t]*#[ \\t]*![ \\t]*/bin/t?csh"::::::\n\
+	Makefile:Makefile makefile:::::::\n\
+	LaTeX:.tex .sty .cls .dtx .ins:::::::\n\
+	PostScript:.ps .PS .eps .EPS .epsf .epsi:::::::\n\
+	Lex:.lex:::::::\n\
+	SQL:.sql:::::::\n\
+	Matlab:..m .oct .sci:::::::\n\
+	VHDL:.vhd .vhdl .vdl:::::::\n\
+	Verilog:.v:::::::\n\
+	X Resources:.Xresources .Xdefaults .nedit nedit.rc:"^[!#].*([Aa]pp|[Xx]).*[Dd]efaults"::::::\n\
+	NEdit Macro:.nm .neditmacro:::::::\n\
+	SQR:.sqr:::::::\n\
+	CSS:css::Auto:None:::".,/\\`'!|@#%^&*()=+{}[]"":;<>?~":\n\
+	Regex:.reg .regex:"\\(\\?[:#=!iInN].+\\)":None:Continuous::::\n\
+	SGML HTML:.sgml .sgm .html .htm:::::::\n\
+	XML XSL:.xml .xsl .dtd .xslt:::None:::"<>/=""'()+*?|":\n\
+	Doxygen:dox:::::::\n\
+	PHP:.php .php3 .php4 .phps .phtml:::::::"/Home/ut0tyb/.nedit/php.tips"\n\
+	MAG:::None:None::::
+nedit.styles: 	Plain:AntiqueWhite:Plain\n\
+	Comment:CadetBlue2:Italic\n\
+	Keyword:yellow:Bold\n\
+	Operator:dark blue:Bold\n\
+	Bracket:dark blue:Bold\n\
+	Storage Type:AntiqueWhite2:Bold\n\
+	Storage Type1:saddle brown:Bold\n\
+	String:Light Gray:Bold\n\
+	String1:white:Plain\n\
+	String2:white:Bold\n\
+	Preprocessor:green:Plain\n\
+	Preprocessor1:blue:Plain\n\
+	Character Const:AntiqueWhite:Plain\n\
+	Numeric Const:green:Plain\n\
+	Identifier:brown:Plain\n\
+	Identifier1:green:Plain\n\
+	Identifier2:SteelBlue:Plain\n\
+	Subroutine:gray60:Plain\n\
+	Subroutine1:chocolate2:Bold\n\
+	Ada Attributes:red:Bold\n\
+	Label:white:Plain\n\
+	Flag:red:Bold\n\
+	Text Comment:CadetBlue2:Italic\n\
+	Text Key:CadetBlue:Bold\n\
+	Text Key1:VioletRed:Plain\n\
+	Text Arg:blue:Bold\n\
+	Text Arg1:SteelBlue:Bold\n\
+	Text Arg2:lightBlue:Plain\n\
+	Text Escape:gray30:Bold\n\
+	LaTeX Math:green:Plain\n\
+	Ilog Type:Pink2:Plain\n\
+	Pointer:#660000:Bold\n\
+	Regex:#009944:Bold\n\
+	Warning:brown2:Italic
+nedit.smartIndentInit: 	C:Default\n\
+	C++:Default\n\
+	Python:Default\n\
+	Matlab:Default
+nedit.smartIndentInitCommon: Default
+nedit.autoWrap: None
+nedit.wrapMargin: 0
+nedit.autoIndent: Auto
+nedit.autoSave: False
+nedit.openInTab: True
+nedit.saveOldVersion: False
+nedit.showMatching: Delimiter
+nedit.matchSyntaxBased: True
+nedit.highlightSyntax: True
+nedit.backlightChars: False
+nedit.searchDialogs: False
+nedit.beepOnSearchWrap: False
+nedit.retainSearchDialogs: False
+nedit.searchWraps: True
+nedit.stickyCaseSenseButton: True
+nedit.repositionDialogs: True
+nedit.autoScroll: False
+nedit.appendLF: True
+nedit.sortOpenPrevMenu: True
+nedit.statisticsLine: True
+nedit.iSearchLine: False
+nedit.sortTabs: False
+nedit.tabBar: True
+nedit.tabBarHideOne: True
+nedit.toolTips: True
+nedit.globalTabNavigate: False
+nedit.lineNumbers: True
+nedit.pathInWindowsMenu: True
+nedit.warnFileMods: True
+nedit.warnRealFileMods: True
+nedit.warnExit: True
+nedit.searchMethod: Literal
+nedit.textRows: 50
+nedit.textCols: 80
+nedit.tabDistance: 2
+nedit.emulateTabs: 2
+nedit.insertTabs: False
+nedit.textFont: -adobe-courier-medium-r-normal--14-140-75-75-m-90-iso8859-1
+nedit.boldHighlightFont: -adobe-courier-bold-r-normal--14-140-75-75-m-90-iso8859-1
+nedit.italicHighlightFont: -adobe-courier-medium-o-normal--14-140-75-75-m-90-iso8859-1
+nedit.boldItalicHighlightFont: -adobe-courier-bold-o-normal--14-140-75-75-m-90-iso8859-1
+nedit.textFgColor: AntiqueWhite
+nedit.textBgColor: DodgerBlue4
+nedit.selectFgColor: black
+nedit.selectBgColor: DodgerBlue3
+nedit.hiliteFgColor: white
+nedit.hiliteBgColor: red
+nedit.lineNoFgColor: AntiqueWhite
+nedit.cursorFgColor: AntiqueWhite
+nedit.shell: /bin/bash
+nedit.smartTags: True
+nedit.prefFileRead: True
+nedit.titleFormat: %f - %d{%c}(%S)  [%s]

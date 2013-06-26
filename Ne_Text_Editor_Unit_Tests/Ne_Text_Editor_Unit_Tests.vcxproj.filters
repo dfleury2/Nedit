@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="test_Ne_Range_Set.cpp" />
+    <ClCompile Include="..\Ne_Text_Editor\Ne_Range_Set.cpp">
+      <Filter>External Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Ne_Text_Editor\Ne_Text_Buffer.cpp">
+      <Filter>External Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="test_Ne_Text_Buffer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="External Sources">
+      <UniqueIdentifier>{dc76c9d4-6a31-49b7-98bc-9638c90101d0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

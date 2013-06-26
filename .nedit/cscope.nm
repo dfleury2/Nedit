@@ -1,0 +1,431 @@
+##########################################################################
+#
+# file: cscope.nm
+#
+# cscope macros: Some macros to facillitate cscope usage.
+#
+# Version 1.0.0: merged original YT macros with ROb's macros.
+#
+# Version 1.0.1
+#   Included these suggestions from YT:
+#     1) if there is only one item in the list, do not show the result list
+#        again after the user makes his choice (suggestion by Damien Faure)
+#     2) I also made the search results permanent by storing them in a file
+#       (you can recall them in the next session)
+#
+# Based on work by ytlim1 AT gmail.com, robertlbyrne AT goolgemail.com.
+#
+# This is free software; you may modify and redistribute it under
+# the terms of the GNU General Public License, Version 2.
+# (http://www.gnu.org/licenses/gpl.html)
+#
+# All the essential operations are provided:
+# create, delete, search, rebuild, use an existing index file,
+# view last results.
+#
+# By default only indexes .c and .h files--see the $find_pattern global
+# variable.
+#
+#########################
+# How to use these macros
+#########################
+#
+# Step 1:Include the following initialization code
+# in your autoload.nm
+#
+# Initialization for cscope.nm
+# This is required for the results to be recalled quickly
+# $cscope_results = ""
+# $find_pattern="\"*.[ch]\""
+# $nedit_home = getenv("HOME") "/.nedit"
+# $cscope_saved_index_name = "" $nedit_home "/cscope_saved_index_name"
+# $cscope_dir = read_file($cscope_saved_index_name)
+# load_macro_file($nedit_home "/cscope.nm")
+#
+# Step 2: Copy paste this macro code into a file called
+# cscope.nm in $HOME/.nedit
+#
+# Step 3: Add these menu itmes using:
+# Preferences>Default Preferences>Customize Menus>Macros.
+#
+# cscope>search index                   --> cscope_search_index()
+# cscope>view last results              --> cscope_view_last_results()
+# cscope>create index                   --> cscope_create_index()
+# cscope>delete index                   --> cscope_delete_index()
+# cscope>set current cscope directory   --> cscope_set_current_directory()
+# cscope>rebuild                        --> cscope_rebuild_index()
+#
+# Step 4: choose Macros>cscope>create index to build an index
+# for  a source tree.  You can then choose Macros>cscope>search index
+# to find functions, files, text and symbols etc.
+#
+##############
+# How it works
+##############
+#
+# The current cscope index directory containing the cscope files
+# is stored on exit and reused on
+# restart. This is stored in the file: cscope_saved_index_name in $nedit_home.
+#
+# When you create an index, you specify a directory where your source
+# code is located.  The cscope files are placed in a subdirectory
+# called "cscope" and used thereafter by the cscope macro operations.
+#
+# As a general principle the public macros provided here never
+# delete any directory without asking for confimation.  Deleting
+# directory is required for the deletion and rebuilding of the index.
+# So in this sense these macros are safe (they won't accidentally delete
+# your source tree!).
+#
+# Dependencies:
+# 1. nedit minimum version.  Not sure but it works with 5.4 and 5.5.
+# 2. utilities from the path: find, cscope, test, rm, mkdir, grep.
+#
+######
+# Todo
+######
+#
+# 0) Offer a menu to configure the find pattern (for cpp, ksh, perl
+# Makefiles etc)
+#
+# 1) One thing might be to customize the find command that makes the list
+# based on the platform--the unixes seem to have different forms of
+# find--could argue that leaving it generic is better though.
+#
+# 2) Offering default selections: might be an nedit limitation but it would
+# be nice to paste in a default selection in a stringdialog, you know
+# where you ask for a directory.  Didn't really see how to do that with
+# the nedit macro language.  Might post a question there.
+#
+# 3) When the guys selects a file to open, could we keep that selection
+# hightlighted in the list dialog--right now seems to skip back to the
+# start of the list.  Effect is you can't scroll down the list
+# hitting return to open the files you want.  Again, maybe an nedit
+# macro limitation.
+#
+# 4) Maybe a kind of mark and pop type thing (emacs has this type of thing).
+#  Allows you to select a string, open a bunch of files and then lets
+# you jump back directly to the original point.
+#
+##########################################################################
+#
+# Public macros (callable from menu items)
+#
+##########################################################################
+#
+# create a cscope index
+#
+# Asks for the source directory and uses $find_pattern to recursively index
+# all matching files in source directory.  A subdirectory 'cscope' is made
+# to store the cscope index, stored in the global $cscope_dir and used
+# thereafter for operations (until $cscope_dir is reset).
+#
+define cscope_create_index {
+
+  # first build the files list
+  # Search type
+  source_dir = string_dialog("Enter a root source directory on which to run" \
+  " cscope. (default is current directory).\n" \
+  "All files matching" $find_pattern "will be indexed recursively.\n" \
+  "The results will be stored in the cscope subdirectory of the source" \
+  " directory", "OK", "Cancel")
+
+  # Cancelled
+  # Button that has been pressed
+  button = $string_dialog_button
+  if ((button == 2) || (button == 0))
+    return
+
+  if (source_dir == "")
+    source_dir = $file_path
+
+  $cscope_dir = source_dir "/cscope"
+  cscope_internal_build_index()
+
+}
+
+##########################################################################
+#
+# Delete the cscope index directory in $cscope_dir.
+#
+# Requests confirmation before deleting the directory.
+#
+define cscope_delete_index {
+  if ($cscope_dir == ""){
+    rc = dialog("The cscope index directory is not defined.  Use 'cscope>create index' to create an index", "OK", "Cancel")
+     return
+  }
+
+  rc = dialog("Delete cscope index directory '" $cscope_dir "' ?", "OK", "Cancel")
+  if ( (rc == 2) || (rc == 0))
+    return
+
+  cscope_internal_delete_dir()
+
+  $cscope_dir = ""
+  shell_cmd_str = "rm  " $cscope_saved_index_name
+  rc = shell_command( shell_cmd_str, "")
+
+}
+
+##########################################################################
+#
+# Rebuilds the cscope index in $cscope_dir from scratch.
+#
+# Requests confirmation before deleting the old one.
+#
+#
+define cscope_rebuild_index{
+
+  if ($cscope_dir == "")
+  {
+     dialog("No cscope directory currently set -- " \
+     "use cscope>create index to build an index", "OK")
+     return
+  }
+
+  # sanity check the directory to index
+  shell_cmd_str = "test -d " $cscope_dir ""
+  shell_command( shell_cmd_str, "")
+
+  if ($shell_cmd_status != 0)
+  {
+     dialog($cscope_dir " does not exist -- " \
+     "use cscope>create index to build an index", "OK")
+     return
+  }
+
+  rc = dialog("Detete current cscope index directory '" $cscope_dir "'" \
+              " and rebuild it ?", "OK", "Cancel")
+  if ( rc == 2 || rc == 0)
+    return
+  cscope_internal_delete_and_build()
+
+}
+
+##########################################################################
+#
+# Set the current cscope index directory to use
+#
+# Does not delete the old directory.
+#
+# Only accepts the directory if it contains a cscope.out
+# file.
+#
+define cscope_set_current_cscope_dir {
+
+  if ($cscope_dir != "")
+    prefix = "Current cscope directory is: " $cscope_dir "\n\n"
+  else
+    prefix = "No cscope directory currently set.\n\n"
+
+  cscope_dir = string_dialog(prefix "\nEnter a directory containing a cscope " \
+  "index (default is current directory)", "OK", "Cancel")
+  # Cancelled
+  # Button that has been pressed
+  button = $string_dialog_button
+  if ((button == 2) || (button == 0))
+    return
+
+  if (cscope_dir == "")
+    cscope_dir = $file_path
+
+  rc = read_file(cscope_dir "/cscope.out")
+  if ( rc == "" )
+  {
+      dialog(" No cscope.out index found in " cscope_dir ".\n" \
+      "Try again or use 'cscope>create index' to create a cscope " \
+      "index directory", "OK")
+      return
+  }
+
+  $cscope_dir = cscope_dir
+  write_file(cscope_dir, $cscope_saved_index_name )
+}
+
+##########################################################################
+#
+# Search the cscope index in $cscope_dir
+#
+# If $cscope_dir is not set then display an error message.
+#
+# If Selection exists, use Selection as query string
+# Otherwise ask user for the query string
+#
+define cscope_search_index {
+
+    #
+    if ($cscope_dir == "" )
+    {
+        dialog("No cscope directory currently set--create or set a cscope" \
+        " directory first")
+        return
+    }
+
+    # Get selection or get user input for string to search
+    if ($selection_start == -1)
+    {
+        query_str = string_dialog("Current cscope directory " $cscope_dir "\nEnter search string", "OK", "CANCEL")
+
+        # Button that has been pressed
+        button = $string_dialog_button
+        if ((button == 2) || (button == 0) || (query_str == ""))
+           return
+    }
+    else
+        query_str = get_selection()
+
+    # Search type
+    query_type = string_dialog("Current cscope directory " $cscope_dir "." \
+    "\n\nFind type:\n 0=Symbol\n 1=Definition\n 2=Funcs called by this func\n 3=Funcs calling this func\n 4=Text\n 5=Egrep\n 6=Find file\n 7=Files #inc this file", "OK", "CANCEL")
+
+    # Cancelled
+    if ($string_dialog_button == 2)
+        return
+
+    # Defaults to Symbol if not specified
+    if (query_type == "")
+      query_type = "0"
+
+    # We don't accept 5, so options 5-7 becomes 6-8
+    if ((query_type > 4) && (query_type < 8))
+        query_type = query_type + 1
+    else if ((query_type < 0) || (query_type > 7))
+    {
+        dialog("Find type error: must be between 0-7")
+        return
+    }
+
+    # cscope command line argument options
+    # eg. cscope -d -f cscope.out -L -1 log4c_init
+    argv = "-d -f " $cscope_dir "/cscope.out -L -"query_type" " query_str " "
+
+    # Main task: search through cscope
+    $cscope_results = shell_command( "cscope " argv "", "" )
+
+    if ( search_string($cscope_results, "No match", 0) != -1)
+    {
+       dialog(" No match ", "OK")
+       $cscope_results = ""
+       return
+    }
+
+    if ( $cscope_results != ""){
+        write_file($cscope_results, $cscope_saved_last_results_name)
+        cscope_view_last_results()
+    } else{
+        dialog(" ["query_str"] not found! ", "OK")
+    }
+}
+
+##########################################################################
+#
+# Show results in a listbox so that user can choose files to load,
+# one at a time
+#
+define cscope_view_last_results {
+    if ($cscope_results == "")
+    {
+        dialog(" No existing cscope query results! ", "OK")
+        return
+    }
+
+  #dialog("" $cscope_results, "OK")
+
+    while(1)
+    {
+       # Show the listbox
+       line = list_dialog("Open a file: " , $cscope_results, "OK", "CANCEL")
+       button = $list_dialog_button
+
+       # CANCEL button was clicked or no file has been chosen
+       if ((button == 2) || (line == ""))
+           return
+
+       # Split the chosen line
+       fields = split(line, " ")
+       # First field is the filename
+       filename = fields[0]
+       # Third field is the line number
+       lineno = fields[2]
+
+       # Load the file and set focus to it
+       open(filename)
+       focus_window(filename)
+       # Jump to the line number
+       goto_line_number(lineno)
+
+       # Thanks to Damien Faure for the suggestion
+       if (search_string($cscope_results, "\n", 0) == length($cscope_results) - 1)
+        return
+    }
+
+
+}
+
+##########################################################################
+#
+# Internal cscope macros--not invoked directly from the cscope menu
+#
+# WARNING!!!!!
+#   some of these macros delete the $cscope_dir directory without asking for
+#   confirmation so if you use them be sure to prefix the call with an
+#   appropriate dialog asking for confirmation.  See the usage above
+#   for example.
+# WARNING!!!!!
+#
+define cscope_internal_delete_dir {
+
+ if ( $cscope_dir != "" )
+  {
+    shell_cmd_str = "rm -rf " $cscope_dir ""
+    rc = shell_command( shell_cmd_str, "")
+
+  }
+}
+
+define cscope_internal_delete_and_build {
+
+  # delete the old indes directory
+  cscope_internal_delete_dir()
+
+  # build the new index
+  shell_cmd_str = "mkdir -p " $cscope_dir ""
+  shell_command( shell_cmd_str, "")
+
+  shell_cmd_str = "find " $cscope_dir "/.. -name " $find_pattern " | grep -v SCCS > " $cscope_dir "/cscope.files"
+  rc = shell_command( shell_cmd_str, "")
+
+  shell_cmd_str = "cd " $cscope_dir "; cscope -b "
+  rc = shell_command( shell_cmd_str, "")
+
+  write_file($cscope_dir, $cscope_saved_index_name )
+}
+
+#
+# if $cscope_dir exists then remove it and rebuild the index
+
+#
+define cscope_internal_build_index{
+
+  # sanity check the directory to index
+  shell_cmd_str = "test -d " $cscope_dir ""
+  shell_command( shell_cmd_str, "")
+
+  if ($shell_cmd_status == 0)
+  {
+     rc = dialog($cscope_dir " already exists", "Detete it and build new index", "Cancel")
+     if ( rc == 2 || rc == 0)
+     return
+  }
+
+  cscope_internal_delete_and_build()
+
+}
+
+#
+# Internal cscope functions
+##########################################################################
+
+# end cscope
+###############################

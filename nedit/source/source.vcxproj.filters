@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="calltips.cpp" />
+    <ClCompile Include="windowTitle.cpp" />
+    <ClCompile Include="file.cpp" />
+    <ClCompile Include="help.cpp" />
+    <ClCompile Include="highlight.cpp" />
+    <ClCompile Include="highlightData.cpp" />
+    <ClCompile Include="interpret.cpp" />
+    <ClCompile Include="linkdate.cpp" />
+    <ClCompile Include="macro.cpp" />
+    <ClCompile Include="menu.cpp" />
+    <ClCompile Include="nc.cpp" />
+    <ClCompile Include="nedit.cpp" />
+    <ClCompile Include="parse_noyacc.cpp" />
+    <ClCompile Include="preferences.cpp" />
+    <ClCompile Include="rangeset.cpp" />
+    <ClCompile Include="rbTree.cpp" />
+    <ClCompile Include="regexConvert.cpp" />
+    <ClCompile Include="regularExp.cpp" />
+    <ClCompile Include="search.cpp" />
+    <ClCompile Include="selection.cpp" />
+    <ClCompile Include="server.cpp" />
+    <ClCompile Include="server_common.cpp" />
+    <ClCompile Include="shell.cpp" />
+    <ClCompile Include="shift.cpp" />
+    <ClCompile Include="smartIndent.cpp" />
+    <ClCompile Include="tags.cpp" />
+    <ClCompile Include="text.cpp" />
+    <ClCompile Include="textBuf.cpp" />
+    <ClCompile Include="textDisp.cpp" />
+    <ClCompile Include="textDrag.cpp" />
+    <ClCompile Include="textSel.cpp" />
+    <ClCompile Include="undo.cpp" />
+    <ClCompile Include="userCmds.cpp" />
+    <ClCompile Include="window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="calltips.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="file.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="help.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="help_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="help_topic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="highlight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="highlightData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="interpret.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="macro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nedit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="preferences.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rangeset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rbTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="regexConvert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="regularExp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="search.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="server_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shift.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="smartIndent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textBuf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textDisp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textDrag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textSel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="undo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="userCmds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="windowTitle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

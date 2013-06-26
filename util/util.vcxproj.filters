@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Done">
+      <UniqueIdentifier>{44620a38-f691-434a-893d-ecf8670ed085}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Done">
+      <UniqueIdentifier>{3b580bc9-ef04-4e19-97c8-3b0ba31816c1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DialogF.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="getfiles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="managedList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="misc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="motif.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="printUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>Source Files\Done</Filter>
+    </ClCompile>
+    <ClCompile Include="fileUtils.cpp">
+      <Filter>Source Files\Done</Filter>
+    </ClCompile>
+    <ClCompile Include="prefFile.cpp">
+      <Filter>Source Files\Done</Filter>
+    </ClCompile>
+    <ClCompile Include="Ne_Database.cpp">
+      <Filter>Source Files\Done</Filter>
+    </ClCompile>
+    <ClCompile Include="Ne_AppContext.cpp">
+      <Filter>Source Files\Done</Filter>
+    </ClCompile>
+    <ClCompile Include="Ne_MenuBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fontsel.cpp">
+      <Filter>Source Files\Done</Filter>
+    </ClCompile>
+    <ClCompile Include="Ne_Font.cpp">
+      <Filter>Source Files\Done</Filter>
+    </ClCompile>
+    <ClCompile Include="Ne_FontDescription.cpp">
+      <Filter>Source Files\Done</Filter>
+    </ClCompile>
+    <ClCompile Include="Ne_StatsLine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ne_Color.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ne_Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DialogF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="getfiles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="managedList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="misc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="motif.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="printUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files\Done</Filter>
+    </ClInclude>
+    <ClInclude Include="fileUtils.h">
+      <Filter>Header Files\Done</Filter>
+    </ClInclude>
+    <ClInclude Include="system.h">
+      <Filter>Header Files\Done</Filter>
+    </ClInclude>
+    <ClInclude Include="Ne_Database.h">
+      <Filter>Header Files\Done</Filter>
+    </ClInclude>
+    <ClInclude Include="prefFile.h">
+      <Filter>Header Files\Done</Filter>
+    </ClInclude>
+    <ClInclude Include="Ne_AppContext.h">
+      <Filter>Header Files\Done</Filter>
+    </ClInclude>
+    <ClInclude Include="Ne_MenuBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fontsel.h">
+      <Filter>Header Files\Done</Filter>
+    </ClInclude>
+    <ClInclude Include="Ne_Font.h">
+      <Filter>Header Files\Done</Filter>
+    </ClInclude>
+    <ClInclude Include="Ne_FontDescription.h">
+      <Filter>Header Files\Done</Filter>
+    </ClInclude>
+    <ClInclude Include="Ne_MenuLevel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ne_StatsLine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ne_Color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ne_Dimension.h">
+      <Filter>Header Files\Done</Filter>
+    </ClInclude>
+    <ClInclude Include="Ne_Input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

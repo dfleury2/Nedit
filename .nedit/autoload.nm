@@ -1,0 +1,7 @@
+$cscope_results = ""
+$find_pattern="\"*.[ch]\""
+$nedit_home = getenv("HOME") "/.nedit"
+$cscope_saved_index_name = "" $nedit_home "/cscope_saved_index_name"
+$cscope_dir = read_file($cscope_saved_index_name)
+#load_macro_file($nedit_home "/cscope.nm")
+load_macro_file($nedit_home "/findall.nm")

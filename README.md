@@ -15,10 +15,9 @@ This project contains:
 This project needs FLTK 1.3. You need to change to prop files to fill the FLTK home.
 
 Basic editing functions are availables (open, save, find).
-Syntax highlighting is just *pre-alpha* quality.
+Copy/paste should work fine, as the rectangular selection.
+Syntax highlighting is just *pre-alpha* quality, and crash a lot.
+There is no macros, shell commands, adn help.
 
 This editor version is pretty harmfull, very unstable and immature. You use it only for
 experimental purpose.
-
-
- 

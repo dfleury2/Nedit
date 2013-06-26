@@ -11,3 +11,11 @@
 *.lai
 *.la
 *.a
+
+/NEdit_cpp.sdf
+Release
+Debug
+
+/source/source.vcxproj.user
+
+/util/util.vcxproj.user

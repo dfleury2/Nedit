@@ -13,9 +13,12 @@
 *.a
 
 /NEdit_cpp.sdf
+/NEdit_cpp.opendsdf
 Release
 Debug
 
 /source/source.vcxproj.user
 
 /util/util.vcxproj.user
+/Tabs/Tabs.vcxproj.user
+/MenuBar/MenuBar.vcxproj.user

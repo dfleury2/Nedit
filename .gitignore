@@ -22,3 +22,6 @@ Debug
 /util/util.vcxproj.user
 /Tabs/Tabs.vcxproj.user
 /MenuBar/MenuBar.vcxproj.user
+/ipch/
+/NEdit_cpp.opensdf
+/NEdit_cpp.suo

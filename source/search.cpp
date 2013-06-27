@@ -3344,65 +3344,60 @@ static void eraseFlash(WindowInfo* window)
 // TODO:    BufFree(tempBuf);
 // TODO:    return;
 // TODO: }
-// TODO: 
-// TODO: /*
-// TODO: ** Replace all occurences of "searchString" in "window" with "replaceString".
-// TODO: ** Also adds the search and replace strings to the global search history.
-// TODO: */
-// TODO: int ReplaceAll(WindowInfo* window, const char* searchString,
-// TODO:                const char* replaceString, int searchType)
-// TODO: {
-// TODO:    const char* fileString;
-// TODO:    char* newFileString;
-// TODO:    int copyStart, copyEnd, replacementLen;
-// TODO: 
-// TODO:    /* reject empty string */
-// TODO:    if (*searchString == '\0')
-// TODO:       return false;
-// TODO: 
-// TODO:    /* save a copy of search and replace strings in the search history */
-// TODO:    saveSearchHistory(searchString, replaceString, searchType, false);
-// TODO: 
-// TODO:    /* view the entire text buffer from the text area widget as a string */
-// TODO:    fileString = BufAsString(window->buffer);
-// TODO: 
-// TODO:    newFileString = ReplaceAllInString(fileString, searchString, replaceString,
-// TODO:                                       searchType, &copyStart, &copyEnd, &replacementLen,
-// TODO:                                       GetWindowDelimiters(window));
-// TODO: 
-// TODO:    if (newFileString == NULL)
-// TODO:    {
-// TODO:       if (window->multiFileBusy)
-// TODO:       {
-// TODO:          window->replaceFailed = true; /* only needed during multi-file
-// TODO:                                              replacements */
-// TODO:       }
-// TODO:       else if (GetPrefSearchDlogs())
-// TODO:       {
-// TODO:          if (window->findDlog && XtIsManaged(window->findDlog) &&
-// TODO:                !NeToggleButtonGetState(window->findKeepBtn))
-// TODO:             XtUnmanageChild(window->findDlog);
-// TODO:          if (window->replaceDlog && XtIsManaged(window->replaceDlog) &&
-// TODO:                !NeToggleButtonGetState(window->replaceKeepBtn))
-// TODO:             unmanageReplaceDialogs(window);
-// TODO:          DialogF(DF_INF, window->mainWindow, 1, "String not found",
-// TODO:                  "String was not found", "OK");
-// TODO:       }
-// TODO:       else
-// TODO:          XBell(TheDisplay, 0);
-// TODO:       return false;
-// TODO:    }
-// TODO: 
-// TODO:    /* replace the contents of the text widget with the substituted text */
-// TODO:    BufReplace(window->buffer, copyStart, copyEnd, newFileString);
-// TODO: 
-// TODO:    /* Move the cursor to the end of the last replacement */
-// TODO:    TextSetCursorPos(window->lastFocus, copyStart + replacementLen);
-// TODO: 
-// TODO:    XtFree(newFileString);
-// TODO:    return true;
-// TODO: }
-// TODO: 
+
+/*
+** Replace all occurences of "searchString" in "window" with "replaceString".
+** Also adds the search and replace strings to the global search history.
+*/
+int ReplaceAll(WindowInfo* window, const char* searchString, const char* replaceString, int searchType)
+{
+   const char* fileString;
+   char* newFileString;
+   int copyStart, copyEnd, replacementLen;
+
+   /* reject empty string */
+   if (*searchString == '\0')
+      return false;
+
+   /* save a copy of search and replace strings in the search history */
+   saveSearchHistory(searchString, replaceString, searchType, false);
+
+   /* view the entire text buffer from the text area widget as a string */
+   fileString = BufAsString(window->buffer);
+
+   newFileString = ReplaceAllInString(fileString, searchString, replaceString,
+                                      searchType, &copyStart, &copyEnd, &replacementLen,
+                                      GetWindowDelimiters(window));
+
+   if (newFileString == NULL)
+   {
+      if (window->multiFileBusy)
+      {
+         window->replaceFailed = true; /* only needed during multi-file replacements */
+      }
+      else if (GetPrefSearchDlogs())
+      {
+         if (window->findDlog && window->findDlog->visible() && !NeToggleButtonGetState(window->findKeepBtn))
+            window->findDlog->hide();
+         if (window->replaceDlog && window->replaceDlog->visible() && !NeToggleButtonGetState(window->replaceKeepBtn))
+            unmanageReplaceDialogs(window);
+         DialogF(DF_INF, window->mainWindow, 1, "String not found", "String was not found", "OK");
+      }
+      else
+         fl_beep();
+      return false;
+   }
+
+   /* replace the contents of the text widget with the substituted text */
+   BufReplace(window->buffer, copyStart, copyEnd, newFileString);
+
+   /* Move the cursor to the end of the last replacement */
+   TextSetCursorPos(window->lastFocus, copyStart + replacementLen);
+
+   delete[] newFileString;
+   return true;
+}
+
 /*
 ** Replace all occurences of "searchString" in "inString" with "replaceString"
 ** and return an allocated string covering the range between the start of the

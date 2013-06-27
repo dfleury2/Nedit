@@ -2838,17 +2838,16 @@ static void replaceAP(Fl_Widget* w, int, const char** args, int* nArgs)
 
 static void replaceAllAP(Fl_Widget* w, int, const char** args, int* nArgs)
 {
-// TODO:    WindowInfo* window = WidgetToWindow(w);
-// TODO: 
-// TODO:    if (CheckReadOnly(window))
-// TODO:       return;
-// TODO:    if (*nArgs < 2)
-// TODO:    {
-// TODO:       fprintf(stderr,
-// TODO:               "nedit: replace_all action requires search and replace string arguments\n");
-// TODO:       return;
-// TODO:    }
-// TODO:    ReplaceAll(window, args[0], args[1], searchType(2, args, nArgs));
+   WindowInfo* window = WidgetToWindow(w);
+
+   if (CheckReadOnly(window))
+      return;
+   if (*nArgs < 2)
+   {
+      fprintf(stderr, "nedit: replace_all action requires search and replace string arguments\n");
+      return;
+   }
+   ReplaceAll(window, args[0], args[1], searchType(2, args, nArgs));
 }
 
 static void replaceInSelAP(Fl_Widget* w, int, const char** args, int* nArgs)

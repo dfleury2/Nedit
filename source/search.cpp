@@ -91,12 +91,12 @@ static bool textFieldNonEmpty(Fl_Input* w);
 // TODO: static void getSelectionCB(Widget w, SelectionInfo* selectionInfo, Atom* selection, Atom* type, char* value, int* length, int* format);
 static void rKeepCB(Fl_Widget* w, void* data);
 static void fKeepCB(Fl_Widget* w, void* data);
-// TODO: static void replaceCB(Widget w, WindowInfo* window, XmAnyCallbackStruct* callData);
+static void replaceCB(Fl_Widget* w, void* data);
 static void replaceAllCB(Fl_Widget* w, void* data);
 static void rInSelCB(Fl_Widget* w, void* data);
-// TODO: static void rCancelCB(Widget w, WindowInfo* window, caddr_t callData);
+static void rCancelCB(Fl_Widget* w, void* data);
 static void fCancelCB(Fl_Widget* w, void* data);
-// TODO: static void rFindCB(Widget w,WindowInfo* window,XmAnyCallbackStruct* callData);
+static void rFindCB(Fl_Widget* w, void* data);
 static void rFindTextValueChangedCB(Fl_Widget* w, void* data);
 static void rFindArrowKeyCB(Fl_Widget* w, void* data);
 
@@ -109,7 +109,7 @@ static void replaceArrowKeyCB(Fl_Widget* w, void* data);
 static void fUpdateActionButtons(WindowInfo* window);
 static void findTextValueChangedCB(Fl_Widget* w, void* data);
 static void findArrowKeyCB(Fl_Widget* w, void* data);
-// TODO: static void replaceFindCB(Widget w, WindowInfo* window, XmAnyCallbackStruct* callData);
+static void replaceFindCB(Fl_Widget* w, void* data);
 static void findCB(Fl_Widget* w, void* data);
 static void replaceMultiFileCB(Fl_Widget* w, void* data);
 // TODO: static void rMultiFileReplaceCB(Widget w, WindowInfo* window,
@@ -602,131 +602,19 @@ void CreateReplaceDlog(Fl_Widget* parent, WindowInfo* window)
    Fl_Group* buttonLine = new Fl_Group(0, 205, 500, 50);
    buttonLine->box(FL_ENGRAVED_FRAME);
 
+   window->replaceBtn = new Fl_Button(25, 215, 100, 25, "Replace");
+   window->replaceBtn->callback(replaceCB, window);
 
-// TODO:    argcnt = 0;
-// TODO:    XtSetArg(args[argcnt], XmNtraversalOn, true);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNhighlightThickness, 2);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNlabelString, st1=MKSTRING("Replace"));
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNshowAsDefault, (short)1);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNtopAttachment, XmATTACH_FORM);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNleftAttachment, XmATTACH_POSITION);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNrightAttachment, XmATTACH_POSITION);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNbottomAttachment, XmATTACH_FORM);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNleftPosition, 0);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNrightPosition, 25);
-// TODO:    argcnt++;
-// TODO:    replaceBtn = XmCreatePushButton(btnForm, "replace", args, argcnt);
-// TODO:    XtAddCallback(replaceBtn, XmNactivateCallback, (XtCallbackProc)replaceCB, window);
-// TODO:    NeStringFree(st1);
-// TODO:    XtManageChild(replaceBtn);
-// TODO:    XtVaGetValues(replaceBtn, XmNshadowThickness, &shadowThickness, NULL);
-// TODO:    defaultBtnOffset = shadowThickness + 4;
-// TODO: 
-// TODO:    argcnt = 0;
-// TODO:    XtSetArg(args[argcnt], XmNtraversalOn, true);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNhighlightThickness, 2);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNlabelString, st1=MKSTRING("Find"));
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNmnemonic, 'F');
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNtopAttachment, XmATTACH_FORM);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNbottomAttachment, XmATTACH_FORM);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNleftAttachment, XmATTACH_POSITION);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNrightAttachment, XmATTACH_POSITION);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNleftPosition, 25);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNrightPosition, 42);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNtopOffset, defaultBtnOffset);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNbottomOffset, defaultBtnOffset);
-// TODO:    argcnt++;
-// TODO:    findBtn = XmCreatePushButton(btnForm, "find", args, argcnt);
-// TODO:    XtAddCallback(findBtn, XmNactivateCallback, (XtCallbackProc)rFindCB, window);
-// TODO:    NeStringFree(st1);
-// TODO:    XtManageChild(findBtn);
-// TODO: 
-// TODO:    argcnt = 0;
-// TODO:    XtSetArg(args[argcnt], XmNtraversalOn, true);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNhighlightThickness, 2);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNlabelString, st1=MKSTRING("Replace & Find"));
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNmnemonic, 'n');
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNtopAttachment, XmATTACH_FORM);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNbottomAttachment, XmATTACH_FORM);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNleftAttachment, XmATTACH_POSITION);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNrightAttachment, XmATTACH_POSITION);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNleftPosition, 42);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNrightPosition, 79);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNtopOffset, defaultBtnOffset);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNbottomOffset, defaultBtnOffset);
-// TODO:    argcnt++;
-// TODO:    replaceFindBtn = XmCreatePushButton(btnForm, "replacefind", args, argcnt);
-// TODO:    XtAddCallback(replaceFindBtn, XmNactivateCallback, (XtCallbackProc)replaceFindCB, window);
-// TODO:    NeStringFree(st1);
-// TODO:    XtManageChild(replaceFindBtn);
-// TODO: 
-// TODO:    argcnt = 0;
-// TODO:    XtSetArg(args[argcnt], XmNtraversalOn, true);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNhighlightThickness, 2);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNlabelString, st1=MKSTRING("Cancel"));
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNtopAttachment, XmATTACH_FORM);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNbottomAttachment, XmATTACH_FORM);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNleftAttachment, XmATTACH_POSITION);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNrightAttachment, XmATTACH_POSITION);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNleftPosition, 79);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNrightPosition, 100);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNtopOffset, defaultBtnOffset);
-// TODO:    argcnt++;
-// TODO:    XtSetArg(args[argcnt], XmNbottomOffset, defaultBtnOffset);
-// TODO:    argcnt++;
-// TODO:    cancelBtn = XmCreatePushButton(btnForm, "cancel", args, argcnt);
-// TODO:    NeStringFree(st1);
-// TODO:    XtAddCallback(cancelBtn, XmNactivateCallback, (XtCallbackProc)rCancelCB, window);
-// TODO:    XtManageChild(cancelBtn);
-// TODO: 
-// TODO:    XtVaSetValues(form, XmNcancelButton, cancelBtn, NULL);
-// TODO:    AddDialogMnemonicHandler(form, false);
+   window->replaceFindBtn = new Fl_Button(140, 215, 100, 25, "&Find");
+   window->replaceFindBtn->callback(rFindCB, window);
 
-      buttonLine->end();
+   window->replaceAndFindBtn = new Fl_Button(255, 215, 100, 25, "Replace & Fi&nd");
+   window->replaceAndFindBtn->callback(replaceFindCB, window);
 
-// TODO:    window->replaceBtn = replaceBtn;
-// TODO:    window->replaceAndFindBtn = replaceFindBtn;
-// TODO:    window->replaceFindBtn = findBtn;
+   Fl_Button* cancelButton = new Fl_Button(370, 215, 100, 25, "Cancel");
+   cancelButton->callback(rCancelCB, window);
+
+   buttonLine->end();
 }
 
 void CreateFindDlog(Fl_Widget* parent, WindowInfo* window)
@@ -1172,37 +1060,35 @@ static void fKeepCB(Fl_Widget* w, void* data)
       window->findDlog->copy_label("Find");
 }
 
-// TODO: static void replaceCB(Widget w, WindowInfo* window,
-// TODO:                       XmAnyCallbackStruct* callData)
-// TODO: {
-// TODO:    char searchString[SEARCHMAX], replaceString[SEARCHMAX];
-// TODO:    int direction, searchType;
-// TODO:    char* params[5];
-// TODO: 
-// TODO:    window = WidgetToWindow(w);
-// TODO: 
-// TODO:    /* Validate and fetch the find and replace strings from the dialog */
-// TODO:    if (!getReplaceDlogInfo(window, &direction, searchString, replaceString,
-// TODO:                            &searchType))
-// TODO:       return;
-// TODO: 
-// TODO:    /* Set the initial focus of the dialog back to the search string */
-// TODO:    resetReplaceTabGroup(window);
-// TODO: 
-// TODO:    /* Find the text and replace it */
-// TODO:    params[0] = searchString;
-// TODO:    params[1] = replaceString;
-// TODO:    params[2] = directionArg(direction);
-// TODO:    params[3] = searchTypeArg(searchType);
-// TODO:    params[4] = searchWrapArg(GetPrefSearchWraps());
-// TODO:    windowNotToClose = window;
-// TODO:    XtCallActionProc(window->lastFocus, "replace", callData->event, params, 5);
-// TODO:    windowNotToClose = NULL;
-// TODO: 
-// TODO:    /* Pop down the dialog */
-// TODO:    if (!NeToggleButtonGetState(window->replaceKeepBtn))
-// TODO:       unmanageReplaceDialogs(window);
-// TODO: }
+static void replaceCB(Fl_Widget* w, void* data)
+{
+   char searchString[SEARCHMAX], replaceString[SEARCHMAX];
+   int direction, searchType;
+   const char* params[5];
+
+   WindowInfo* window = static_cast<WindowInfo*>(data);
+
+   /* Validate and fetch the find and replace strings from the dialog */
+   if (!getReplaceDlogInfo(window, &direction, searchString, replaceString, &searchType))
+      return;
+
+   /* Set the initial focus of the dialog back to the search string */
+   resetReplaceTabGroup(window);
+
+   /* Find the text and replace it */
+   params[0] = searchString;
+   params[1] = replaceString;
+   params[2] = directionArg(direction);
+   params[3] = searchTypeArg(searchType);
+   params[4] = searchWrapArg(GetPrefSearchWraps());
+   windowNotToClose = window;
+   AppContext.callAction(window->lastFocus, "replace", Fl::event(), params, 5);
+   windowNotToClose = NULL;
+
+   /* Pop down the dialog */
+   if (!NeToggleButtonGetState(window->replaceKeepBtn))
+      unmanageReplaceDialogs(window);
+}
 
 static void replaceAllCB(Fl_Widget* w, void* data)
 {
@@ -1685,16 +1571,16 @@ static void rInSelCB(Fl_Widget* w, void* data)
       unmanageReplaceDialogs(window);
 }
 
-// TODO: static void rCancelCB(Widget w, WindowInfo* window, caddr_t callData)
-// TODO: {
-// TODO:    window = WidgetToWindow(w);
-// TODO: 
-// TODO:    /* Set the initial focus of the dialog back to the search string	*/
-// TODO:    resetReplaceTabGroup(window);
-// TODO: 
-// TODO:    /* pop down the dialog */
-// TODO:    unmanageReplaceDialogs(window);
-// TODO: }
+static void rCancelCB(Fl_Widget* w, void* data)
+{
+   WindowInfo* window = static_cast<WindowInfo*>(data);
+
+   /* Set the initial focus of the dialog back to the search string	*/
+   resetReplaceTabGroup(window);
+
+   /* pop down the dialog */
+   unmanageReplaceDialogs(window);
+}
 
 static void fCancelCB(Fl_Widget* w, void* data)
 {
@@ -1707,76 +1593,74 @@ static void fCancelCB(Fl_Widget* w, void* data)
    resetFindTabGroup(window);
 }
 
-// TODO: static void rFindCB(Widget w, WindowInfo* window,XmAnyCallbackStruct* callData)
-// TODO: {
-// TODO:    char searchString[SEARCHMAX], replaceString[SEARCHMAX];
-// TODO:    int direction, searchType;
-// TODO:    char* params[4];
-// TODO: 
-// TODO:    window = WidgetToWindow(w);
-// TODO: 
-// TODO:    /* Validate and fetch the find and replace strings from the dialog */
-// TODO:    if (!getReplaceDlogInfo(window, &direction, searchString, replaceString,
-// TODO:                            &searchType))
-// TODO:       return;
-// TODO: 
-// TODO:    /* Set the initial focus of the dialog back to the search string	*/
-// TODO:    resetReplaceTabGroup(window);
-// TODO: 
-// TODO:    /* Find the text and mark it */
-// TODO:    params[0] = searchString;
-// TODO:    params[1] = directionArg(direction);
-// TODO:    params[2] = searchTypeArg(searchType);
-// TODO:    params[3] = searchWrapArg(GetPrefSearchWraps());
-// TODO:    windowNotToClose = window;
-// TODO:    XtCallActionProc(window->lastFocus, "find", callData->event, params, 4);
-// TODO:    windowNotToClose = NULL;
-// TODO: 
-// TODO:    /* Doctor the search history generated by the action to include the
-// TODO:       replace string (if any), so the replace string can be used on
-// TODO:       subsequent replaces, even though no actual replacement was done. */
-// TODO:    if (historyIndex(1) != -1 &&
-// TODO:          !strcmp(SearchHistory[historyIndex(1)], searchString))
-// TODO:    {
-// TODO:       XtFree(ReplaceHistory[historyIndex(1)]);
-// TODO:       ReplaceHistory[historyIndex(1)] = NeNewString(replaceString);
-// TODO:    }
-// TODO: 
-// TODO:    /* Pop down the dialog */
-// TODO:    if (!NeToggleButtonGetState(window->replaceKeepBtn))
-// TODO:       unmanageReplaceDialogs(window);
-// TODO: }
-// TODO: 
-// TODO: static void replaceFindCB(Widget w, WindowInfo* window, XmAnyCallbackStruct* callData)
-// TODO: {
-// TODO:    char searchString[SEARCHMAX+1], replaceString[SEARCHMAX+1];
-// TODO:    int direction, searchType;
-// TODO:    char* params[4];
-// TODO: 
-// TODO:    window = WidgetToWindow(w);
-// TODO: 
-// TODO:    /* Validate and fetch the find and replace strings from the dialog */
-// TODO:    if (!getReplaceDlogInfo(window, &direction, searchString, replaceString,
-// TODO:                            &searchType))
-// TODO:       return;
-// TODO: 
-// TODO:    /* Set the initial focus of the dialog back to the search string */
-// TODO:    resetReplaceTabGroup(window);
-// TODO: 
-// TODO:    /* Find the text and replace it */
-// TODO:    params[0] = searchString;
-// TODO:    params[1] = replaceString;
-// TODO:    params[2] = directionArg(direction);
-// TODO:    params[3] = searchTypeArg(searchType);
-// TODO:    windowNotToClose = window;
-// TODO:    XtCallActionProc(window->lastFocus, "replace_find", callData->event, params, 4);
-// TODO:    windowNotToClose = NULL;
-// TODO: 
-// TODO:    /* Pop down the dialog */
-// TODO:    if (!NeToggleButtonGetState(window->replaceKeepBtn))
-// TODO:       unmanageReplaceDialogs(window);
-// TODO: }
-// TODO: 
+static void rFindCB(Fl_Widget* w, void* data)
+{
+   char searchString[SEARCHMAX], replaceString[SEARCHMAX];
+   int direction, searchType;
+   const char* params[4];
+
+   WindowInfo* window = static_cast<WindowInfo*>(data);
+
+   /* Validate and fetch the find and replace strings from the dialog */
+   if (!getReplaceDlogInfo(window, &direction, searchString, replaceString, &searchType))
+      return;
+
+   /* Set the initial focus of the dialog back to the search string	*/
+   resetReplaceTabGroup(window);
+
+   /* Find the text and mark it */
+   params[0] = searchString;
+   params[1] = directionArg(direction);
+   params[2] = searchTypeArg(searchType);
+   params[3] = searchWrapArg(GetPrefSearchWraps());
+   windowNotToClose = window;
+   AppContext.callAction(window->lastFocus, "find", Fl::event(), params, 4);
+   windowNotToClose = NULL;
+
+   /* Doctor the search history generated by the action to include the
+      replace string (if any), so the replace string can be used on
+      subsequent replaces, even though no actual replacement was done. */
+   if (historyIndex(1) != -1 &&
+         !strcmp(SearchHistory[historyIndex(1)], searchString))
+   {
+      delete[] (ReplaceHistory[historyIndex(1)]);
+      ReplaceHistory[historyIndex(1)] = NeNewString(replaceString);
+   }
+
+   /* Pop down the dialog */
+   if (!NeToggleButtonGetState(window->replaceKeepBtn))
+      unmanageReplaceDialogs(window);
+}
+
+static void replaceFindCB(Fl_Widget* w, void* data)
+{
+   char searchString[SEARCHMAX+1], replaceString[SEARCHMAX+1];
+   int direction, searchType;
+   const char* params[4];
+
+   WindowInfo* window = static_cast<WindowInfo*>(data);
+
+   /* Validate and fetch the find and replace strings from the dialog */
+   if (!getReplaceDlogInfo(window, &direction, searchString, replaceString, &searchType))
+      return;
+
+   /* Set the initial focus of the dialog back to the search string */
+   resetReplaceTabGroup(window);
+
+   /* Find the text and replace it */
+   params[0] = searchString;
+   params[1] = replaceString;
+   params[2] = directionArg(direction);
+   params[3] = searchTypeArg(searchType);
+   windowNotToClose = window;
+   AppContext.callAction(window->lastFocus, "replace_find", Fl::event(), params, 4);
+   windowNotToClose = NULL;
+
+   /* Pop down the dialog */
+   if (!NeToggleButtonGetState(window->replaceKeepBtn))
+      unmanageReplaceDialogs(window);
+}
+
 static void rSetActionButtons(WindowInfo* window,
                               int replaceBtn,
                               int replaceFindBtn,

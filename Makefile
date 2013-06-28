@@ -1,9 +1,9 @@
 SUBDIRS=source util
 
-source:util/libutil.a
+source:libutil.a source/*.cpp source/*.h
 	(cd source && make)
 
-util/libutil.a:
+libutil.a:util/*.cpp util/*.h
 	(cd util && make)
 
 clean:

@@ -2931,174 +2931,172 @@ static void eraseFlash(WindowInfo* window)
    BufUnhighlight(window->buffer);
 }
 
-// TODO: /*
-// TODO: ** Search and replace using previously entered search strings (from dialog
-// TODO: ** or selection).
-// TODO: */
-// TODO: int ReplaceSame(WindowInfo* window, int direction, int searchWrap)
-// TODO: {
-// TODO:    if (NHist < 1)
-// TODO:    {
-// TODO:       XBell(TheDisplay, 0);
-// TODO:       return false;
-// TODO:    }
-// TODO: 
-// TODO:    return SearchAndReplace(window, direction, SearchHistory[historyIndex(1)],
-// TODO:                            ReplaceHistory[historyIndex(1)],
-// TODO:                            SearchTypeHistory[historyIndex(1)], searchWrap);
-// TODO: }
-// TODO: 
-// TODO: /*
-// TODO: ** Search and replace using previously entered search strings (from dialog
-// TODO: ** or selection).
-// TODO: */
-// TODO: int ReplaceFindSame(WindowInfo* window, int direction, int searchWrap)
-// TODO: {
-// TODO:    if (NHist < 1)
-// TODO:    {
-// TODO:       XBell(TheDisplay, 0);
-// TODO:       return false;
-// TODO:    }
-// TODO: 
-// TODO:    return ReplaceAndSearch(window, direction, SearchHistory[historyIndex(1)],
-// TODO:                            ReplaceHistory[historyIndex(1)],
-// TODO:                            SearchTypeHistory[historyIndex(1)], searchWrap);
-// TODO: }
-// TODO: 
-// TODO: /*
-// TODO: ** Replace selection with "replaceString" and search for string "searchString" in window "window",
-// TODO: ** using algorithm "searchType" and direction "direction"
-// TODO: */
-// TODO: int ReplaceAndSearch(WindowInfo* window, int direction, const char* searchString,
-// TODO:                      const char* replaceString, int searchType, int searchWrap)
-// TODO: {
-// TODO:    int startPos = 0, endPos = 0, replaceLen = 0;
-// TODO:    int searchExtentBW, searchExtentFW;
-// TODO:    int replaced;
-// TODO: 
-// TODO:    /* Save a copy of search and replace strings in the search history */
-// TODO:    saveSearchHistory(searchString, replaceString, searchType, false);
-// TODO: 
-// TODO:    replaced = 0;
-// TODO: 
-// TODO:    /* Replace the selected text only if it matches the search string */
-// TODO:    if (searchMatchesSelection(window, searchString, searchType,
-// TODO:                               &startPos, &endPos, &searchExtentBW,
-// TODO:                               &searchExtentFW))
-// TODO:    {
-// TODO:       /* replace the text */
-// TODO:       if (isRegexType(searchType))
-// TODO:       {
-// TODO:          char replaceResult[SEARCHMAX+1], *foundString;
-// TODO:          foundString = BufGetRange(window->buffer, searchExtentBW,
-// TODO:                                    searchExtentFW+1);
-// TODO:          replaceUsingRE(searchString, replaceString, foundString,
-// TODO:                         startPos-searchExtentBW,
-// TODO:                         replaceResult, SEARCHMAX, startPos == 0 ? '\0' :
-// TODO:                         BufGetCharacter(window->buffer, startPos-1),
-// TODO:                         GetWindowDelimiters(window), defaultRegexFlags(searchType));
-// TODO:          XtFree(foundString);
-// TODO:          BufReplace(window->buffer, startPos, endPos, replaceResult);
-// TODO:          replaceLen = strlen(replaceResult);
-// TODO:       }
-// TODO:       else
-// TODO:       {
-// TODO:          BufReplace(window->buffer, startPos, endPos, replaceString);
-// TODO:          replaceLen = strlen(replaceString);
-// TODO:       }
-// TODO: 
-// TODO:       /* Position the cursor so the next search will work correctly based */
-// TODO:       /* on the direction of the search */
-// TODO:       TextSetCursorPos(window->lastFocus, startPos +
-// TODO:                        ((direction == SEARCH_FORWARD) ? replaceLen : 0));
-// TODO:       replaced = 1;
-// TODO:    }
-// TODO: 
-// TODO:    /* do the search; beeps/dialogs are taken care of */
-// TODO:    SearchAndSelect(window, direction, searchString, searchType, searchWrap);
-// TODO: 
-// TODO:    return replaced;
-// TODO: }
-// TODO: 
-// TODO: /*
-// TODO: ** Search for string "searchString" in window "window", using algorithm
-// TODO: ** "searchType" and direction "direction", and replace it with "replaceString"
-// TODO: ** Also adds the search and replace strings to the global search history.
-// TODO: */
-// TODO: int SearchAndReplace(WindowInfo* window, int direction, const char* searchString,
-// TODO:                      const char* replaceString, int searchType, int searchWrap)
-// TODO: {
-// TODO:    int startPos, endPos, replaceLen, searchExtentBW, searchExtentFW;
-// TODO:    int found;
-// TODO:    int beginPos, cursorPos;
-// TODO: 
-// TODO:    /* Save a copy of search and replace strings in the search history */
-// TODO:    saveSearchHistory(searchString, replaceString, searchType, false);
-// TODO: 
-// TODO:    /* If the text selected in the window matches the search string, 	*/
-// TODO:    /* the user is probably using search then replace method, so	*/
-// TODO:    /* replace the selected text regardless of where the cursor is.	*/
-// TODO:    /* Otherwise, search for the string.				*/
-// TODO:    if (!searchMatchesSelection(window, searchString, searchType,
-// TODO:                                &startPos, &endPos, &searchExtentBW, &searchExtentFW))
-// TODO:    {
-// TODO:       /* get the position to start the search */
-// TODO:       cursorPos = TextGetCursorPos(window->lastFocus);
-// TODO:       if (direction == SEARCH_BACKWARD)
-// TODO:       {
-// TODO:          /* use the insert position - 1 for backward searches */
-// TODO:          beginPos = cursorPos-1;
-// TODO:       }
-// TODO:       else
-// TODO:       {
-// TODO:          /* use the insert position for forward searches */
-// TODO:          beginPos = cursorPos;
-// TODO:       }
-// TODO:       /* do the search */
-// TODO:       found = SearchWindow(window, direction, searchString, searchType, searchWrap,
-// TODO:                            beginPos, &startPos, &endPos, &searchExtentBW, &searchExtentFW);
-// TODO:       if (!found)
-// TODO:          return false;
-// TODO:    }
-// TODO: 
-// TODO:    /* replace the text */
-// TODO:    if (isRegexType(searchType))
-// TODO:    {
-// TODO:       char replaceResult[SEARCHMAX], *foundString;
-// TODO:       foundString = BufGetRange(window->buffer, searchExtentBW, searchExtentFW+1);
-// TODO:       replaceUsingRE(searchString, replaceString, foundString,
-// TODO:                      startPos - searchExtentBW,
-// TODO:                      replaceResult, SEARCHMAX, startPos == 0 ? '\0' :
-// TODO:                      BufGetCharacter(window->buffer, startPos-1),
-// TODO:                      GetWindowDelimiters(window), defaultRegexFlags(searchType));
-// TODO:       XtFree(foundString);
-// TODO:       BufReplace(window->buffer, startPos, endPos, replaceResult);
-// TODO:       replaceLen = strlen(replaceResult);
-// TODO:    }
-// TODO:    else
-// TODO:    {
-// TODO:       BufReplace(window->buffer, startPos, endPos, replaceString);
-// TODO:       replaceLen = strlen(replaceString);
-// TODO:    }
-// TODO: 
-// TODO:    /* after successfully completing a replace, selected text attracts
-// TODO:       attention away from the area of the replacement, particularly
-// TODO:       when the selection represents a previous search. so deselect */
-// TODO:    BufUnselect(window->buffer);
-// TODO: 
-// TODO:    /* temporarily shut off autoShowInsertPos before setting the cursor
-// TODO:       position so MakeSelectionVisible gets a chance to place the replaced
-// TODO:       string at a pleasing position on the screen (otherwise, the cursor would
-// TODO:       be automatically scrolled on screen and MakeSelectionVisible would do
-// TODO:       nothing) */
+/*
+** Search and replace using previously entered search strings (from dialog
+** or selection).
+*/
+int ReplaceSame(WindowInfo* window, int direction, int searchWrap)
+{
+   if (NHist < 1)
+   {
+      fl_beep();
+      return false;
+   }
+
+   return SearchAndReplace(window, direction, SearchHistory[historyIndex(1)],
+                           ReplaceHistory[historyIndex(1)],
+                           SearchTypeHistory[historyIndex(1)], searchWrap);
+}
+
+/*
+** Search and replace using previously entered search strings (from dialog
+** or selection).
+*/
+int ReplaceFindSame(WindowInfo* window, int direction, int searchWrap)
+{
+   if (NHist < 1)
+   {
+      fl_beep();
+      return false;
+   }
+
+   return ReplaceAndSearch(window, direction, SearchHistory[historyIndex(1)],
+                           ReplaceHistory[historyIndex(1)],
+                           SearchTypeHistory[historyIndex(1)], searchWrap);
+}
+
+/*
+** Replace selection with "replaceString" and search for string "searchString" in window "window",
+** using algorithm "searchType" and direction "direction"
+*/
+int ReplaceAndSearch(WindowInfo* window, int direction, const char* searchString,
+                     const char* replaceString, int searchType, int searchWrap)
+{
+   int startPos = 0, endPos = 0, replaceLen = 0;
+   int searchExtentBW, searchExtentFW;
+   int replaced;
+
+   /* Save a copy of search and replace strings in the search history */
+   saveSearchHistory(searchString, replaceString, searchType, false);
+
+   replaced = 0;
+
+   /* Replace the selected text only if it matches the search string */
+   if (searchMatchesSelection(window, searchString, searchType,
+                              &startPos, &endPos, &searchExtentBW,
+                              &searchExtentFW))
+   {
+      /* replace the text */
+      if (isRegexType(searchType))
+      {
+         char replaceResult[SEARCHMAX+1], *foundString;
+         foundString = BufGetRange(window->buffer, searchExtentBW,
+                                   searchExtentFW+1);
+         replaceUsingRE(searchString, replaceString, foundString,
+                        startPos-searchExtentBW,
+                        replaceResult, SEARCHMAX, startPos == 0 ? '\0' :
+                        BufGetCharacter(window->buffer, startPos-1),
+                        GetWindowDelimiters(window), defaultRegexFlags(searchType));
+         delete[] foundString;
+         BufReplace(window->buffer, startPos, endPos, replaceResult);
+         replaceLen = strlen(replaceResult);
+      }
+      else
+      {
+         BufReplace(window->buffer, startPos, endPos, replaceString);
+         replaceLen = strlen(replaceString);
+      }
+
+      /* Position the cursor so the next search will work correctly based */
+      /* on the direction of the search */
+      TextSetCursorPos(window->lastFocus, startPos + ((direction == SEARCH_FORWARD) ? replaceLen : 0));
+      replaced = 1;
+   }
+
+   /* do the search; beeps/dialogs are taken care of */
+   SearchAndSelect(window, direction, searchString, searchType, searchWrap);
+
+   return replaced;
+}
+
+/*
+** Search for string "searchString" in window "window", using algorithm
+** "searchType" and direction "direction", and replace it with "replaceString"
+** Also adds the search and replace strings to the global search history.
+*/
+int SearchAndReplace(WindowInfo* window, int direction, const char* searchString,
+                     const char* replaceString, int searchType, int searchWrap)
+{
+   int startPos, endPos, replaceLen, searchExtentBW, searchExtentFW;
+   int found;
+   int beginPos, cursorPos;
+
+   /* Save a copy of search and replace strings in the search history */
+   saveSearchHistory(searchString, replaceString, searchType, false);
+
+   /* If the text selected in the window matches the search string, 	*/
+   /* the user is probably using search then replace method, so	*/
+   /* replace the selected text regardless of where the cursor is.	*/
+   /* Otherwise, search for the string.				*/
+   if (!searchMatchesSelection(window, searchString, searchType,
+                               &startPos, &endPos, &searchExtentBW, &searchExtentFW))
+   {
+      /* get the position to start the search */
+      cursorPos = TextGetCursorPos(window->lastFocus);
+      if (direction == SEARCH_BACKWARD)
+      {
+         /* use the insert position - 1 for backward searches */
+         beginPos = cursorPos-1;
+      }
+      else
+      {
+         /* use the insert position for forward searches */
+         beginPos = cursorPos;
+      }
+      /* do the search */
+      found = SearchWindow(window, direction, searchString, searchType, searchWrap,
+                           beginPos, &startPos, &endPos, &searchExtentBW, &searchExtentFW);
+      if (!found)
+         return false;
+   }
+
+   /* replace the text */
+   if (isRegexType(searchType))
+   {
+      char replaceResult[SEARCHMAX], *foundString;
+      foundString = BufGetRange(window->buffer, searchExtentBW, searchExtentFW+1);
+      replaceUsingRE(searchString, replaceString, foundString,
+                     startPos - searchExtentBW,
+                     replaceResult, SEARCHMAX, startPos == 0 ? '\0' :
+                     BufGetCharacter(window->buffer, startPos-1),
+                     GetWindowDelimiters(window), defaultRegexFlags(searchType));
+      delete[] foundString;
+      BufReplace(window->buffer, startPos, endPos, replaceResult);
+      replaceLen = strlen(replaceResult);
+   }
+   else
+   {
+      BufReplace(window->buffer, startPos, endPos, replaceString);
+      replaceLen = strlen(replaceString);
+   }
+
+   /* after successfully completing a replace, selected text attracts
+      attention away from the area of the replacement, particularly
+      when the selection represents a previous search. so deselect */
+   BufUnselect(window->buffer);
+
+   /* temporarily shut off autoShowInsertPos before setting the cursor
+      position so MakeSelectionVisible gets a chance to place the replaced
+      string at a pleasing position on the screen (otherwise, the cursor would
+      be automatically scrolled on screen and MakeSelectionVisible would do
+      nothing) */
 // TODO:    XtVaSetValues(window->lastFocus, textNautoShowInsertPos, false, NULL);
-// TODO:    TextSetCursorPos(window->lastFocus, startPos +
-// TODO:                     ((direction == SEARCH_FORWARD) ? replaceLen : 0));
-// TODO:    MakeSelectionVisible(window, window->lastFocus);
+   TextSetCursorPos(window->lastFocus, startPos + ((direction == SEARCH_FORWARD) ? replaceLen : 0));
+   MakeSelectionVisible(window, window->lastFocus);
 // TODO:    XtVaSetValues(window->lastFocus, textNautoShowInsertPos, true, NULL);
-// TODO: 
-// TODO:    return true;
-// TODO: }
+
+   return true;
+}
 
 /*
 **  Uses the resource nedit.truncSubstitution to determine how to deal with

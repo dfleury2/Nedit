@@ -1062,11 +1062,9 @@ static void replaceSameCB(Fl_Widget* w, void* data)
 static void replaceFindSameCB(Fl_Widget* w, void* data)
 {
    TRACE();
-// TODO:    HidePointerOnKeyedEvent(WidgetToWindow(w)->lastFocus,
-// TODO:                            ((XmAnyCallbackStruct*)callData)->event);
-// TODO:    XtCallActionProc(WidgetToWindow(w)->lastFocus, "replace_find_same",
-// TODO:                     ((XmAnyCallbackStruct*)callData)->event,
-// TODO:                     shiftKeyToDir(callData), 1);
+
+   AppContext.callAction(WidgetToWindow(w)->lastFocus, "replace_find_same", 
+      Fl::event(), shiftKeyToDir(Fl::event_shift()), 1);
 }
 
 static void markCB(Fl_Widget* w, void* data)
@@ -2866,41 +2864,41 @@ static void replaceInSelAP(Fl_Widget* w, int, const char** args, int* nArgs)
 
 static void replaceSameAP(Fl_Widget* w, int, const char** args, int* nArgs)
 {
-// TODO:    WindowInfo* window = WidgetToWindow(w);
-// TODO: 
-// TODO:    if (CheckReadOnly(window))
-// TODO:       return;
-// TODO:    ReplaceSame(window, searchDirection(0, args, nArgs), searchWrap(0, args, nArgs));
+   WindowInfo* window = WidgetToWindow(w);
+
+   if (CheckReadOnly(window))
+      return;
+   ReplaceSame(window, searchDirection(0, args, nArgs), searchWrap(0, args, nArgs));
 }
 
 static void replaceFindAP(Fl_Widget* w, int, const char** args, int* nArgs)
 {
-// TODO:    WindowInfo* window = WidgetToWindow(w);
-// TODO: 
-// TODO:    if (CheckReadOnly(window))
-// TODO:    {
-// TODO:       return;
-// TODO:    }
-// TODO: 
-// TODO:    if (*nArgs < 2)
-// TODO:    {
-// TODO:       DialogF(DF_WARN, window->mainWindow, 1, "Error in replace_find",
-// TODO:               "replace_find action requires search and replace string arguments",
-// TODO:               "OK");
-// TODO:       return;
-// TODO:    }
-// TODO: 
-// TODO:    ReplaceAndSearch(window, searchDirection(2, args, nArgs), args[0], args[1],
-// TODO:                     searchType(2, args, nArgs), searchWrap(0, args, nArgs));
+   WindowInfo* window = WidgetToWindow(w);
+
+   if (CheckReadOnly(window))
+   {
+      return;
+   }
+
+   if (*nArgs < 2)
+   {
+      DialogF(DF_WARN, window->mainWindow, 1, "Error in replace_find",
+              "replace_find action requires search and replace string arguments",
+              "OK");
+      return;
+   }
+
+   ReplaceAndSearch(window, searchDirection(2, args, nArgs), args[0], args[1],
+                    searchType(2, args, nArgs), searchWrap(0, args, nArgs));
 }
 
 static void replaceFindSameAP(Fl_Widget* w, int, const char** args, int* nArgs)
 {
-// TODO:    WindowInfo* window = WidgetToWindow(w);
-// TODO: 
-// TODO:    if (CheckReadOnly(window))
-// TODO:       return;
-// TODO:    ReplaceFindSame(window, searchDirection(0, args, nArgs), searchWrap(0, args, nArgs));
+   WindowInfo* window = WidgetToWindow(w);
+
+   if (CheckReadOnly(window))
+      return;
+   ReplaceFindSame(window, searchDirection(0, args, nArgs), searchWrap(0, args, nArgs));
 }
 
 static void gotoAP(Fl_Widget* w, int, const char** args, int* nArgs)

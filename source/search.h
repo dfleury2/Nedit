@@ -44,12 +44,12 @@ int SearchAndSelectSame(WindowInfo* window, int direction, int searchWrap);
 // TODO: int SearchAndSelectIncremental(WindowInfo* window, int direction,
 // TODO:                                const char* searchString, int searchType, int searchWrap, int continued);
 void SearchForSelected(WindowInfo* window, int direction, int searchWrap, int searchType, int time);
-// TODO: int SearchAndReplace(WindowInfo* window, int direction, const char* searchString,
-// TODO:                      const char* replaceString, int searchType, int searchWrap);
-// TODO: int ReplaceAndSearch(WindowInfo* window, int direction, const char* searchString,
-// TODO:                      const char* replaceString, int searchType, int searchWrap);
-// TODO: int ReplaceFindSame(WindowInfo* window, int direction, int searchWrap);
-// TODO: int ReplaceSame(WindowInfo* window, int direction, int searchWrap);
+int SearchAndReplace(WindowInfo* window, int direction, const char* searchString,
+                     const char* replaceString, int searchType, int searchWrap);
+int ReplaceAndSearch(WindowInfo* window, int direction, const char* searchString,
+                     const char* replaceString, int searchType, int searchWrap);
+int ReplaceFindSame(WindowInfo* window, int direction, int searchWrap);
+int ReplaceSame(WindowInfo* window, int direction, int searchWrap);
 int ReplaceAll(WindowInfo* window, const char* searchString, const char* replaceString, int searchType);
 void ReplaceInSelection(const WindowInfo* window, const char* searchString, const char* replaceString, const int searchType);
 int SearchWindow(WindowInfo* window, int direction, const char* searchString,

@@ -51,8 +51,7 @@ void SearchForSelected(WindowInfo* window, int direction, int searchWrap, int se
 // TODO: int ReplaceFindSame(WindowInfo* window, int direction, int searchWrap);
 // TODO: int ReplaceSame(WindowInfo* window, int direction, int searchWrap);
 int ReplaceAll(WindowInfo* window, const char* searchString, const char* replaceString, int searchType);
-// TODO: void ReplaceInSelection(const WindowInfo* window, const char* searchString,
-// TODO:                         const char* replaceString, const int searchType);
+void ReplaceInSelection(const WindowInfo* window, const char* searchString, const char* replaceString, const int searchType);
 int SearchWindow(WindowInfo* window, int direction, const char* searchString,
                  int searchType, int searchWrap, int beginPos, int* startPos, int* endPos,
                  int* extentBW, int* extentFW);

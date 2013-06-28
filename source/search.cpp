@@ -189,9 +189,8 @@ static void replaceCaseToggleCB(Fl_Widget* w, void* data);
 // TODO:                                 XtPointer callData);
 static void iSearchTryBeepOnWrap(WindowInfo* window, int direction, int beginPos, int startPos);
 static void iSearchRecordLastBeginPos(WindowInfo* window, int direction, int initPos);
-// TODO: static bool prefOrUserCancelsSubst(const Widget parent,
-// TODO:                                       const Display* display);
-// TODO: 
+static bool prefOrUserCancelsSubst(Fl_Widget* parent);
+
 typedef struct _charMatchTable
 {
    char c;
@@ -3100,250 +3099,246 @@ static void eraseFlash(WindowInfo* window)
 // TODO: 
 // TODO:    return true;
 // TODO: }
-// TODO: 
-// TODO: /*
-// TODO: **  Uses the resource nedit.truncSubstitution to determine how to deal with
-// TODO: **  regex failures. This function only knows about the resource (via the usual
-// TODO: **  setting getter) and asks or warns the user depending on that.
-// TODO: **
-// TODO: **  One could argue that the dialoging should be determined by the setting
-// TODO: **  'searchDlogs'. However, the incomplete substitution is not just a question
-// TODO: **  of verbosity, but of data loss. The search is successful, only the
-// TODO: **  replacement fails due to an internal limitation of NEdit.
-// TODO: **
-// TODO: **  The parameters 'parent' and 'display' are only used to put dialogs and
-// TODO: **  beeps at the right place.
-// TODO: **
-// TODO: **  The result is either predetermined by the resource or the user's choice.
-// TODO: */
-// TODO: static bool prefOrUserCancelsSubst(const Widget parent,
-// TODO:                                       const Display* display)
-// TODO: {
-// TODO:    bool cancel = true;
-// TODO:    unsigned confirmResult = 0;
-// TODO: 
-// TODO:    switch (GetPrefTruncSubstitution())
-// TODO:    {
-// TODO:    case TRUNCSUBST_SILENT:
-// TODO:       /*  silently fail the operation  */
-// TODO:       cancel = true;
-// TODO:       break;
-// TODO: 
-// TODO:    case TRUNCSUBST_FAIL:
-// TODO:       /*  fail the operation and pop up a dialog informing the user  */
-// TODO:       XBell((Display*) display, 0);
-// TODO:       DialogF(DF_INF, parent, 1, "Substitution Failed",
-// TODO:               "The result length of the substitution exceeded an internal limit.\n"
-// TODO:               "The substitution is canceled.",
-// TODO:               "OK");
-// TODO:       cancel = true;
-// TODO:       break;
-// TODO: 
-// TODO:    case TRUNCSUBST_WARN:
-// TODO:       /*  pop up dialog and ask for confirmation  */
-// TODO:       XBell((Display*) display, 0);
-// TODO:       confirmResult = DialogF(DF_WARN, parent, 2,
-// TODO:                               "Substitution Failed",
-// TODO:                               "The result length of the substitution exceeded an internal limit.\n"
-// TODO:                               "Executing the substitution will result in loss of data.",
-// TODO:                               "Lose Data", "Cancel");
-// TODO:       cancel = (1 != confirmResult);
-// TODO:       break;
-// TODO: 
-// TODO:    case TRUNCSUBST_IGNORE:
-// TODO:       /*  silently conclude the operation; THIS WILL DESTROY DATA.  */
-// TODO:       cancel = false;
-// TODO:       break;
-// TODO:    }
-// TODO: 
-// TODO:    return cancel;
-// TODO: }
-// TODO: 
-// TODO: /*
-// TODO: ** Replace all occurences of "searchString" in "window" with "replaceString"
-// TODO: ** within the current primary selection in "window". Also adds the search and
-// TODO: ** replace strings to the global search history.
-// TODO: */
-// TODO: void ReplaceInSelection(const WindowInfo* window, const char* searchString,
-// TODO:                         const char* replaceString, const int searchType)
-// TODO: {
-// TODO:    int selStart, selEnd, beginPos, startPos, endPos, realOffset, replaceLen;
-// TODO:    int found, isRect, rectStart, rectEnd, lineStart, cursorPos;
-// TODO:    int extentBW, extentFW;
-// TODO:    char* fileString;
-// TODO:    textBuffer* tempBuf;
-// TODO:    bool substSuccess = false;
-// TODO:    bool anyFound = false;
-// TODO:    bool cancelSubst = true;
-// TODO: 
-// TODO:    /* save a copy of search and replace strings in the search history */
-// TODO:    saveSearchHistory(searchString, replaceString, searchType, false);
-// TODO: 
-// TODO:    /* find out where the selection is */
-// TODO:    if (!BufGetSelectionPos(window->buffer, &selStart, &selEnd, &isRect,
-// TODO:                            &rectStart, &rectEnd))
-// TODO:       return;
-// TODO: 
-// TODO:    /* get the selected text */
-// TODO:    if (isRect)
-// TODO:    {
-// TODO:       selStart = BufStartOfLine(window->buffer, selStart);
-// TODO:       selEnd = BufEndOfLine(window->buffer, selEnd);
-// TODO:       fileString = BufGetRange(window->buffer, selStart, selEnd);
-// TODO:    }
-// TODO:    else
-// TODO:       fileString = BufGetSelectionText(window->buffer);
-// TODO: 
-// TODO:    /* create a temporary buffer in which to do the replacements to hide the
-// TODO:       intermediate steps from the display routines, and so everything can
-// TODO:       be undone in a single operation */
-// TODO:    tempBuf = BufCreate();
-// TODO:    BufSetAll(tempBuf, fileString);
-// TODO: 
-// TODO:    /* search the string and do the replacements in the temporary buffer */
-// TODO:    replaceLen = strlen(replaceString);
-// TODO:    found = true;
-// TODO:    beginPos = 0;
-// TODO:    cursorPos = 0;
-// TODO:    realOffset = 0;
-// TODO:    while (found)
-// TODO:    {
-// TODO:       found = SearchString(fileString, searchString, SEARCH_FORWARD,
-// TODO:                            searchType, false, beginPos, &startPos, &endPos, &extentBW,
-// TODO:                            &extentFW, GetWindowDelimiters(window));
-// TODO:       if (!found)
-// TODO:          break;
-// TODO: 
-// TODO:       anyFound = true;
-// TODO:       /* if the selection is rectangular, verify that the found
-// TODO:          string is in the rectangle */
-// TODO:       if (isRect)
-// TODO:       {
-// TODO:          lineStart = BufStartOfLine(window->buffer, selStart+startPos);
-// TODO:          if (BufCountDispChars(window->buffer, lineStart, selStart+startPos) <
-// TODO:                rectStart || BufCountDispChars(window->buffer, lineStart,
-// TODO:                                               selStart+endPos) > rectEnd)
-// TODO:          {
-// TODO:             if (fileString[endPos] == '\0')
-// TODO:                break;
-// TODO:             /* If the match starts before the left boundary of the
-// TODO:                selection, and extends past it, we should not continue
-// TODO:                search after the end of the (false) match, because we
-// TODO:                could miss a valid match starting between the left boundary
-// TODO:                and the end of the false match. */
-// TODO:             if (BufCountDispChars(window->buffer, lineStart,
-// TODO:                                   selStart+startPos) < rectStart &&
-// TODO:                   BufCountDispChars(window->buffer, lineStart,
-// TODO:                                     selStart+endPos) > rectStart)
-// TODO:                beginPos += 1;
-// TODO:             else
-// TODO:                beginPos = (startPos == endPos) ? endPos+1 : endPos;
-// TODO:             continue;
-// TODO:          }
-// TODO:       }
-// TODO: 
-// TODO:       /* Make sure the match did not start past the end (regular expressions
-// TODO:          can consider the artificial end of the range as the end of a line,
-// TODO:          and match a fictional whole line beginning there) */
-// TODO:       if (startPos == (selEnd - selStart))
-// TODO:       {
-// TODO:          found = false;
-// TODO:          break;
-// TODO:       }
-// TODO: 
-// TODO:       /* replace the string and compensate for length change */
-// TODO:       if (isRegexType(searchType))
-// TODO:       {
-// TODO:          char replaceResult[SEARCHMAX], *foundString;
-// TODO:          foundString = BufGetRange(tempBuf, extentBW+realOffset,
-// TODO:                                    extentFW+realOffset+1);
-// TODO:          substSuccess = replaceUsingRE(searchString, replaceString,
-// TODO:                                        foundString, startPos - extentBW, replaceResult, SEARCHMAX,
-// TODO:                                        0 == (startPos + realOffset)
-// TODO:                                        ? '\0'
-// TODO:                                        : BufGetCharacter(tempBuf, startPos + realOffset - 1),
-// TODO:                                        GetWindowDelimiters(window), defaultRegexFlags(searchType));
-// TODO:          XtFree(foundString);
-// TODO: 
-// TODO:          if (!substSuccess)
-// TODO:          {
-// TODO:             /*  The substitution failed. Primary reason for this would be
-// TODO:                 a result string exceeding SEARCHMAX. */
-// TODO: 
-// TODO:             cancelSubst = prefOrUserCancelsSubst(window->mainWindow, TheDisplay);
-// TODO: 
-// TODO:             if (cancelSubst)
-// TODO:             {
-// TODO:                /*  No point in trying other substitutions.  */
-// TODO:                break;
-// TODO:             }
-// TODO:          }
-// TODO: 
-// TODO:          BufReplace(tempBuf, startPos+realOffset, endPos+realOffset,
-// TODO:                     replaceResult);
-// TODO:          replaceLen = strlen(replaceResult);
-// TODO:       }
-// TODO:       else
-// TODO:       {
-// TODO:          /* at this point plain substitutions (should) always work */
-// TODO:          BufReplace(tempBuf, startPos+realOffset, endPos+realOffset,
-// TODO:                     replaceString);
-// TODO:          substSuccess = true;
-// TODO:       }
-// TODO: 
-// TODO:       realOffset += replaceLen - (endPos - startPos);
-// TODO:       /* start again after match unless match was empty, then endPos+1 */
-// TODO:       beginPos = (startPos == endPos) ? endPos+1 : endPos;
-// TODO:       cursorPos = endPos;
-// TODO:       if (fileString[endPos] == '\0')
-// TODO:          break;
-// TODO:    }
-// TODO:    XtFree(fileString);
-// TODO: 
-// TODO:    if (anyFound)
-// TODO:    {
-// TODO:       if (substSuccess || !cancelSubst)
-// TODO:       {
-// TODO:          /*  Either the substitution was successful (the common case) or the
-// TODO:              user does not care and wants to have a faulty replacement.  */
-// TODO: 
-// TODO:          /* replace the selected range in the real buffer */
-// TODO:          BufReplace(window->buffer, selStart, selEnd, BufAsString(tempBuf));
-// TODO: 
-// TODO:          /* set the insert point at the end of the last replacement */
-// TODO:          TextSetCursorPos(window->lastFocus, selStart + cursorPos + realOffset);
-// TODO: 
-// TODO:          /* leave non-rectangular selections selected (rect. ones after replacement
-// TODO:             are less useful since left/right positions are randomly adjusted) */
-// TODO:          if (!isRect)
-// TODO:          {
-// TODO:             BufSelect(window->buffer, selStart, selEnd + realOffset);
-// TODO:          }
-// TODO:       }
-// TODO:    }
-// TODO:    else
-// TODO:    {
-// TODO:       /*  Nothing found, tell the user about it  */
-// TODO:       if (GetPrefSearchDlogs())
-// TODO:       {
-// TODO:          /* Avoid bug in Motif 1.1 by putting away search dialog
-// TODO:             before DialogF */
-// TODO:          if (window->findDlog && XtIsManaged(window->findDlog) &&
-// TODO:                !NeToggleButtonGetState(window->findKeepBtn))
-// TODO:             XtUnmanageChild(window->findDlog);
-// TODO:          if (window->replaceDlog && XtIsManaged(window->replaceDlog) &&
-// TODO:                !NeToggleButtonGetState(window->replaceKeepBtn))
-// TODO:             unmanageReplaceDialogs(window);
-// TODO:          DialogF(DF_INF, window->mainWindow, 1, "String not found",
-// TODO:                  "String was not found", "OK");
-// TODO:       }
-// TODO:       else
-// TODO:          XBell(TheDisplay, 0);
-// TODO:    }
-// TODO: 
-// TODO:    BufFree(tempBuf);
-// TODO:    return;
-// TODO: }
+
+/*
+**  Uses the resource nedit.truncSubstitution to determine how to deal with
+**  regex failures. This function only knows about the resource (via the usual
+**  setting getter) and asks or warns the user depending on that.
+**
+**  One could argue that the dialoging should be determined by the setting
+**  'searchDlogs'. However, the incomplete substitution is not just a question
+**  of verbosity, but of data loss. The search is successful, only the
+**  replacement fails due to an internal limitation of NEdit.
+**
+**  The parameters 'parent' and 'display' are only used to put dialogs and
+**  beeps at the right place.
+**
+**  The result is either predetermined by the resource or the user's choice.
+*/
+static bool prefOrUserCancelsSubst(Fl_Widget* parent)
+{
+   bool cancel = true;
+   unsigned confirmResult = 0;
+
+   switch (GetPrefTruncSubstitution())
+   {
+   case TRUNCSUBST_SILENT:
+      /*  silently fail the operation  */
+      cancel = true;
+      break;
+
+   case TRUNCSUBST_FAIL:
+      /*  fail the operation and pop up a dialog informing the user  */
+      fl_beep();
+      DialogF(DF_INF, parent, 1, "Substitution Failed",
+              "The result length of the substitution exceeded an internal limit.\n"
+              "The substitution is canceled.",
+              "OK");
+      cancel = true;
+      break;
+
+   case TRUNCSUBST_WARN:
+      /*  pop up dialog and ask for confirmation  */
+      fl_beep();
+      confirmResult = DialogF(DF_WARN, parent, 2,
+                              "Substitution Failed",
+                              "The result length of the substitution exceeded an internal limit.\n"
+                              "Executing the substitution will result in loss of data.",
+                              "Lose Data", "Cancel");
+      cancel = (1 != confirmResult);
+      break;
+
+   case TRUNCSUBST_IGNORE:
+      /*  silently conclude the operation; THIS WILL DESTROY DATA.  */
+      cancel = false;
+      break;
+   }
+
+   return cancel;
+}
+
+/*
+** Replace all occurences of "searchString" in "window" with "replaceString"
+** within the current primary selection in "window". Also adds the search and
+** replace strings to the global search history.
+*/
+void ReplaceInSelection(const WindowInfo* window, const char* searchString,
+                        const char* replaceString, const int searchType)
+{
+   int selStart, selEnd, beginPos, startPos, endPos, realOffset, replaceLen;
+   int found, isRect, rectStart, rectEnd, lineStart, cursorPos;
+   int extentBW, extentFW;
+   char* fileString;
+   Ne_Text_Buffer* tempBuf;
+   bool substSuccess = false;
+   bool anyFound = false;
+   bool cancelSubst = true;
+
+   /* save a copy of search and replace strings in the search history */
+   saveSearchHistory(searchString, replaceString, searchType, false);
+
+   /* find out where the selection is */
+   if (!BufGetSelectionPos(window->buffer, &selStart, &selEnd, &isRect, &rectStart, &rectEnd))
+      return;
+
+   /* get the selected text */
+   if (isRect)
+   {
+      selStart = BufStartOfLine(window->buffer, selStart);
+      selEnd = BufEndOfLine(window->buffer, selEnd);
+      fileString = BufGetRange(window->buffer, selStart, selEnd);
+   }
+   else
+      fileString = BufGetSelectionText(window->buffer);
+
+   /* create a temporary buffer in which to do the replacements to hide the
+      intermediate steps from the display routines, and so everything can
+      be undone in a single operation */
+   tempBuf = BufCreate();
+   BufSetAll(tempBuf, fileString);
+
+   /* search the string and do the replacements in the temporary buffer */
+   replaceLen = strlen(replaceString);
+   found = true;
+   beginPos = 0;
+   cursorPos = 0;
+   realOffset = 0;
+   while (found)
+   {
+      found = SearchString(fileString, searchString, SEARCH_FORWARD,
+                           searchType, false, beginPos, &startPos, &endPos, &extentBW,
+                           &extentFW, GetWindowDelimiters(window));
+      if (!found)
+         break;
+
+      anyFound = true;
+      /* if the selection is rectangular, verify that the found
+         string is in the rectangle */
+      if (isRect)
+      {
+         lineStart = BufStartOfLine(window->buffer, selStart+startPos);
+         if (BufCountDispChars(window->buffer, lineStart, selStart+startPos) <
+               rectStart || BufCountDispChars(window->buffer, lineStart,
+                                              selStart+endPos) > rectEnd)
+         {
+            if (fileString[endPos] == '\0')
+               break;
+            /* If the match starts before the left boundary of the
+               selection, and extends past it, we should not continue
+               search after the end of the (false) match, because we
+               could miss a valid match starting between the left boundary
+               and the end of the false match. */
+            if (BufCountDispChars(window->buffer, lineStart,
+                                  selStart+startPos) < rectStart &&
+                  BufCountDispChars(window->buffer, lineStart,
+                                    selStart+endPos) > rectStart)
+               beginPos += 1;
+            else
+               beginPos = (startPos == endPos) ? endPos+1 : endPos;
+            continue;
+         }
+      }
+
+      /* Make sure the match did not start past the end (regular expressions
+         can consider the artificial end of the range as the end of a line,
+         and match a fictional whole line beginning there) */
+      if (startPos == (selEnd - selStart))
+      {
+         found = false;
+         break;
+      }
+
+      /* replace the string and compensate for length change */
+      if (isRegexType(searchType))
+      {
+         char replaceResult[SEARCHMAX], *foundString;
+         foundString = BufGetRange(tempBuf, extentBW+realOffset,
+                                   extentFW+realOffset+1);
+         substSuccess = replaceUsingRE(searchString, replaceString,
+                                       foundString, startPos - extentBW, replaceResult, SEARCHMAX,
+                                       0 == (startPos + realOffset)
+                                       ? '\0'
+                                       : BufGetCharacter(tempBuf, startPos + realOffset - 1),
+                                       GetWindowDelimiters(window), defaultRegexFlags(searchType));
+         delete[] foundString;
+
+         if (!substSuccess)
+         {
+            /*  The substitution failed. Primary reason for this would be
+                a result string exceeding SEARCHMAX. */
+
+            cancelSubst = prefOrUserCancelsSubst(window->mainWindow);
+
+            if (cancelSubst)
+            {
+               /*  No point in trying other substitutions.  */
+               break;
+            }
+         }
+
+         BufReplace(tempBuf, startPos+realOffset, endPos+realOffset, replaceResult);
+         replaceLen = strlen(replaceResult);
+      }
+      else
+      {
+         /* at this point plain substitutions (should) always work */
+         BufReplace(tempBuf, startPos+realOffset, endPos+realOffset,
+                    replaceString);
+         substSuccess = true;
+      }
+
+      realOffset += replaceLen - (endPos - startPos);
+      /* start again after match unless match was empty, then endPos+1 */
+      beginPos = (startPos == endPos) ? endPos+1 : endPos;
+      cursorPos = endPos;
+      if (fileString[endPos] == '\0')
+         break;
+   }
+   delete[] fileString;
+
+   if (anyFound)
+   {
+      if (substSuccess || !cancelSubst)
+      {
+         /*  Either the substitution was successful (the common case) or the
+             user does not care and wants to have a faulty replacement.  */
+
+         /* replace the selected range in the real buffer */
+         BufReplace(window->buffer, selStart, selEnd, BufAsString(tempBuf));
+
+         /* set the insert point at the end of the last replacement */
+         TextSetCursorPos(window->lastFocus, selStart + cursorPos + realOffset);
+
+         /* leave non-rectangular selections selected (rect. ones after replacement
+            are less useful since left/right positions are randomly adjusted) */
+         if (!isRect)
+         {
+            BufSelect(window->buffer, selStart, selEnd + realOffset);
+         }
+      }
+   }
+   else
+   {
+      /*  Nothing found, tell the user about it  */
+      if (GetPrefSearchDlogs())
+      {
+         /* Avoid bug in Motif 1.1 by putting away search dialog
+            before DialogF */
+         if (window->findDlog && window->findDlog->visible() &&
+               !NeToggleButtonGetState(window->findKeepBtn))
+            window->findDlog->hide();
+         if (window->replaceDlog && window->replaceDlog->visible() &&
+               !NeToggleButtonGetState(window->replaceKeepBtn))
+            unmanageReplaceDialogs(window);
+         DialogF(DF_INF, window->mainWindow, 1, "String not found", "String was not found", "OK");
+      }
+      else
+         fl_beep();
+   }
+
+   BufFree(tempBuf);
+   return;
+}
 
 /*
 ** Replace all occurences of "searchString" in "window" with "replaceString".

@@ -19,5 +19,5 @@ Copy/paste should work fine, as the rectangular selection.
 Syntax highlighting is just *pre-alpha* quality, and crash a lot.
 There is no macros, shell commands, and help.
 
-This editor version is pretty harmfull, very unstable and immature. You use it only for
+This editor version is pretty harmfull, very unstable and immature. You should use it only for
 experimental purpose.

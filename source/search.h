@@ -34,7 +34,7 @@ enum SearchDirection {SEARCH_FORWARD, SEARCH_BACKWARD};
 
 void CreateFindDlog(Fl_Widget* parent, WindowInfo* window);
 void CreateReplaceDlog(Fl_Widget* parent, WindowInfo* window);
-// TODO: void CreateReplaceMultiFileDlog(WindowInfo* window);
+void CreateReplaceMultiFileDlog(WindowInfo* window);
 void DoFindReplaceDlog(WindowInfo* window, int direction, int keepDialogs, int searchType, double time);
 void DoReplaceMultiFileDlog(WindowInfo* window);
 void UpdateReplaceActionButtons(WindowInfo* window);

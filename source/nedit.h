@@ -50,6 +50,7 @@
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Tabs.H>
+#include <FL/Fl_Browser.H>
 
 #include <iostream>
 
@@ -337,9 +338,10 @@ struct  WindowInfo
    Fl_Check_Button*	findKeepBtn;
    Fl_Button*	findBtn;
 
-   Fl_Widget*	replaceMultiFileDlog;	/* Replace in multiple files */
-   Fl_Widget*	replaceMultiFileList;
-   Fl_Widget*	replaceMultiFilePathBtn;
+   // Replace in multiple files dialog
+   Fl_Window*	replaceMultiFileDlog;	/* Replace in multiple files */
+   Fl_Browser*	replaceMultiFileList;
+   Fl_Check_Button*	replaceMultiFilePathBtn;
    void* fontDialog;                   /* NULL, unless font dialog is up */
    void* colorDialog;                  /* NULL, unless color dialog is up */
    Fl_Widget*	readOnlyItem;           /* menu bar settable Fl_Widget*s... */

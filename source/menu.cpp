@@ -3012,7 +3012,7 @@ static void gotoMarkDialogAP(Fl_Widget* w, int, const char** args, int* nArgs)
 
 static void selectToMatchingAP(Fl_Widget* w, int, const char** args, int* nArgs)
 {
-// TODO:    SelectToMatchingCharacter(WidgetToWindow(w));
+   SelectToMatchingCharacter(WidgetToWindow(w));
 }
 
 static void gotoMatchingAP(Fl_Widget* w, int, const char** args, int* nArgs)

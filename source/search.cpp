@@ -2398,54 +2398,54 @@ void FlashMatching(WindowInfo* window, Ne_Text_Editor* textW)
    window->flashPos = matchPos;
 }
 
-// TODO: void SelectToMatchingCharacter(WindowInfo* window)
-// TODO: {
-// TODO:    int selStart, selEnd;
-// TODO:    int startPos, endPos, matchPos;
-// TODO:    textBuffer* buf = window->buffer;
-// TODO: 
-// TODO:    /* get the character to match and its position from the selection, or
-// TODO:       the character before the insert point if nothing is selected.
-// TODO:       Give up if too many characters are selected */
-// TODO:    if (!GetSimpleSelection(buf, &selStart, &selEnd))
-// TODO:    {
-// TODO:       selEnd = TextGetCursorPos(window->lastFocus);
-// TODO:       if (window->overstrike)
-// TODO:          selEnd += 1;
-// TODO:       selStart = selEnd - 1;
-// TODO:       if (selStart < 0)
-// TODO:       {
-// TODO:          XBell(TheDisplay, 0);
-// TODO:          return;
-// TODO:       }
-// TODO:    }
-// TODO:    if ((selEnd - selStart) != 1)
-// TODO:    {
-// TODO:       XBell(TheDisplay, 0);
-// TODO:       return;
-// TODO:    }
-// TODO: 
-// TODO:    /* Search for it in the buffer */
-// TODO:    if (!findMatchingChar(window, BufGetCharacter(buf, selStart),
-// TODO:                          GetHighlightInfo(window, selStart), selStart, 0, buf->length, &matchPos))
-// TODO:    {
-// TODO:       XBell(TheDisplay, 0);
-// TODO:       return;
-// TODO:    }
-// TODO:    startPos = (matchPos > selStart) ? selStart : matchPos;
-// TODO:    endPos = (matchPos > selStart) ? matchPos : selStart;
-// TODO: 
-// TODO:    /* temporarily shut off autoShowInsertPos before setting the cursor
-// TODO:       position so MakeSelectionVisible gets a chance to place the cursor
-// TODO:       string at a pleasing position on the screen (otherwise, the cursor would
-// TODO:       be automatically scrolled on screen and MakeSelectionVisible would do
-// TODO:       nothing) */
+void SelectToMatchingCharacter(WindowInfo* window)
+{
+   int selStart, selEnd;
+   int startPos, endPos, matchPos;
+   Ne_Text_Buffer* buf = window->buffer;
+
+   /* get the character to match and its position from the selection, or
+      the character before the insert point if nothing is selected.
+      Give up if too many characters are selected */
+   if (!GetSimpleSelection(buf, &selStart, &selEnd))
+   {
+      selEnd = TextGetCursorPos(window->lastFocus);
+      if (window->overstrike)
+         selEnd += 1;
+      selStart = selEnd - 1;
+      if (selStart < 0)
+      {
+         fl_beep();
+         return;
+      }
+   }
+   if ((selEnd - selStart) != 1)
+   {
+      fl_beep();
+      return;
+   }
+
+   /* Search for it in the buffer */
+   if (!findMatchingChar(window, BufGetCharacter(buf, selStart),
+                         GetHighlightInfo(window, selStart), selStart, 0, buf->length, &matchPos))
+   {
+      fl_beep();
+      return;
+   }
+   startPos = (matchPos > selStart) ? selStart : matchPos;
+   endPos = (matchPos > selStart) ? matchPos : selStart;
+
+   /* temporarily shut off autoShowInsertPos before setting the cursor
+      position so MakeSelectionVisible gets a chance to place the cursor
+      string at a pleasing position on the screen (otherwise, the cursor would
+      be automatically scrolled on screen and MakeSelectionVisible would do
+      nothing) */
 // TODO:    XtVaSetValues(window->lastFocus, textNautoShowInsertPos, false, NULL);
-// TODO:    /* select the text between the matching characters */
-// TODO:    BufSelect(buf, startPos, endPos+1);
-// TODO:    MakeSelectionVisible(window, window->lastFocus);
+   /* select the text between the matching characters */
+   BufSelect(buf, startPos, endPos+1);
+   MakeSelectionVisible(window, window->lastFocus);
 // TODO:    XtVaSetValues(window->lastFocus, textNautoShowInsertPos, true, NULL);
-// TODO: }
+}
 
 void GotoMatchingCharacter(WindowInfo* window)
 {

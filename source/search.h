@@ -65,7 +65,7 @@ void BeginISearch(WindowInfo* window, int direction);
 // TODO: void EndISearch(WindowInfo* window);
 // TODO: void SetISearchTextCallbacks(WindowInfo* window);
 void FlashMatching(WindowInfo* window, Ne_Text_Editor* textW);
-// TODO: void SelectToMatchingCharacter(WindowInfo* window);
+void SelectToMatchingCharacter(WindowInfo* window);
 void GotoMatchingCharacter(WindowInfo* window);
 void RemoveFromMultiReplaceDialog(WindowInfo* window);
 bool WindowCanBeClosed(WindowInfo* window);

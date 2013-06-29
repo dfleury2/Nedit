@@ -869,26 +869,26 @@ void SetPointerCenteredDialogs(int state)
 }
 
 
-// TODO: /*
-// TODO: ** Raise a window to the top and give it the input focus.  Setting input focus
-// TODO: ** is important on systems which use explict (rather than pointer) focus.
-// TODO: **
-// TODO: ** The X alternatives XMapRaised, and XSetInputFocus both have problems.
-// TODO: ** XMapRaised only gives the window the focus if it was initially not visible,
-// TODO: ** and XSetInputFocus sets the input focus, but crashes if the window is not
-// TODO: ** visible.
-// TODO: **
-// TODO: ** This routine should also be used in the case where a dialog is popped up and
-// TODO: ** subsequent calls to the dialog function use a flag, or the XtIsManaged, to
-// TODO: ** decide whether to create a new instance of the dialog, because on slower
-// TODO: ** systems, events can intervene while a dialog is still on its way up and its
-// TODO: ** window is still invisible, causing a subtle crash potential if
-// TODO: ** XSetInputFocus is used.
-// TODO: */
-// TODO: void RaiseDialogWindow(Fl_Widget* shell)
-// TODO: {
-// TODO:    RaiseWindow(XtDisplay(shell), XtWindow(shell), true);
-// TODO: }
+/*
+** Raise a window to the top and give it the input focus.  Setting input focus
+** is important on systems which use explict (rather than pointer) focus.
+**
+** The X alternatives XMapRaised, and XSetInputFocus both have problems.
+** XMapRaised only gives the window the focus if it was initially not visible,
+** and XSetInputFocus sets the input focus, but crashes if the window is not
+** visible.
+**
+** This routine should also be used in the case where a dialog is popped up and
+** subsequent calls to the dialog function use a flag, or the XtIsManaged, to
+** decide whether to create a new instance of the dialog, because on slower
+** systems, events can intervene while a dialog is still on its way up and its
+** window is still invisible, causing a subtle crash potential if
+** XSetInputFocus is used.
+*/
+void RaiseDialogWindow(Fl_Widget* window)
+{
+   window->show();
+}
 
 void RaiseShellWindow(Fl_Widget* shell, bool focus)
 {

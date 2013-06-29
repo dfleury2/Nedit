@@ -118,7 +118,7 @@ void SetDeleteRemap(int state);
 void RemovePPositionHint(Fl_Widget* shell);
 void ManageDialogCenteredOnPointer(Fl_Widget* dialogChild);
 void SetPointerCenteredDialogs(int state);
-// TODO: void RaiseDialogWindow(Fl_Widget* shell);
+void RaiseDialogWindow(Fl_Widget* shell);
 void RaiseShellWindow(Fl_Widget* shell, bool focus);
 // TODO: void RaiseWindow(Display* display, Window w, bool focus);
 // TODO: void AddDialogMnemonicHandler(Fl_Widget* dialog, int unmodifiedToo);

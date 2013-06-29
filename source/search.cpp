@@ -241,16 +241,16 @@ static const char* searchTypeStrings[] =
 */
 static WindowInfo* windowNotToClose = NULL;
 
-// TODO: bool WindowCanBeClosed(WindowInfo* window)
-// TODO: {
-// TODO:    if (windowNotToClose &&
-// TODO:          GetTopDocument(window->mainWindow) ==
-// TODO:          GetTopDocument(windowNotToClose->mainWindow))
-// TODO:    {
-// TODO:       return false;
-// TODO:    }
-// TODO:    return true; /* It's safe */
-// TODO: }
+bool WindowCanBeClosed(WindowInfo* window)
+{
+   if (windowNotToClose &&
+         GetTopDocument(window->mainWindow) ==
+         GetTopDocument(windowNotToClose->mainWindow))
+   {
+      return false;
+   }
+   return true; /* It's safe */
+}
 
 /*
 ** Shared routine for replace and find dialogs and i-search bar to initialize
@@ -342,45 +342,38 @@ void DoFindReplaceDlog(WindowInfo* window, int direction, int keepDialogs, int s
    if (window->replaceDlog == NULL)
       CreateReplaceDlog(window->mainWindow, window);
 
-// TODO:    setTextField(window, time, window->replaceText);
-// TODO: 
-// TODO:    /* If the window is already up, just pop it to the top */
-// TODO:    if (XtIsManaged(window->replaceDlog))
-// TODO:    {
-// TODO:       RaiseDialogWindow(XtParent(window->replaceDlog));
-// TODO:       return;
-// TODO:    }
+   /* If the window is already up, just pop it to the top */
+   if (window->replaceDlog->visible())
+   {
+      RaiseDialogWindow(window->replaceDlog);
+      return;
+   }
 
    window->replaceDlog->show();
 
-// TODO:    /* Blank the Replace with field */
-// TODO:    NeTextSetString(window->replaceWithText, "");
-// TODO: 
-// TODO:    /* Set the initial search type */
-// TODO:    initToggleButtons(searchType, window->replaceRegexToggle,
-// TODO:                      window->replaceCaseToggle, &window->replaceWordToggle,
-// TODO:                      &window->replaceLastLiteralCase,
-// TODO:                      &window->replaceLastRegexCase);
-// TODO: 
-// TODO:    /* Set the initial direction based on the direction argument */
-// TODO:    NeToggleButtonSetState(window->replaceRevToggle,
-// TODO:                           direction == SEARCH_FORWARD ? false: true, true);
-// TODO: 
-// TODO:    /* Set the state of the Keep Dialog Up button */
-// TODO:    NeToggleButtonSetState(window->replaceKeepBtn, keepDialogs, true);
-// TODO: 
-// TODO:    UpdateReplaceActionButtons(window);
-// TODO: 
-// TODO:    /* Start the search history mechanism at the current history item */
-// TODO:    window->rHistIndex = 0;
-// TODO: 
-// TODO:    /* Display the dialog */
-// TODO:    ManageDialogCenteredOnPointer(window->replaceDlog);
-// TODO: 
-// TODO:    /* Workaround: LessTif (as of version 0.89) needs reminding of who had
-// TODO:       the focus when the dialog was unmanaged.  When re-managed, focus is
-// TODO:       lost and events fall through to the window below. */
-// TODO:    XmProcessTraversal(window->replaceText, XmTRAVERSE_CURRENT);
+   /* Blank the Replace with field */
+   NeTextSetString(window->replaceWithText, "");
+
+   /* Set the initial search type */
+   initToggleButtons(searchType, window->replaceRegexToggle,
+                     window->replaceCaseToggle, window->replaceWordToggle,
+                     &window->replaceLastLiteralCase,
+                     &window->replaceLastRegexCase);
+
+   /* Set the initial direction based on the direction argument */
+   NeToggleButtonSetState(window->replaceRevToggle,
+                          direction == SEARCH_FORWARD ? false: true, true);
+
+   /* Set the state of the Keep Dialog Up button */
+   NeToggleButtonSetState(window->replaceKeepBtn, keepDialogs, true);
+
+   UpdateReplaceActionButtons(window);
+
+   /* Start the search history mechanism at the current history item */
+   window->rHistIndex = 0;
+
+   /* Display the dialog */
+   ManageDialogCenteredOnPointer(window->replaceDlog);
 }
 
 // TODO: static void setTextField(WindowInfo* window, Time time, Widget textField)
@@ -454,13 +447,14 @@ void DoFindDlog(WindowInfo* window, int direction, int keepDialogs, int searchTy
       CreateFindDlog(window->mainWindow, window);
    
 // TODO:    setTextField(window, time, window->findText);
-// TODO: 
-// TODO:    /* If the window is already up, just pop it to the top */
-// TODO:    if (XtIsManaged(window->findDlog))
-// TODO:    {
-// TODO:       RaiseDialogWindow(XtParent(window->findDlog));
-// TODO:       return;
-// TODO:    }
+
+   /* If the window is already up, just pop it to the top */
+   if (window->findDlog->visible())
+
+   {
+      RaiseDialogWindow(window->findDlog);
+      return;
+   }
 
    window->findDlog->show();
 
@@ -485,11 +479,6 @@ void DoFindDlog(WindowInfo* window, int direction, int keepDialogs, int searchTy
 
    /* Display the dialog */
    ManageDialogCenteredOnPointer(window->findDlog);
-
-// TODO:    /* Workaround: LessTif (as of version 0.89) needs reminding of who had
-// TODO:       the focus when the dialog was unmanaged.  When re-managed, focus is
-// TODO:       lost and events fall through to the window below. */
-// TODO:    XmProcessTraversal(window->findText, XmTRAVERSE_CURRENT);
 }
 
 void DoReplaceMultiFileDlog(WindowInfo* window)

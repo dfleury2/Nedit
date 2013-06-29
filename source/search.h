@@ -68,13 +68,13 @@ void FlashMatching(WindowInfo* window, Ne_Text_Editor* textW);
 // TODO: void SelectToMatchingCharacter(WindowInfo* window);
 void GotoMatchingCharacter(WindowInfo* window);
 void RemoveFromMultiReplaceDialog(WindowInfo* window);
-// TODO: bool WindowCanBeClosed(WindowInfo* window);
+bool WindowCanBeClosed(WindowInfo* window);
 
 /*
 ** Schwarzenberg: added SEARCH_LITERAL_WORD .. SEARCH_REGEX_NOCASE
 **
 ** The order of the integers in this enumeration must be exactly
-** the same as the order of the coressponding strings of the
+** the same as the order of the corresponding strings of the
 ** array  SearchMethodStrings defined in preferences.c (!!)
 **
 */

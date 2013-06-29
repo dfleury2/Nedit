@@ -20,7 +20,7 @@ struct selection
 typedef void (*bufModifyCallbackProc)(int pos, int nInserted, int nDeleted, int nRestyled, const char* deletedText, void* cbArg);
 typedef void (*bufPreDeleteCallbackProc)(int pos, int nDeleted, void* cbArg);
 
-typedef struct Ne_Text_Buffer
+struct Ne_Text_Buffer
 {
    int length; 	        /* length of the text in the buffer (the length of the buffer itself must be calculated: gapEnd - gapStart + length) */
    char* buf;                  /* allocated memory where the text is stored */
@@ -42,9 +42,9 @@ typedef struct Ne_Text_Buffer
    char nullSubsChar;	    	/* NEdit is based on C null-terminated strings, so ascii-nul characters must be substituted
 				   with something else.  This is the else, but of course, things get quite messy when you use it */
    RangesetTable* rangesetTable;   /* current range sets */
-} Ne_Text_Buffer;
+};
 
-Ne_Text_Buffer* BufCreate(void);
+Ne_Text_Buffer* BufCreate();
 Ne_Text_Buffer* BufCreatePreallocated(int requestedSize);
 void BufFree(Ne_Text_Buffer* buf);
 char* BufGetAll(Ne_Text_Buffer* buf);

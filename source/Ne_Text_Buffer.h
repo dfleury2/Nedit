@@ -4,7 +4,7 @@
 /* Maximum length in characters of a tab or control character expansion  of a single buffer character */
 #define MAX_EXP_CHAR_LEN 20
 
-typedef struct _RangesetTable RangesetTable;
+struct RangesetTable;
 
 struct selection
 {

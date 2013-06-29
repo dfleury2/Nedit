@@ -10,15 +10,14 @@
 #include <ctype.h>
 
 /* -------------------------------------------------------------------------- */
-
-struct _Range
+struct Range
 {
    int start, end;			/* range from [start-]end */
 };
 
 typedef Rangeset* RangesetUpdateFn(Rangeset* p, int pos, int ins, int del);
 
-struct _Rangeset
+struct Rangeset
 {
    RangesetUpdateFn* update_fn;	/* modification update function */
    char* update_name;			/* update function name */
@@ -35,7 +34,7 @@ struct _Rangeset
    char* name;                         /* name of rangeset */
 };
 
-struct _RangesetTable
+struct RangesetTable
 {
    int n_set;				/* how many sets are active */
    Ne_Text_Buffer* buf;			/* the text buffer of the rangeset */
@@ -47,7 +46,6 @@ struct _RangesetTable
 };
 
 /* -------------------------------------------------------------------------- */
-
 #define SWAPval(T,a,b) { T t; t = *(a); *(a) = *(b); *(b) = t; }
 
 static unsigned char rangeset_labels[N_RANGESETS + 1] =
@@ -59,7 +57,6 @@ static unsigned char rangeset_labels[N_RANGESETS + 1] =
 };
 
 /* -------------------------------------------------------------------------- */
-
 static RangesetUpdateFn rangesetInsDelMaintain;
 static RangesetUpdateFn rangesetInclMaintain;
 static RangesetUpdateFn rangesetDelInsMaintain;

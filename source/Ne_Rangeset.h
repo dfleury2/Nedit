@@ -5,10 +5,10 @@
 
 #define N_RANGESETS 63
 
-typedef struct _Range Range;
-typedef struct _Rangeset Rangeset;
-typedef struct _RangesetTable RangesetTable;
-typedef struct Ne_Text_Buffer Ne_Text_Buffer;
+struct Range;
+struct Rangeset;
+struct RangesetTable;
+struct Ne_Text_Buffer;
 
 void RangesetRefreshRange(Rangeset* rangeset, int start, int end);
 void RangesetEmpty(Rangeset* rangeset);

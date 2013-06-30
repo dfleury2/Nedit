@@ -49,19 +49,6 @@ static char* unexpandTabs(const char* text, int startIndent, int tabDist, char n
 static int max(int i1, int i2);
 static int min(int i1, int i2);
 
-#ifdef __MVS__
-static const char* ControlCodeTable[64] =
-{
-   "nul", "soh", "stx", "etx", "sel", "ht", "rnl", "del",
-   "ge", "sps", "rpt", "vt", "ff", "cr", "so", "si",
-   "dle", "dc1", "dc2", "dc3", "res", "nl", "bs", "poc",
-   "can", "em", "ubs", "cu1", "ifs", "igs", "irs", "ius",
-   "ds", "sos", "fs", "wus", "byp", "lf", "etb", "esc",
-   "sa", "sfe", "sm", "csp", "mfa", "enq", "ack", "bel",
-   "x30", "x31", "syn", "ir", "pp", "trn", "nbs", "eot",
-   "sbs", "it", "rff", "cu3", "dc4", "nak", "x3e", "sub"
-};
-#else
 static const char* ControlCodeTable[32] =
 {
    "nul", "soh", "stx", "etx", "eot", "enq", "ack", "bel",
@@ -69,22 +56,21 @@ static const char* ControlCodeTable[32] =
    "dle", "dc1", "dc2", "dc3", "dc4", "nak", "syn", "etb",
    "can", "em", "sub", "esc", "fs", "gs", "rs", "us"
 };
-#endif
 
-/*
-** Create an empty text buffer
-*/
+// --------------------------------------------------------------------------
+// Create an empty text buffer
+// --------------------------------------------------------------------------
 Ne_Text_Buffer* BufCreate(void)
 {
    Ne_Text_Buffer* buf = BufCreatePreallocated(0);
    return buf;
 }
 
-/*
-** Create an empty text buffer of a pre-determined size (use this to
-** avoid unnecessary re-allocation if you know exactly how much the buffer
-** will need to hold
-*/
+// --------------------------------------------------------------------------
+// Create an empty text buffer of a pre-determined size (use this to
+// avoid unnecessary re-allocation if you know exactly how much the buffer
+// will need to hold
+// --------------------------------------------------------------------------
 Ne_Text_Buffer* BufCreatePreallocated(int requestedSize)
 {
    Ne_Text_Buffer* buf;
@@ -116,19 +102,13 @@ Ne_Text_Buffer* BufCreatePreallocated(int requestedSize)
    buf->preDeleteCbArgs = NULL;
    buf->nPreDeleteProcs = 0;
    buf->nullSubsChar = '\0';
-#ifdef PURIFY
-   {
-      int i;
-      for (i=buf->gapStart; i<buf->gapEnd; i++) buf->buf[i] = '.';
-   }
-#endif
    buf->rangesetTable = NULL;
    return buf;
 }
 
-/*
-** Free a text buffer
-*/
+// --------------------------------------------------------------------------
+// Free a text buffer
+// --------------------------------------------------------------------------
 void BufFree(Ne_Text_Buffer* buf)
 {
    free__(buf->buf);
@@ -147,10 +127,10 @@ void BufFree(Ne_Text_Buffer* buf)
    free__((char*)buf);
 }
 
-/*
-** Get the entire contents of a text buffer.  Memory is allocated to contain
-** the returned string, which the caller must free__.
-*/
+// --------------------------------------------------------------------------
+// Get the entire contents of a text buffer.  Memory is allocated to contain
+// the returned string, which the caller must free__.
+// --------------------------------------------------------------------------
 char* BufGetAll(Ne_Text_Buffer* buf)
 {
    char* text;
@@ -163,15 +143,15 @@ char* BufGetAll(Ne_Text_Buffer* buf)
    return text;
 }
 
-/*
-** Get the entire contents of a text buffer as a single string.  The gap is
-** moved so that the buffer data can be accessed as a single contiguous
-** character array.
-** NB DO NOT ALTER THE TEXT THROUGH THE RETURNED POINTER!
-** (we make an exception in BufSubstituteNullChars() however)
-** This function is intended ONLY to provide a searchable string without copying
-** into a temporary buffer.
-*/
+// --------------------------------------------------------------------------
+// Get the entire contents of a text buffer as a single string.  The gap is
+// moved so that the buffer data can be accessed as a single contiguous
+// character array.
+// NB DO NOT ALTER THE TEXT THROUGH THE RETURNED POINTER!
+// (we make an exception in BufSubstituteNullChars() however)
+// This function is intended ONLY to provide a searchable string without copying
+// into a temporary buffer.
+// --------------------------------------------------------------------------
 const char* BufAsString(Ne_Text_Buffer* buf)
 {
    char* text;
@@ -193,9 +173,9 @@ const char* BufAsString(Ne_Text_Buffer* buf)
    return text;
 }
 
-/*
-** Replace the entire contents of the text buffer
-*/
+// --------------------------------------------------------------------------
+// Replace the entire contents of the text buffer
+// --------------------------------------------------------------------------
 void BufSetAll(Ne_Text_Buffer* buf, const char* text)
 {
    int length, deletedLength;
@@ -217,12 +197,6 @@ void BufSetAll(Ne_Text_Buffer* buf, const char* text)
    buf->gapEnd = buf->gapStart + PREFERRED_GAP_SIZE;
    memcpy(buf->buf, text, buf->gapStart);
    memcpy(&buf->buf[buf->gapEnd], &text[buf->gapStart], length-buf->gapStart);
-#ifdef PURIFY
-   {
-      int i;
-      for (i=buf->gapStart; i<buf->gapEnd; i++) buf->buf[i] = '.';
-   }
-#endif
 
    /* Zero all of the existing selections */
    updateSelections(buf, 0, deletedLength, 0);
@@ -232,11 +206,11 @@ void BufSetAll(Ne_Text_Buffer* buf, const char* text)
    free__(deletedText);
 }
 
-/*
-** Return a copy of the text between "start" and "end" character positions
-** from text buffer "buf".  Positions start at 0, and the range does not
-** include the character pointed to by "end"
-*/
+// --------------------------------------------------------------------------
+// Return a copy of the text between "start" and "end" character positions
+// from text buffer "buf".  Positions start at 0, and the range does not
+// include the character pointed to by "end"
+// --------------------------------------------------------------------------
 char* BufGetRange(const Ne_Text_Buffer* buf, int start, int end)
 {
    char* text;
@@ -280,9 +254,9 @@ char* BufGetRange(const Ne_Text_Buffer* buf, int start, int end)
    return text;
 }
 
-/*
-** Return the character at buffer position "pos".  Positions start at 0.
-*/
+// --------------------------------------------------------------------------
+// Return the character at buffer position "pos".  Positions start at 0.
+// --------------------------------------------------------------------------
 char BufGetCharacter(const Ne_Text_Buffer* buf, const int pos)
 {
    if (pos < 0 || pos >= buf->length)
@@ -293,9 +267,9 @@ char BufGetCharacter(const Ne_Text_Buffer* buf, const int pos)
       return buf->buf[pos + buf->gapEnd-buf->gapStart];
 }
 
-/*
-** Insert null-terminated string "text" at position "pos" in "buf"
-*/
+// --------------------------------------------------------------------------
+// Insert null-terminated string "text" at position "pos" in "buf"
+// --------------------------------------------------------------------------
 void BufInsert(Ne_Text_Buffer* buf, int pos, const char* text)
 {
    int nInserted;
@@ -313,10 +287,10 @@ void BufInsert(Ne_Text_Buffer* buf, int pos, const char* text)
    callModifyCBs(buf, pos, 0, nInserted, 0, NULL);
 }
 
-/*
-** Delete the characters between "start" and "end", and insert the
-** null-terminated string "text" in their place in in "buf"
-*/
+// --------------------------------------------------------------------------
+// Delete the characters between "start" and "end", and insert the
+// null-terminated string "text" in their place in in "buf"
+// --------------------------------------------------------------------------
 void BufReplace(Ne_Text_Buffer* buf, int start, int end, const char* text)
 {
    char* deletedText;
@@ -331,6 +305,7 @@ void BufReplace(Ne_Text_Buffer* buf, int start, int end, const char* text)
    free__(deletedText);
 }
 
+// --------------------------------------------------------------------------
 void BufRemove(Ne_Text_Buffer* buf, int start, int end)
 {
    char* deletedText;
@@ -356,6 +331,7 @@ void BufRemove(Ne_Text_Buffer* buf, int start, int end)
    free__(deletedText);
 }
 
+// --------------------------------------------------------------------------
 void BufCopyFromBuf(Ne_Text_Buffer* fromBuf, Ne_Text_Buffer* toBuf, int fromStart,
    int fromEnd, int toPos)
 {
@@ -395,14 +371,14 @@ void BufCopyFromBuf(Ne_Text_Buffer* fromBuf, Ne_Text_Buffer* toBuf, int fromStar
    updateSelections(toBuf, toPos, 0, length);
 }
 
-/*
-** Insert "text" columnwise into buffer starting at displayed character
-** position "column" on the line beginning at "startPos".  Opens a rectangular
-** space the width and height of "text", by moving all text to the right of
-** "column" right.  If charsInserted and charsDeleted are not NULL, the
-** number of characters inserted and deleted in the operation (beginning
-** at startPos) are returned in these arguments
-*/
+// --------------------------------------------------------------------------
+// Insert "text" columnwise into buffer starting at displayed character
+// position "column" on the line beginning at "startPos".  Opens a rectangular
+// space the width and height of "text", by moving all text to the right of
+// "column" right.  If charsInserted and charsDeleted are not NULL, the
+// number of characters inserted and deleted in the operation (beginning
+// at startPos) are returned in these arguments
+// --------------------------------------------------------------------------
 void BufInsertCol(Ne_Text_Buffer* buf, int column, int startPos, const char* text,
    int* charsInserted, int* charsDeleted)
 {
@@ -427,13 +403,13 @@ void BufInsertCol(Ne_Text_Buffer* buf, int column, int startPos, const char* tex
       *charsDeleted = nDeleted;
 }
 
-/*
-** Overlay "text" between displayed character positions "rectStart" and
-** "rectEnd" on the line beginning at "startPos".  If charsInserted and
-** charsDeleted are not NULL, the number of characters inserted and deleted
-** in the operation (beginning at startPos) are returned in these arguments.
-** If rectEnd equals -1, the width of the inserted text is measured first.
-*/
+// --------------------------------------------------------------------------
+// Overlay "text" between displayed character positions "rectStart" and
+// "rectEnd" on the line beginning at "startPos".  If charsInserted and
+// charsDeleted are not NULL, the number of characters inserted and deleted
+// in the operation (beginning at startPos) are returned in these arguments.
+// If rectEnd equals -1, the width of the inserted text is measured first.
+// --------------------------------------------------------------------------
 void BufOverlayRect(Ne_Text_Buffer* buf, int startPos, int rectStart,
    int rectEnd, const char* text, int* charsInserted, int* charsDeleted)
 {
@@ -461,11 +437,11 @@ void BufOverlayRect(Ne_Text_Buffer* buf, int startPos, int rectStart,
       *charsDeleted = nDeleted;
 }
 
-/*
-** Replace a rectangular area in buf, given by "start", "end", "rectStart",
-** and "rectEnd", with "text".  If "text" is vertically longer than the
-** rectangle, add extra lines to make room for it.
-*/
+// --------------------------------------------------------------------------
+// Replace a rectangular area in buf, given by "start", "end", "rectStart",
+// and "rectEnd", with "text".  If "text" is vertically longer than the
+// rectangle, add extra lines to make room for it.
+// --------------------------------------------------------------------------
 void BufReplaceRect(Ne_Text_Buffer* buf, int start, int end, int rectStart,
    int rectEnd, const char* text)
 {
@@ -534,10 +510,10 @@ void BufReplaceRect(Ne_Text_Buffer* buf, int start, int end, int rectStart,
    free__(deletedText);
 }
 
-/*
-** Remove a rectangular swath of characters between character positions start
-** and end and horizontal displayed-character offsets rectStart and rectEnd.
-*/
+// --------------------------------------------------------------------------
+// Remove a rectangular swath of characters between character positions start
+// and end and horizontal displayed-character offsets rectStart and rectEnd.
+// --------------------------------------------------------------------------
 void BufRemoveRect(Ne_Text_Buffer* buf, int start, int end, int rectStart,
    int rectEnd)
 {
@@ -554,11 +530,11 @@ void BufRemoveRect(Ne_Text_Buffer* buf, int start, int end, int rectStart,
    free__(deletedText);
 }
 
-/*
-** Clear a rectangular "hole" out of the buffer between character positions
-** start and end and horizontal displayed-character offsets rectStart and
-** rectEnd.
-*/
+// --------------------------------------------------------------------------
+// Clear a rectangular "hole" out of the buffer between character positions
+// start and end and horizontal displayed-character offsets rectStart and
+// rectEnd.
+// --------------------------------------------------------------------------
 void BufClearRect(Ne_Text_Buffer* buf, int start, int end, int rectStart,
    int rectEnd)
 {
@@ -575,6 +551,7 @@ void BufClearRect(Ne_Text_Buffer* buf, int start, int end, int rectStart,
    free__(newlineString);
 }
 
+// --------------------------------------------------------------------------
 char* BufGetTextInRect(Ne_Text_Buffer* buf, int start, int end,
    int rectStart, int rectEnd)
 {
@@ -610,19 +587,19 @@ char* BufGetTextInRect(Ne_Text_Buffer* buf, int start, int end,
    return retabbedStr;
 }
 
-/*
-** Get the hardware tab distance used by all displays for this buffer,
-** and used in computing offsets for rectangular selection operations.
-*/
+// --------------------------------------------------------------------------
+// Get the hardware tab distance used by all displays for this buffer,
+// and used in computing offsets for rectangular selection operations.
+// --------------------------------------------------------------------------
 int BufGetTabDistance(Ne_Text_Buffer* buf)
 {
    return buf->tabDist;
 }
 
-/*
-** Set the hardware tab distance used by all displays for this buffer,
-** and used in computing offsets for rectangular selection operations.
-*/
+// --------------------------------------------------------------------------
+// Set the hardware tab distance used by all displays for this buffer,
+// and used in computing offsets for rectangular selection operations.
+// --------------------------------------------------------------------------
 void BufSetTabDistance(Ne_Text_Buffer* buf, int tabDist)
 {
    const char* deletedText;
@@ -639,12 +616,14 @@ void BufSetTabDistance(Ne_Text_Buffer* buf, int tabDist)
    callModifyCBs(buf, 0, buf->length, buf->length, 0, deletedText);
 }
 
+// --------------------------------------------------------------------------
 void BufCheckDisplay(Ne_Text_Buffer* buf, int start, int end)
 {
    /* just to make sure colors in the selected region are up to date */
    callModifyCBs(buf, start, 0, 0, end-start, NULL);
 }
 
+// --------------------------------------------------------------------------
 void BufSelect(Ne_Text_Buffer* buf, int start, int end)
 {
    selection oldSelection = buf->primary;
@@ -653,6 +632,7 @@ void BufSelect(Ne_Text_Buffer* buf, int start, int end)
    redisplaySelection(buf, &oldSelection, &buf->primary);
 }
 
+// --------------------------------------------------------------------------
 void BufUnselect(Ne_Text_Buffer* buf)
 {
    selection oldSelection = buf->primary;
@@ -662,8 +642,8 @@ void BufUnselect(Ne_Text_Buffer* buf)
    redisplaySelection(buf, &oldSelection, &buf->primary);
 }
 
-void BufRectSelect(Ne_Text_Buffer* buf, int start, int end, int rectStart,
-   int rectEnd)
+// --------------------------------------------------------------------------
+void BufRectSelect(Ne_Text_Buffer* buf, int start, int end, int rectStart, int rectEnd)
 {
    selection oldSelection = buf->primary;
 
@@ -671,6 +651,7 @@ void BufRectSelect(Ne_Text_Buffer* buf, int start, int end, int rectStart,
    redisplaySelection(buf, &oldSelection, &buf->primary);
 }
 
+// --------------------------------------------------------------------------
 int BufGetSelectionPos(Ne_Text_Buffer* buf, int* start, int* end,
    int* isRect, int* rectStart, int* rectEnd)
 {
@@ -678,7 +659,9 @@ int BufGetSelectionPos(Ne_Text_Buffer* buf, int* start, int* end,
       rectEnd);
 }
 
-/* Same as above, but also returns TRUE for empty selections */
+// --------------------------------------------------------------------------
+// Same as above, but also returns TRUE for empty selections
+// --------------------------------------------------------------------------
 int BufGetEmptySelectionPos(Ne_Text_Buffer* buf, int* start, int* end,
    int* isRect, int* rectStart, int* rectEnd)
 {
@@ -686,21 +669,25 @@ int BufGetEmptySelectionPos(Ne_Text_Buffer* buf, int* start, int* end,
       rectEnd) || buf->primary.zeroWidth;
 }
 
+// --------------------------------------------------------------------------
 char* BufGetSelectionText(Ne_Text_Buffer* buf)
 {
    return getSelectionText(buf, &buf->primary);
 }
 
+// --------------------------------------------------------------------------
 void BufRemoveSelected(Ne_Text_Buffer* buf)
 {
    removeSelected(buf, &buf->primary);
 }
 
+// --------------------------------------------------------------------------
 void BufReplaceSelected(Ne_Text_Buffer* buf, const char* text)
 {
    replaceSelected(buf, &buf->primary, text);
 }
 
+// --------------------------------------------------------------------------
 void BufSecondarySelect(Ne_Text_Buffer* buf, int start, int end)
 {
    selection oldSelection = buf->secondary;
@@ -709,6 +696,7 @@ void BufSecondarySelect(Ne_Text_Buffer* buf, int start, int end)
    redisplaySelection(buf, &oldSelection, &buf->secondary);
 }
 
+// --------------------------------------------------------------------------
 void BufSecondaryUnselect(Ne_Text_Buffer* buf)
 {
    selection oldSelection = buf->secondary;
@@ -718,8 +706,8 @@ void BufSecondaryUnselect(Ne_Text_Buffer* buf)
    redisplaySelection(buf, &oldSelection, &buf->secondary);
 }
 
-void BufSecRectSelect(Ne_Text_Buffer* buf, int start, int end,
-   int rectStart, int rectEnd)
+// --------------------------------------------------------------------------
+void BufSecRectSelect(Ne_Text_Buffer* buf, int start, int end, int rectStart, int rectEnd)
 {
    selection oldSelection = buf->secondary;
 
@@ -727,6 +715,7 @@ void BufSecRectSelect(Ne_Text_Buffer* buf, int start, int end,
    redisplaySelection(buf, &oldSelection, &buf->secondary);
 }
 
+// --------------------------------------------------------------------------
 int BufGetSecSelectPos(Ne_Text_Buffer* buf, int* start, int* end,
    int* isRect, int* rectStart, int* rectEnd)
 {
@@ -734,21 +723,25 @@ int BufGetSecSelectPos(Ne_Text_Buffer* buf, int* start, int* end,
       rectEnd);
 }
 
+// --------------------------------------------------------------------------
 char* BufGetSecSelectText(Ne_Text_Buffer* buf)
 {
    return getSelectionText(buf, &buf->secondary);
 }
 
+// --------------------------------------------------------------------------
 void BufRemoveSecSelect(Ne_Text_Buffer* buf)
 {
    removeSelected(buf, &buf->secondary);
 }
 
+// --------------------------------------------------------------------------
 void BufReplaceSecSelect(Ne_Text_Buffer* buf, const char* text)
 {
    replaceSelected(buf, &buf->secondary, text);
 }
 
+// --------------------------------------------------------------------------
 void BufHighlight(Ne_Text_Buffer* buf, int start, int end)
 {
    selection oldSelection = buf->highlight;
@@ -757,6 +750,7 @@ void BufHighlight(Ne_Text_Buffer* buf, int start, int end)
    redisplaySelection(buf, &oldSelection, &buf->highlight);
 }
 
+// --------------------------------------------------------------------------
 void BufUnhighlight(Ne_Text_Buffer* buf)
 {
    selection oldSelection = buf->highlight;
@@ -766,8 +760,8 @@ void BufUnhighlight(Ne_Text_Buffer* buf)
    redisplaySelection(buf, &oldSelection, &buf->highlight);
 }
 
-void BufRectHighlight(Ne_Text_Buffer* buf, int start, int end,
-   int rectStart, int rectEnd)
+// --------------------------------------------------------------------------
+void BufRectHighlight(Ne_Text_Buffer* buf, int start, int end, int rectStart, int rectEnd)
 {
    selection oldSelection = buf->highlight;
 
@@ -775,6 +769,7 @@ void BufRectHighlight(Ne_Text_Buffer* buf, int start, int end,
    redisplaySelection(buf, &oldSelection, &buf->highlight);
 }
 
+// --------------------------------------------------------------------------
 int BufGetHighlightPos(Ne_Text_Buffer* buf, int* start, int* end,
    int* isRect, int* rectStart, int* rectEnd)
 {
@@ -782,9 +777,9 @@ int BufGetHighlightPos(Ne_Text_Buffer* buf, int* start, int* end,
       rectEnd);
 }
 
-/*
-** Add a callback routine to be called when the buffer is modified
-*/
+// --------------------------------------------------------------------------
+// Add a callback routine to be called when the buffer is modified
+// --------------------------------------------------------------------------
 void BufAddModifyCB(Ne_Text_Buffer* buf, bufModifyCallbackProc bufModifiedCB,
    void* cbArg)
 {
@@ -812,10 +807,10 @@ void BufAddModifyCB(Ne_Text_Buffer* buf, bufModifyCallbackProc bufModifiedCB,
    buf->cbArgs = newCBArgs;
 }
 
-/*
-** Similar to the above, but makes sure that the callback is called before
-** normal priority callbacks.
-*/
+// --------------------------------------------------------------------------
+// Similar to the above, but makes sure that the callback is called before
+// normal priority callbacks.
+// --------------------------------------------------------------------------
 void BufAddHighPriorityModifyCB(Ne_Text_Buffer* buf, bufModifyCallbackProc bufModifiedCB,
    void* cbArg)
 {
@@ -843,8 +838,8 @@ void BufAddHighPriorityModifyCB(Ne_Text_Buffer* buf, bufModifyCallbackProc bufMo
    buf->cbArgs = newCBArgs;
 }
 
-void BufRemoveModifyCB(Ne_Text_Buffer* buf, bufModifyCallbackProc bufModifiedCB,
-   void* cbArg)
+// --------------------------------------------------------------------------
+void BufRemoveModifyCB(Ne_Text_Buffer* buf, bufModifyCallbackProc bufModifiedCB, void* cbArg)
 {
    int i, toRemove = -1;
    bufModifyCallbackProc* newModifyProcs;
@@ -898,9 +893,9 @@ void BufRemoveModifyCB(Ne_Text_Buffer* buf, bufModifyCallbackProc bufModifiedCB,
    buf->cbArgs = newCBArgs;
 }
 
-/*
-** Add a callback routine to be called before text is deleted from the buffer.
-*/
+// --------------------------------------------------------------------------
+// Add a callback routine to be called before text is deleted from the buffer.
+// --------------------------------------------------------------------------
 void BufAddPreDeleteCB(Ne_Text_Buffer* buf, bufPreDeleteCallbackProc bufPreDeleteCB,
    void* cbArg)
 {
@@ -928,8 +923,8 @@ void BufAddPreDeleteCB(Ne_Text_Buffer* buf, bufPreDeleteCallbackProc bufPreDelet
    buf->preDeleteCbArgs = newCBArgs;
 }
 
-void BufRemovePreDeleteCB(Ne_Text_Buffer* buf, bufPreDeleteCallbackProc bufPreDeleteCB,
-   void* cbArg)
+// --------------------------------------------------------------------------
+void BufRemovePreDeleteCB(Ne_Text_Buffer* buf, bufPreDeleteCallbackProc bufPreDeleteCB, void* cbArg)
 {
    int i, toRemove = -1;
    bufPreDeleteCallbackProc* newPreDeleteProcs;
@@ -984,9 +979,9 @@ void BufRemovePreDeleteCB(Ne_Text_Buffer* buf, bufPreDeleteCallbackProc bufPreDe
    buf->preDeleteCbArgs = newCBArgs;
 }
 
-/*
-** Find the position of the start of the line containing position "pos"
-*/
+// --------------------------------------------------------------------------
+// Find the position of the start of the line containing position "pos"
+// --------------------------------------------------------------------------
 int BufStartOfLine(Ne_Text_Buffer* buf, int pos)
 {
    int startPos;
@@ -996,12 +991,11 @@ int BufStartOfLine(Ne_Text_Buffer* buf, int pos)
    return startPos + 1;
 }
 
-
-/*
-** Find the position of the end of the line containing position "pos"
-** (which is either a pointer to the newline character ending the line,
-** or a pointer to one character beyond the end of the buffer)
-*/
+// --------------------------------------------------------------------------
+// Find the position of the end of the line containing position "pos"
+// (which is either a pointer to the newline character ending the line,
+// or a pointer to one character beyond the end of the buffer)
+// --------------------------------------------------------------------------
 int BufEndOfLine(Ne_Text_Buffer* buf, int pos)
 {
    int endPos;
@@ -1011,14 +1005,14 @@ int BufEndOfLine(Ne_Text_Buffer* buf, int pos)
    return endPos;
 }
 
-/*
-** Get a character from the text buffer expanded into it's screen
-** representation (which may be several characters for a tab or a
-** control code).  Returns the number of characters written to "outStr".
-** "indent" is the number of characters from the start of the line
-** for figuring tabs.  Output string is guranteed to be shorter or
-** equal in length to MAX_EXP_CHAR_LEN
-*/
+// --------------------------------------------------------------------------
+// Get a character from the text buffer expanded into it's screen
+// representation (which may be several characters for a tab or a
+// control code).  Returns the number of characters written to "outStr".
+// "indent" is the number of characters from the start of the line
+// for figuring tabs.  Output string is guranteed to be shorter or
+// equal in length to MAX_EXP_CHAR_LEN
+// --------------------------------------------------------------------------
 int BufGetExpandedChar(const Ne_Text_Buffer* buf, const int pos, const int indent,
    char* outStr)
 {
@@ -1026,14 +1020,14 @@ int BufGetExpandedChar(const Ne_Text_Buffer* buf, const int pos, const int inden
       buf->tabDist, buf->nullSubsChar);
 }
 
-/*
-** Expand a single character from the text buffer into it's screen
-** representation (which may be several characters for a tab or a
-** control code).  Returns the number of characters added to "outStr".
-** "indent" is the number of characters from the start of the line
-** for figuring tabs.  Output string is guranteed to be shorter or
-** equal in length to MAX_EXP_CHAR_LEN
-*/
+// --------------------------------------------------------------------------
+// Expand a single character from the text buffer into it's screen
+// representation (which may be several characters for a tab or a
+// control code).  Returns the number of characters added to "outStr".
+// "indent" is the number of characters from the start of the line
+// for figuring tabs.  Output string is guranteed to be shorter or
+// equal in length to MAX_EXP_CHAR_LEN
+// --------------------------------------------------------------------------
 int BufExpandCharacter(const char c, const int indent, char* outStr,
    const int tabDist, const char nullSubsChar)
 {
@@ -1055,13 +1049,6 @@ int BufExpandCharacter(const char c, const int indent, char* outStr,
       sprintf(outStr, "<nul>");
       return 5;
    }
-#ifdef __MVS__
-   if (((unsigned char)c) <= 63)
-   {
-      sprintf(outStr, "<%s>", ControlCodeTable[(unsigned char)c]);
-      return strlen(outStr);
-   }
-#else
    if (((unsigned char)c) <= 31)
    {
       sprintf(outStr, "<%s>", ControlCodeTable[(unsigned char)c]);
@@ -1072,20 +1059,19 @@ int BufExpandCharacter(const char c, const int indent, char* outStr,
       sprintf(outStr, "<del>");
       return 5;
    }
-#endif
 
    /* Otherwise, just return the character */
    *outStr = c;
    return 1;
 }
 
-/*
-** Return the length in displayed characters of character "c" expanded
-** for display (as discussed above in BufGetExpandedChar).  If the
-** buffer for which the character width is being measured is doing null
-** substitution, nullSubsChar should be passed as that character (or nul
-** to ignore).
-*/
+// --------------------------------------------------------------------------
+// Return the length in displayed characters of character "c" expanded
+// for display (as discussed above in BufGetExpandedChar).  If the
+// buffer for which the character width is being measured is doing null
+// substitution, nullSubsChar should be passed as that character (or nul
+// to ignore).
+// --------------------------------------------------------------------------
 int BufCharWidth(char c, int indent, int tabDist, char nullSubsChar)
 {
    /* Note, this code must parallel that in BufExpandCharacter */
@@ -1100,12 +1086,12 @@ int BufCharWidth(char c, int indent, int tabDist, char nullSubsChar)
    return 1;
 }
 
-/*
-** Count the number of displayed characters between buffer position
-** "lineStartPos" and "targetPos". (displayed characters are the characters
-** shown on the screen to represent characters in the buffer, where tabs and
-** control characters are expanded)
-*/
+// --------------------------------------------------------------------------
+// Count the number of displayed characters between buffer position
+// "lineStartPos" and "targetPos". (displayed characters are the characters
+// shown on the screen to represent characters in the buffer, where tabs and
+// control characters are expanded)
+// --------------------------------------------------------------------------
 int BufCountDispChars(const Ne_Text_Buffer* buf, const int lineStartPos,
    const int targetPos)
 {
@@ -1118,11 +1104,11 @@ int BufCountDispChars(const Ne_Text_Buffer* buf, const int lineStartPos,
    return charCount;
 }
 
-/*
-** Count forward from buffer position "startPos" in displayed characters
-** (displayed characters are the characters shown on the screen to represent
-** characters in the buffer, where tabs and control characters are expanded)
-*/
+// --------------------------------------------------------------------------
+// Count forward from buffer position "startPos" in displayed characters
+// (displayed characters are the characters shown on the screen to represent
+// characters in the buffer, where tabs and control characters are expanded)
+// --------------------------------------------------------------------------
 int BufCountForwardDispChars(Ne_Text_Buffer* buf, int lineStartPos, int nChars)
 {
    int pos, charCount = 0;
@@ -1140,10 +1126,10 @@ int BufCountForwardDispChars(Ne_Text_Buffer* buf, int lineStartPos, int nChars)
    return pos;
 }
 
-/*
-** Count the number of newlines between startPos and endPos in buffer "buf".
-** The character at position "endPos" is not counted.
-*/
+// --------------------------------------------------------------------------
+// Count the number of newlines between startPos and endPos in buffer "buf".
+// The character at position "endPos" is not counted.
+// --------------------------------------------------------------------------
 int BufCountLines(Ne_Text_Buffer* buf, int startPos, int endPos)
 {
    int pos, gapLen = buf->gapEnd - buf->gapStart;
@@ -1167,12 +1153,11 @@ int BufCountLines(Ne_Text_Buffer* buf, int startPos, int endPos)
    return lineCount;
 }
 
-/*
-** Find the first character of the line "nLines" forward from "startPos"
-** in "buf" and return its position
-*/
-int BufCountForwardNLines(const Ne_Text_Buffer* buf, const int startPos,
-   const unsigned nLines)
+// --------------------------------------------------------------------------
+// Find the first character of the line "nLines" forward from "startPos"
+// in "buf" and return its position
+// --------------------------------------------------------------------------
+int BufCountForwardNLines(const Ne_Text_Buffer* buf, const int startPos, const unsigned nLines)
 {
    int pos, gapLen = buf->gapEnd - buf->gapStart;
    int lineCount = 0;
@@ -1202,12 +1187,12 @@ int BufCountForwardNLines(const Ne_Text_Buffer* buf, const int startPos,
    return pos;
 }
 
-/*
-** Find the position of the first character of the line "nLines" backwards
-** from "startPos" (not counting the character pointed to by "startpos" if
-** that is a newline) in "buf".  nLines == 0 means find the beginning of
-** the line
-*/
+// --------------------------------------------------------------------------
+// Find the position of the first character of the line "nLines" backwards
+// from "startPos" (not counting the character pointed to by "startpos" if
+// that is a newline) in "buf".  nLines == 0 means find the beginning of
+// the line
+// --------------------------------------------------------------------------
 int BufCountBackwardNLines(Ne_Text_Buffer* buf, int startPos, int nLines)
 {
    int pos, gapLen = buf->gapEnd - buf->gapStart;
@@ -1238,13 +1223,12 @@ int BufCountBackwardNLines(Ne_Text_Buffer* buf, int startPos, int nLines)
    return 0;
 }
 
-/*
-** Search forwards in buffer "buf" for characters in "searchChars", starting
-** with the character "startPos", and returning the result in "foundPos"
-** returns true if found, false if not.
-*/
-int BufSearchForward(Ne_Text_Buffer* buf, int startPos, const char* searchChars,
-   int* foundPos)
+// --------------------------------------------------------------------------
+// Search forwards in buffer "buf" for characters in "searchChars", starting
+// with the character "startPos", and returning the result in "foundPos"
+// returns true if found, false if not.
+// --------------------------------------------------------------------------
+int BufSearchForward(Ne_Text_Buffer* buf, int startPos, const char* searchChars, int* foundPos)
 {
    int pos, gapLen = buf->gapEnd - buf->gapStart;
    const char* c;
@@ -1278,13 +1262,12 @@ int BufSearchForward(Ne_Text_Buffer* buf, int startPos, const char* searchChars,
    return false;
 }
 
-/*
-** Search backwards in buffer "buf" for characters in "searchChars", starting
-** with the character BEFORE "startPos", returning the result in "foundPos"
-** returns true if found, false if not.
-*/
-int BufSearchBackward(Ne_Text_Buffer* buf, int startPos, const char* searchChars,
-   int* foundPos)
+// --------------------------------------------------------------------------
+// Search backwards in buffer "buf" for characters in "searchChars", starting
+// with the character BEFORE "startPos", returning the result in "foundPos"
+// returns true if found, false if not.
+// --------------------------------------------------------------------------
+int BufSearchBackward(Ne_Text_Buffer* buf, int startPos, const char* searchChars, int* foundPos)
 {
    int pos, gapLen = buf->gapEnd - buf->gapStart;
    const char* c;
@@ -1323,26 +1306,26 @@ int BufSearchBackward(Ne_Text_Buffer* buf, int startPos, const char* searchChars
    return false;
 }
 
-/*
-** A horrible design flaw in NEdit (from the very start, before we knew that
-** NEdit would become so popular), is that it uses C NULL terminated strings
-** to hold text.  This means editing text containing NUL characters is not
-** possible without special consideration.  Here is the special consideration.
-** The routines below maintain a special substitution-character which stands
-** in for a null, and translates strings an buffers back and forth from/to
-** the substituted form, figure out what to substitute, and figure out
-** when we're in over our heads and no translation is possible.
-*/
+// --------------------------------------------------------------------------
+// A horrible design flaw in NEdit (from the very start, before we knew that
+// NEdit would become so popular), is that it uses C NULL terminated strings
+// to hold text.  This means editing text containing NUL characters is not
+// possible without special consideration.  Here is the special consideration.
+// The routines below maintain a special substitution-character which stands
+// in for a null, and translates strings an buffers back and forth from/to
+// the substituted form, figure out what to substitute, and figure out
+// when we're in over our heads and no translation is possible.
+// --------------------------------------------------------------------------
 
-/*
-** The primary routine for integrating new text into a text buffer with
-** substitution of another character for ascii nuls.  This substitutes null
-** characters in the string in preparation for being copied or replaced
-** into the buffer, and if neccessary, adjusts the buffer as well, in the
-** event that the string contains the character it is currently using for
-** substitution.  Returns false, if substitution is no longer possible
-** because all non-printable characters are already in use.
-*/
+// --------------------------------------------------------------------------
+// The primary routine for integrating new text into a text buffer with
+// substitution of another character for ascii nuls.  This substitutes null
+// characters in the string in preparation for being copied or replaced
+// into the buffer, and if neccessary, adjusts the buffer as well, in the
+// event that the string contains the character it is currently using for
+// substitution.  Returns false, if substitution is no longer possible
+// because all non-printable characters are already in use.
+// --------------------------------------------------------------------------
 int BufSubstituteNullChars(char* string, int length, Ne_Text_Buffer* buf)
 {
    char histogram[256];
@@ -1378,12 +1361,12 @@ int BufSubstituteNullChars(char* string, int length, Ne_Text_Buffer* buf)
    return true;
 }
 
-/*
-** Convert strings obtained from buffers which contain null characters, which
-** have been substituted for by a special substitution character, back to
-** a null-containing string.  There is no time penalty for calling this
-** routine if no substitution has been done.
-*/
+// --------------------------------------------------------------------------
+// Convert strings obtained from buffers which contain null characters, which
+// have been substituted for by a special substitution character, back to
+// a null-containing string.  There is no time penalty for calling this
+// routine if no substitution has been done.
+// --------------------------------------------------------------------------
 void BufUnsubstituteNullChars(char* string, Ne_Text_Buffer* buf)
 {
    register char* c, subsChar = buf->nullSubsChar;
@@ -1395,12 +1378,11 @@ void BufUnsubstituteNullChars(char* string, Ne_Text_Buffer* buf)
          *c = '\0';
 }
 
-/*
-** Compares len Bytes contained in buf starting at Position pos with
-** the contens of cmpText. Returns 0 if there are no differences,
-** != 0 otherwise.
-**
-*/
+// --------------------------------------------------------------------------
+// Compares len Bytes contained in buf starting at Position pos with
+// the contens of cmpText. Returns 0 if there are no differences,
+// != 0 otherwise.
+// --------------------------------------------------------------------------
 int BufCmp(Ne_Text_Buffer* buf, int pos, int len, const char* cmpText)
 {
    int     posEnd;
@@ -1439,12 +1421,12 @@ int BufCmp(Ne_Text_Buffer* buf, int pos, int len, const char* cmpText)
    }
 }
 
-/*
-** Create a pseudo-histogram of the characters in a string (don't actually
-** count, because we don't want overflow, just mark the character's presence
-** with a 1).  If init is true, initialize the histogram before acumulating.
-** if not, add the new data to an existing histogram.
-*/
+// --------------------------------------------------------------------------
+// Create a pseudo-histogram of the characters in a string (don't actually
+// count, because we don't want overflow, just mark the character's presence
+// with a 1).  If init is true, initialize the histogram before acumulating.
+// if not, add the new data to an existing histogram.
+// --------------------------------------------------------------------------
 static void histogramCharacters(const char* string, int length, char hist[256],
    int init)
 {
@@ -1458,9 +1440,9 @@ static void histogramCharacters(const char* string, int length, char hist[256],
       hist[*((unsigned char*)c)] |= 1;
 }
 
-/*
-** Substitute fromChar with toChar in string.
-*/
+// --------------------------------------------------------------------------
+// Substitute fromChar with toChar in string.
+// --------------------------------------------------------------------------
 static void subsChars(char* string, int length, char fromChar, char toChar)
 {
    char* c;
@@ -1469,12 +1451,12 @@ static void subsChars(char* string, int length, char fromChar, char toChar)
       if (*c == fromChar) *c = toChar;
 }
 
-/*
-** Search through ascii control characters in histogram in order of least
-** likelihood of use, find an unused character to use as a stand-in for a
-** null.  If the character set is full (no available characters outside of
-** the printable set, return the null character.
-*/
+// --------------------------------------------------------------------------
+// Search through ascii control characters in histogram in order of least
+// likelihood of use, find an unused character to use as a stand-in for a
+// null.  If the character set is full (no available characters outside of
+// the printable set, return the null character.
+// --------------------------------------------------------------------------
 static char chooseNullSubsChar(char hist[256])
 {
 #define N_REPLACEMENTS 25
@@ -1488,13 +1470,13 @@ static char chooseNullSubsChar(char hist[256])
    return '\0';
 }
 
-/*
-** Internal (non-redisplaying) version of BufInsert.  Returns the length of
-** text inserted (this is just strlen(text), however this calculation can be
-** expensive and the length will be required by any caller who will continue
-** on to call redisplay).  pos must be contiguous with the existing text in
-** the buffer (i.e. not past the end).
-*/
+// --------------------------------------------------------------------------
+// Internal (non-redisplaying) version of BufInsert.  Returns the length of
+// text inserted (this is just strlen(text), however this calculation can be
+// expensive and the length will be required by any caller who will continue
+// on to call redisplay).  pos must be contiguous with the existing text in
+// the buffer (i.e. not past the end).
+// --------------------------------------------------------------------------
 static int insert(Ne_Text_Buffer* buf, int pos, const char* text)
 {
    int length = strlen(text);
@@ -1518,11 +1500,11 @@ static int insert(Ne_Text_Buffer* buf, int pos, const char* text)
    return length;
 }
 
-/*
-** Internal (non-redisplaying) version of BufRemove.  Removes the contents
-** of the buffer between start and end (and moves the gap to the site of
-** the delete).
-*/
+// --------------------------------------------------------------------------
+// Internal (non-redisplaying) version of BufRemove.  Removes the contents
+// of the buffer between start and end (and moves the gap to the site of
+// the delete).
+// --------------------------------------------------------------------------
 static void deleteBuf(Ne_Text_Buffer* buf, int start, int end)
 {
    /* if the gap is not contiguous to the area to remove, move it there */
@@ -1542,15 +1524,15 @@ static void deleteBuf(Ne_Text_Buffer* buf, int start, int end)
    updateSelections(buf, start, end-start, 0);
 }
 
-/*
-** Insert a column of text without calling the modify callbacks.  Note that
-** in some pathological cases, inserting can actually decrease the size of
-** the buffer because of spaces being coalesced into tabs.  "nDeleted" and
-** "nInserted" return the number of characters deleted and inserted beginning
-** at the start of the line containing "startPos".  "endPos" returns buffer
-** position of the lower left edge of the inserted column (as a hint for
-** routines which need to set a cursor position).
-*/
+// --------------------------------------------------------------------------
+// Insert a column of text without calling the modify callbacks.  Note that
+// in some pathological cases, inserting can actually decrease the size of
+// the buffer because of spaces being coalesced into tabs.  "nDeleted" and
+// "nInserted" return the number of characters deleted and inserted beginning
+// at the start of the line containing "startPos".  "endPos" returns buffer
+// position of the lower left edge of the inserted column (as a hint for
+// routines which need to set a cursor position).
+// --------------------------------------------------------------------------
 static void insertCol(Ne_Text_Buffer* buf, int column, int startPos,
    const char* insText, int* nDeleted, int* nInserted, int* endPos)
 {
@@ -1602,16 +1584,6 @@ static void insertCol(Ne_Text_Buffer* buf, int column, int startPos,
          buf->useTabs, buf->nullSubsChar, outPtr, &len, &endOffset);
       free__(line);
       free__(insLine);
-#if 0   /* Earlier comments claimed that trailing whitespace could multiply on
-      the ends of lines, but insertColInLine looks like it should never
-      add space unnecessarily, and this trimming interfered with
-      paragraph filling, so lets see if it works without it. MWE */
-      {
-         char* c;
-         for (c=outPtr+len-1; c>outPtr && (*c == ' ' || *c == '\t'); c--)
-            len--;
-      }
-#endif
       outPtr += len;
       *outPtr++ = '\n';
       lineStart = lineEnd < buf->length ? lineEnd + 1 : buf->length;
@@ -1632,14 +1604,14 @@ static void insertCol(Ne_Text_Buffer* buf, int column, int startPos,
    free__(outStr);
 }
 
-/*
-** Delete a rectangle of text without calling the modify callbacks.  Returns
-** the number of characters replacing those between start and end.  Note that
-** in some pathological cases, deleting can actually increase the size of
-** the buffer because of tab expansions.  "endPos" returns the buffer position
-** of the point in the last line where the text was removed (as a hint for
-** routines which need to position the cursor after a delete operation)
-*/
+// --------------------------------------------------------------------------
+// Delete a rectangle of text without calling the modify callbacks.  Returns
+// the number of characters replacing those between start and end.  Note that
+// in some pathological cases, deleting can actually increase the size of
+// the buffer because of tab expansions.  "endPos" returns the buffer position
+// of the point in the last line where the text was removed (as a hint for
+// routines which need to position the cursor after a delete operation)
+// --------------------------------------------------------------------------
 static void deleteRect(Ne_Text_Buffer* buf, int start, int end, int rectStart,
    int rectEnd, int* replaceLen, int* endPos)
 {
@@ -1686,13 +1658,13 @@ static void deleteRect(Ne_Text_Buffer* buf, int start, int end, int rectStart,
    free__(outStr);
 }
 
-/*
-** Overlay a rectangular area of text without calling the modify callbacks.
-** "nDeleted" and "nInserted" return the number of characters deleted and
-** inserted beginning at the start of the line containing "startPos".
-** "endPos" returns buffer position of the lower left edge of the inserted
-** column (as a hint for routines which need to set a cursor position).
-*/
+// --------------------------------------------------------------------------
+// Overlay a rectangular area of text without calling the modify callbacks.
+// "nDeleted" and "nInserted" return the number of characters deleted and
+// inserted beginning at the start of the line containing "startPos".
+// "endPos" returns buffer position of the lower left edge of the inserted
+// column (as a hint for routines which need to set a cursor position).
+// --------------------------------------------------------------------------
 static void overlayRect(Ne_Text_Buffer* buf, int startPos, int rectStart,
    int rectEnd, const char* insText,
    int* nDeleted, int* nInserted, int* endPos)
@@ -1759,14 +1731,14 @@ static void overlayRect(Ne_Text_Buffer* buf, int startPos, int rectStart,
    free__(outStr);
 }
 
-/*
-** Insert characters from single-line string "insLine" in single-line string
-** "line" at "column", leaving "insWidth" space before continuing line.
-** "outLen" returns the number of characters written to "outStr", "endOffset"
-** returns the number of characters from the beginning of the string to
-** the right edge of the inserted text (as a hint for routines which need
-** to position the cursor).
-*/
+// --------------------------------------------------------------------------
+// Insert characters from single-line string "insLine" in single-line string
+// "line" at "column", leaving "insWidth" space before continuing line.
+// "outLen" returns the number of characters written to "outStr", "endOffset"
+// returns the number of characters from the beginning of the string to
+// the right edge of the inserted text (as a hint for routines which need
+// to position the cursor).
+// --------------------------------------------------------------------------
 static void insertColInLine(const char* line, const char* insLine,
    int column, int insWidth, int tabDist, int useTabs, char nullSubsChar,
    char* outStr, int* outLen, int* endOffset)
@@ -1858,15 +1830,15 @@ static void insertColInLine(const char* line, const char* insLine,
    *outLen = (outPtr - outStr) + len;
 }
 
-/*
-** Remove characters in single-line string "line" between displayed positions
-** "rectStart" and "rectEnd", and write the result to "outStr", which is
-** assumed to be large enough to hold the returned string.  Note that in
-** certain cases, it is possible for the string to get longer due to
-** expansion of tabs.  "endOffset" returns the number of characters from
-** the beginning of the string to the point where the characters were
-** deleted (as a hint for routines which need to position the cursor).
-*/
+// --------------------------------------------------------------------------
+// Remove characters in single-line string "line" between displayed positions
+// "rectStart" and "rectEnd", and write the result to "outStr", which is
+// assumed to be large enough to hold the returned string.  Note that in
+// certain cases, it is possible for the string to get longer due to
+// expansion of tabs.  "endOffset" returns the number of characters from
+// the beginning of the string to the point where the characters were
+// deleted (as a hint for routines which need to position the cursor).
+// --------------------------------------------------------------------------
 static void deleteRectFromLine(const char* line, int rectStart, int rectEnd,
    int tabDist, int useTabs, char nullSubsChar, char* outStr, int* outLen,
    int* endOffset)
@@ -1922,16 +1894,16 @@ static void deleteRectFromLine(const char* line, int rectStart, int rectEnd,
    *outLen = (outPtr - outStr) + len;
 }
 
-/*
-** Overlay characters from single-line string "insLine" on single-line string
-** "line" between displayed character offsets "rectStart" and "rectEnd".
-** "outLen" returns the number of characters written to "outStr", "endOffset"
-** returns the number of characters from the beginning of the string to
-** the right edge of the inserted text (as a hint for routines which need
-** to position the cursor).
-**
-** This code does not handle control characters very well, but oh well.
-*/
+// --------------------------------------------------------------------------
+// Overlay characters from single-line string "insLine" on single-line string
+// "line" between displayed character offsets "rectStart" and "rectEnd".
+// "outLen" returns the number of characters written to "outStr", "endOffset"
+// returns the number of characters from the beginning of the string to
+// the right edge of the inserted text (as a hint for routines which need
+// to position the cursor).
+//
+// This code does not handle control characters very well, but oh well.
+// --------------------------------------------------------------------------
 static void overlayRectInLine(const char* line, const char* insLine,
    int rectStart, int rectEnd, int tabDist, int useTabs,
    char nullSubsChar, char* outStr, int* outLen, int* endOffset)
@@ -2035,6 +2007,7 @@ static void overlayRectInLine(const char* line, const char* insLine,
    *outLen = (outPtr - outStr) + strlen(linePtr);
 }
 
+// --------------------------------------------------------------------------
 static void setSelection(selection* sel, int start, int end)
 {
    sel->selected = start != end;
@@ -2044,8 +2017,8 @@ static void setSelection(selection* sel, int start, int end)
    sel->end = max(start, end);
 }
 
-static void setRectSelect(selection* sel, int start, int end,
-   int rectStart, int rectEnd)
+// --------------------------------------------------------------------------
+static void setRectSelect(selection* sel, int start, int end, int rectStart, int rectEnd)
 {
    sel->selected = rectStart < rectEnd;
    sel->zeroWidth = (rectStart == rectEnd) ? 1 : 0;
@@ -2056,8 +2029,8 @@ static void setRectSelect(selection* sel, int start, int end,
    sel->rectEnd = rectEnd;
 }
 
-static int getSelectionPos(selection* sel, int* start, int* end,
-   int* isRect, int* rectStart, int* rectEnd)
+// --------------------------------------------------------------------------
+static int getSelectionPos(selection* sel, int* start, int* end, int* isRect, int* rectStart, int* rectEnd)
 {
    /* Always fill in the parameters (zero-width can be requested too). */
    *isRect = sel->rectangular;
@@ -2071,6 +2044,7 @@ static int getSelectionPos(selection* sel, int* start, int* end,
    return sel->selected;
 }
 
+// --------------------------------------------------------------------------
 static char* getSelectionText(Ne_Text_Buffer* buf, selection* sel)
 {
    int start, end, isRect, rectStart, rectEnd;
@@ -2091,6 +2065,7 @@ static char* getSelectionText(Ne_Text_Buffer* buf, selection* sel)
       return BufGetRange(buf, start, end);
 }
 
+// --------------------------------------------------------------------------
 static void removeSelected(Ne_Text_Buffer* buf, selection* sel)
 {
    int start, end;
@@ -2104,6 +2079,7 @@ static void removeSelected(Ne_Text_Buffer* buf, selection* sel)
       BufRemove(buf, start, end);
 }
 
+// --------------------------------------------------------------------------
 static void replaceSelected(Ne_Text_Buffer* buf, selection* sel, const char* text)
 {
    int start, end, isRect, rectStart, rectEnd;
@@ -2125,6 +2101,7 @@ static void replaceSelected(Ne_Text_Buffer* buf, selection* sel, const char* tex
    redisplaySelection(buf, &oldSelection, sel);
 }
 
+// --------------------------------------------------------------------------
 static void addPadding(char* string, int startIndent, int toIndent,
    int tabDist, int useTabs, char nullSubsChar, int* charsAdded)
 {
@@ -2161,10 +2138,10 @@ static void addPadding(char* string, int startIndent, int toIndent,
    *charsAdded = outPtr - string;
 }
 
-/*
-** Call the stored modify callback procedure(s) for this buffer to update the
-** changed area(s) on the screen and any other listeners.
-*/
+// --------------------------------------------------------------------------
+// Call the stored modify callback procedure(s) for this buffer to update the
+// changed area(s) on the screen and any other listeners.
+// --------------------------------------------------------------------------
 static void callModifyCBs(Ne_Text_Buffer* buf, int pos, int nDeleted,
    int nInserted, int nRestyled, const char* deletedText)
 {
@@ -2175,10 +2152,10 @@ static void callModifyCBs(Ne_Text_Buffer* buf, int pos, int nDeleted,
       deletedText, buf->cbArgs[i]);
 }
 
-/*
-** Call the stored pre-delete callback procedure(s) for this buffer to update
-** the changed area(s) on the screen and any other listeners.
-*/
+// --------------------------------------------------------------------------
+// Call the stored pre-delete callback procedure(s) for this buffer to update
+// the changed area(s) on the screen and any other listeners.
+// --------------------------------------------------------------------------
 static void callPreDeleteCBs(Ne_Text_Buffer* buf, int pos, int nDeleted)
 {
    int i;
@@ -2187,10 +2164,10 @@ static void callPreDeleteCBs(Ne_Text_Buffer* buf, int pos, int nDeleted)
       (*buf->preDeleteProcs[i])(pos, nDeleted, buf->preDeleteCbArgs[i]);
 }
 
-/*
-** Call the stored redisplay procedure(s) for this buffer to update the
-** screen for a change in a selection.
-*/
+// --------------------------------------------------------------------------
+// Call the stored redisplay procedure(s) for this buffer to update the
+// screen for a change in a selection.
+// --------------------------------------------------------------------------
 static void redisplaySelection(Ne_Text_Buffer* buf, selection* oldSelection,
    selection* newSelection)
 {
@@ -2258,6 +2235,7 @@ static void redisplaySelection(Ne_Text_Buffer* buf, selection* oldSelection,
       callModifyCBs(buf, ch2Start, 0, 0, ch2End-ch2Start, NULL);
 }
 
+// --------------------------------------------------------------------------
 static void moveGap(Ne_Text_Buffer* buf, int pos)
 {
    int gapLen = buf->gapEnd - buf->gapStart;
@@ -2271,10 +2249,10 @@ static void moveGap(Ne_Text_Buffer* buf, int pos)
    buf->gapStart += pos - buf->gapStart;
 }
 
-/*
-** reallocate the text storage in "buf" to have a gap starting at "newGapStart"
-** and a gap size of "newGapLen", preserving the buffer's current contents.
-*/
+// --------------------------------------------------------------------------
+// reallocate the text storage in "buf" to have a gap starting at "newGapStart"
+// and a gap size of "newGapLen", preserving the buffer's current contents.
+// --------------------------------------------------------------------------
 static void reallocateBuf(Ne_Text_Buffer* buf, int newGapStart, int newGapLen)
 {
    char* newBuf;
@@ -2304,30 +2282,22 @@ static void reallocateBuf(Ne_Text_Buffer* buf, int newGapStart, int newGapLen)
    buf->buf = newBuf;
    buf->gapStart = newGapStart;
    buf->gapEnd = newGapEnd;
-#ifdef PURIFY
-   {
-      int i;
-      for (i=buf->gapStart; i<buf->gapEnd; i++) buf->buf[i] = '.';
-   }
-#endif
 }
 
-/*
-** Update all of the selections in "buf" for changes in the buffer's text
-*/
-static void updateSelections(Ne_Text_Buffer* buf, int pos, int nDeleted,
-   int nInserted)
+// --------------------------------------------------------------------------
+// Update all of the selections in "buf" for changes in the buffer's text
+// --------------------------------------------------------------------------
+static void updateSelections(Ne_Text_Buffer* buf, int pos, int nDeleted, int nInserted)
 {
    updateSelection(&buf->primary, pos, nDeleted, nInserted);
    updateSelection(&buf->secondary, pos, nDeleted, nInserted);
    updateSelection(&buf->highlight, pos, nDeleted, nInserted);
 }
 
-/*
-** Update an individual selection for changes in the corresponding text
-*/
-static void updateSelection(selection* sel, int pos, int nDeleted,
-   int nInserted)
+// --------------------------------------------------------------------------
+// Update an individual selection for changes in the corresponding text
+// --------------------------------------------------------------------------
+static void updateSelection(selection* sel, int pos, int nDeleted, int nInserted)
 {
    if ((!sel->selected && !sel->zeroWidth) || pos > sel->end)
       return;
@@ -2356,14 +2326,14 @@ static void updateSelection(selection* sel, int pos, int nDeleted,
    }
 }
 
-/*
-** Search forwards in buffer "buf" for character "searchChar", starting
-** with the character "startPos", and returning the result in "foundPos"
-** returns true if found, false if not.  (The difference between this and
-** BufSearchForward is that it's optimized for single characters.  The
-** overall performance of the text widget is dependent on its ability to
-** count lines quickly, hence searching for a single character: newline)
-*/
+// --------------------------------------------------------------------------
+// Search forwards in buffer "buf" for character "searchChar", starting
+// with the character "startPos", and returning the result in "foundPos"
+// returns true if found, false if not.  (The difference between this and
+// BufSearchForward is that it's optimized for single characters.  The
+// overall performance of the text widget is dependent on its ability to
+// count lines quickly, hence searching for a single character: newline)
+// --------------------------------------------------------------------------
 static int searchForward(Ne_Text_Buffer* buf, int startPos, char searchChar,
    int* foundPos)
 {
@@ -2392,16 +2362,15 @@ static int searchForward(Ne_Text_Buffer* buf, int startPos, char searchChar,
    return false;
 }
 
-/*
-** Search backwards in buffer "buf" for character "searchChar", starting
-** with the character BEFORE "startPos", returning the result in "foundPos"
-** returns true if found, false if not.  (The difference between this and
-** BufSearchBackward is that it's optimized for single characters.  The
-** overall performance of the text widget is dependent on its ability to
-** count lines quickly, hence searching for a single character: newline)
-*/
-static int searchBackward(Ne_Text_Buffer* buf, int startPos, char searchChar,
-   int* foundPos)
+// --------------------------------------------------------------------------
+// Search backwards in buffer "buf" for character "searchChar", starting
+// with the character BEFORE "startPos", returning the result in "foundPos"
+// returns true if found, false if not.  (The difference between this and
+// BufSearchBackward is that it's optimized for single characters.  The
+// overall performance of the text widget is dependent on its ability to
+// count lines quickly, hence searching for a single character: newline)
+// --------------------------------------------------------------------------
+static int searchBackward(Ne_Text_Buffer* buf, int startPos, char searchChar, int* foundPos)
 {
    int pos, gapLen = buf->gapEnd - buf->gapStart;
 
@@ -2433,11 +2402,11 @@ static int searchBackward(Ne_Text_Buffer* buf, int startPos, char searchChar,
    return false;
 }
 
-/*
-** Copy from "text" to end up to but not including newline (or end of "text")
-** and return the copy as the function value, and the length of the line in
-** "lineLen"
-*/
+// --------------------------------------------------------------------------
+// Copy from "text" to end up to but not including newline (or end of "text")
+// and return the copy as the function value, and the length of the line in
+// "lineLen"
+// --------------------------------------------------------------------------
 static char* copyLine(const char* text, int* lineLen)
 {
    int len = 0;
@@ -2453,9 +2422,9 @@ static char* copyLine(const char* text, int* lineLen)
    return outStr;
 }
 
-/*
-** Count the number of newlines in a null-terminated text string;
-*/
+// --------------------------------------------------------------------------
+// Count the number of newlines in a null-terminated text string;
+// --------------------------------------------------------------------------
 static int countLines(const char* string)
 {
    const char* c;
@@ -2466,9 +2435,9 @@ static int countLines(const char* string)
    return lineCount;
 }
 
-/*
-** Measure the width in displayed characters of string "text"
-*/
+// --------------------------------------------------------------------------
+// Measure the width in displayed characters of string "text"
+// --------------------------------------------------------------------------
 static int textWidth(const char* text, int tabDist, char nullSubsChar)
 {
    int width = 0, maxWidth = 0;
@@ -2490,20 +2459,20 @@ static int textWidth(const char* text, int tabDist, char nullSubsChar)
    return maxWidth;
 }
 
-/*
-** Find the first and last character position in a line withing a rectangular
-** selection (for copying).  Includes tabs which cross rectStart, but not
-** control characters which do so.  Leaves off tabs which cross rectEnd.
-**
-** Technically, the calling routine should convert tab characters which
-** cross the right boundary of the selection to spaces which line up with
-** the edge of the selection.  Unfortunately, the additional memory
-** management required in the parent routine to allow for the changes
-** in string size is not worth all the extra work just for a couple of
-** shifted characters, so if a tab protrudes, just lop it off and hope
-** that there are other characters in the selection to establish the right
-** margin for subsequent columnar pastes of this data.
-*/
+// --------------------------------------------------------------------------
+// Find the first and last character position in a line withing a rectangular
+// selection (for copying).  Includes tabs which cross rectStart, but not
+// control characters which do so.  Leaves off tabs which cross rectEnd.
+//
+// Technically, the calling routine should convert tab characters which
+// cross the right boundary of the selection to spaces which line up with
+// the edge of the selection.  Unfortunately, the additional memory
+// management required in the parent routine to allow for the changes
+// in string size is not worth all the extra work just for a couple of
+// shifted characters, so if a tab protrudes, just lop it off and hope
+// that there are other characters in the selection to establish the right
+// margin for subsequent columnar pastes of this data.
+// --------------------------------------------------------------------------
 static void findRectSelBoundariesForCopy(Ne_Text_Buffer* buf, int lineStartPos,
    int rectStart, int rectEnd, int* selStart, int* selEnd)
 {
@@ -2548,12 +2517,12 @@ static void findRectSelBoundariesForCopy(Ne_Text_Buffer* buf, int lineStartPos,
    *selEnd = pos;
 }
 
-/*
-** Adjust the space and tab characters from string "text" so that non-white
-** characters remain stationary when the text is shifted from starting at
-** "origIndent" to starting at "newIndent".  Returns an allocated string
-** which must be freed by the caller with free__.
-*/
+// --------------------------------------------------------------------------
+// Adjust the space and tab characters from string "text" so that non-white
+// characters remain stationary when the text is shifted from starting at
+// "origIndent" to starting at "newIndent".  Returns an allocated string
+// which must be freed by the caller with free__.
+// --------------------------------------------------------------------------
 static char* realignTabs(const char* text, int origIndent, int newIndent,
    int tabDist, int useTabs, char nullSubsChar, int* newLength)
 {
@@ -2583,11 +2552,11 @@ static char* realignTabs(const char* text, int origIndent, int newIndent,
    return outStr;
 }
 
-/*
-** Expand tabs to spaces for a block of text.  The additional parameter
-** "startIndent" if nonzero, indicates that the text is a rectangular selection
-** beginning at column "startIndent"
-*/
+// --------------------------------------------------------------------------
+// Expand tabs to spaces for a block of text.  The additional parameter
+// "startIndent" if nonzero, indicates that the text is a rectangular selection
+// beginning at column "startIndent"
+// --------------------------------------------------------------------------
 static char* expandTabs(const char* text, int startIndent, int tabDist,
    char nullSubsChar, int* newLen)
 {
@@ -2645,11 +2614,11 @@ static char* expandTabs(const char* text, int startIndent, int tabDist,
    return outStr;
 }
 
-/*
-** Convert sequences of spaces into tabs.  The threshold for conversion is
-** when 3 or more spaces can be converted into a single tab, this avoids
-** converting double spaces after a period withing a block of text.
-*/
+// --------------------------------------------------------------------------
+// Convert sequences of spaces into tabs.  The threshold for conversion is
+// when 3 or more spaces can be converted into a single tab, this avoids
+// converting double spaces after a period withing a block of text.
+// --------------------------------------------------------------------------
 static char* unexpandTabs(const char* text, int startIndent, int tabDist,
    char nullSubsChar, int* newLen)
 {
@@ -2694,11 +2663,13 @@ static char* unexpandTabs(const char* text, int startIndent, int tabDist,
    return outStr;
 }
 
+// --------------------------------------------------------------------------
 static int max(int i1, int i2)
 {
    return i1 >= i2 ? i1 : i2;
 }
 
+// --------------------------------------------------------------------------
 static int min(int i1, int i2)
 {
    return i1 <= i2 ? i1 : i2;

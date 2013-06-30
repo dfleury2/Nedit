@@ -7,18 +7,17 @@ CXX=g++
 
 FLTK_HOME=/opt/fltk-1.3.2
 
-CXXFLAGS=-O2 -fpermissive -Wno-write-strings --std=c++11 $(shell $(FLTK_HOME)/bin/fltk-config --cxxflags)
+CXXFLAGS=--std=c++11 -Dlinux -O2 $(shell $(FLTK_HOME)/bin/fltk-config --cxxflags) -I../gtest-1.6.0/include
 LDLIBS=$(shell $(FLTK_HOME)/bin/fltk-config --ldflags --use-images)
 
 SOURCES:= $(shell ls *.cpp)
 OBJECTS:=$(SOURCES:.cpp=.o)
 
-libsource.a:$(OBJECTS)
-	ar -r $@ $(OBJECTS)
+NEditUnitTests:$(OBJECTS)
+	$(CXX) -o $@ $(OBJECTS) ../source/libsource.a ../util/libutil.a ../gtest-1.6.0/gtest.a $(LDLIBS)
 
 clean:
-	rm -f libsource.a *.o
+	rm -f NEditUnitTests *.o
 
 %.o:%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
-

@@ -19,6 +19,10 @@ Release
 Debug
 /ipch/
 
+/NEdit/nedit++
+
+/NEditUnitTests/NEditUnitTests
+
 /source/source.vcxproj.user
 /source/nedit++
 

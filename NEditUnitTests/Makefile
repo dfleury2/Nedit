@@ -20,4 +20,4 @@ clean:
 	rm -f NEditUnitTests *.o
 
 %.o:%.cpp
-	$(CXX) $(CXXFLAGS) $(GCOV_FLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $<

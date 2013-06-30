@@ -23,6 +23,7 @@ coverage.info
 Release
 Debug
 /ipch/
+/lcov/
 
 /NEdit/nedit++
 

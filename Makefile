@@ -10,8 +10,9 @@ NEditUnitTests:libutil.a libsource.a gtest.a NEditUnitTests/*.cpp
 
 gcov:util/*.cpp util/*.h source/*.cpp source/*.h NEditUnitTests/*.cpp
 	make GCOV_FLAGS=--coverage NEditUnitTests
-	NEditUnitTests/NEditUnitTests
-	lcov --no-external --capture --directory . --output-file coverage.info
+	cp NEditUnitTests/NEditUnitTests /tmp
+	/tmp/NEditUnitTests
+	lcov --no-external --capture --rc lcov_branch_coverage=1 --directory . --output-file coverage.info
 	genhtml --branch-coverage --demangle-cpp coverage.info --output-directory lcov
 
 libsource.a:source/*.cpp source/*.h

@@ -12,10 +12,9 @@
 *.la
 *.a
 
-/NEdit_cpp.sdf
-/NEdit_cpp.opendsdf
-/NEdit_cpp.opensdf
-/NEdit_cpp.suo
+/NEdit.sdf
+/NEdit.opensdf
+/NEdit.suo
 Release
 Debug
 /ipch/
@@ -24,6 +23,7 @@ Debug
 /source/nedit++
 
 /util/util.vcxproj.user
+
 /Tabs/Tabs.vcxproj.user
 /MenuBar/MenuBar.vcxproj.user
 /MenuBar/MenuBar

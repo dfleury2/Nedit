@@ -31,6 +31,7 @@
 #endif
 
 #include "window.h"
+#include "resource.h"
 #include "Ne_Text_Buffer.h"
 #include "Ne_Text_Sel.h"
 #include "Ne_Text_Editor.h"
@@ -49,8 +50,8 @@
 #include "highlight.h"
 #include "smartIndent.h"
 #include "userCmds.h"
-#include "nedit.bm"
-#include "n.bm"
+//#include "nedit.bm"
+//#include "n.bm"
 #include "windowTitle.h"
 #include "interpret.h"
 #include "Ne_Rangeset.h"
@@ -72,8 +73,7 @@
 #include <sys/stat.h>
 #ifndef WIN32
 #include <sys/param.h>
-#else
-#include "resource.h"
+
 #endif
 #include <limits.h>
 #include <math.h>

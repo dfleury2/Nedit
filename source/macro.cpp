@@ -4243,9 +4243,9 @@ static int selectionRightMV(WindowInfo* window, DataValue* argList, int nArgs,
 
 static int wrapMarginMV(WindowInfo* window, DataValue* argList, int nArgs, DataValue* result, char** errMsg)
 {
-   int margin, nCols;
+   int margin = window->textArea->text.columns;
+   int nCols = window->textArea->text.wrapMargin;
 
-// TODO:    XtVaGetValues(window->textArea, textNcolumns, &nCols, textNwrapMargin, &margin, NULL);
    result->tag = INT_TAG;
    result->val.n = margin == 0 ? nCols : margin;
    return true;
@@ -4555,9 +4555,7 @@ static int tabDistMV(WindowInfo* window, DataValue* argList, int nArgs, DataValu
 
 static int emTabDistMV(WindowInfo* window, DataValue* argList, int nArgs, DataValue* result, char** errMsg)
 {
-   int dist;
-
-// TODO:    XtVaGetValues(window->textArea, textNemulateTabs, &dist, NULL);
+   int dist = window->textArea->text.emulateTabs;
    result->tag = INT_TAG;
    result->val.n = dist;
    return true;
@@ -4566,7 +4564,7 @@ static int emTabDistMV(WindowInfo* window, DataValue* argList, int nArgs, DataVa
 static int useTabsMV(WindowInfo* window, DataValue* argList, int nArgs, DataValue* result, char** errMsg)
 {
    result->tag = INT_TAG;
-   result->val.n = 0; // TODO:window->buffer->useTabs;
+   result->val.n = window->buffer->useTabs;
    return true;
 }
 

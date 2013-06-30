@@ -9,15 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Header Files\Done">
-      <UniqueIdentifier>{151e490d-c0a9-4f09-b3a7-4c1a4497314d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Done">
-      <UniqueIdentifier>{4039de4d-95db-47cd-8e9b-6cb5cd7fa581}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{db4a2aa5-d18f-43c9-b366-39d52415c116}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Preferences">
       <UniqueIdentifier>{2a08da90-e773-4838-9291-73d4fba8a4aa}</UniqueIdentifier>
     </Filter>
@@ -62,21 +53,6 @@
     <ClInclude Include="window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rbTree.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="regularExp.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="regexConvert.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="undo.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="parse.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
     <ClInclude Include="WrapMarginDialog.h">
       <Filter>Preferences</Filter>
     </ClInclude>
@@ -85,39 +61,6 @@
     </ClInclude>
     <ClInclude Include="SelectShellDialog.h">
       <Filter>Preferences</Filter>
-    </ClInclude>
-    <ClInclude Include="windowTitle.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="help_data.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="help.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="file.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="help_topic.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="interpret.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="macro.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="shell.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="nedit.h">
-      <Filter>Header Files\Done</Filter>
-    </ClInclude>
-    <ClInclude Include="smartIndent.h">
-      <Filter>Header Files\Done</Filter>
     </ClInclude>
     <ClInclude Include="Ne_Text_Buffer.h">
       <Filter>Header Files</Filter>
@@ -138,6 +81,54 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Ne_Text_Sel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="file.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="windowTitle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="help.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="help_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="help_topic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="interpret.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="macro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nedit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rbTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="regexConvert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="regularExp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="smartIndent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="undo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -214,24 +205,6 @@
     <ClCompile Include="window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rbTree.cpp">
-      <Filter>Source Files\Done</Filter>
-    </ClCompile>
-    <ClCompile Include="regularExp.cpp">
-      <Filter>Source Files\Done</Filter>
-    </ClCompile>
-    <ClCompile Include="regexConvert.cpp">
-      <Filter>Source Files\Done</Filter>
-    </ClCompile>
-    <ClCompile Include="linkdate.cpp">
-      <Filter>Source Files\Done</Filter>
-    </ClCompile>
-    <ClCompile Include="undo.cpp">
-      <Filter>Source Files\Done</Filter>
-    </ClCompile>
-    <ClCompile Include="parse.cpp">
-      <Filter>Source Files\Done</Filter>
-    </ClCompile>
     <ClCompile Include="WrapMarginDialog.cpp">
       <Filter>Preferences</Filter>
     </ClCompile>
@@ -240,12 +213,6 @@
     </ClCompile>
     <ClCompile Include="SelectShellDialog.cpp">
       <Filter>Preferences</Filter>
-    </ClCompile>
-    <ClCompile Include="windowTitle.cpp">
-      <Filter>Source Files\Done</Filter>
-    </ClCompile>
-    <ClCompile Include="smartIndent.cpp">
-      <Filter>Source Files\Done</Filter>
     </ClCompile>
     <ClCompile Include="Ne_Text_Buffer.cpp">
       <Filter>Source Files</Filter>
@@ -268,15 +235,29 @@
     <ClCompile Include="Ne_Text_Sel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="source.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="nedit_32x32.ico">
-      <Filter>Resource Files</Filter>
-    </None>
+    <ClCompile Include="linkdate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="windowTitle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="parse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rbTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="regexConvert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="regularExp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="smartIndent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="undo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

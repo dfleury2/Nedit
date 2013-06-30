@@ -538,4 +538,9 @@ extern char* ArgV0;
 extern bool IsServer;
 extern Ne_AppContext AppContext;
 
+void nextArg(int argc, char** argv, int* argIndex);
+int checkDoMacroArg(const char* macro);
+int sortAlphabetical(const void* k1, const void* k2);
+
+
 #endif /* NEDIT_NEDIT_H_INCLUDED */

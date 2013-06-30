@@ -12,6 +12,11 @@
 *.la
 *.a
 
+# Coverage
+*.gcno
+*.gcda
+coverage.info
+
 /NEdit.sdf
 /NEdit.opensdf
 /NEdit.suo

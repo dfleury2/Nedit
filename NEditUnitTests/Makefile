@@ -14,10 +14,10 @@ SOURCES:= $(shell ls *.cpp)
 OBJECTS:=$(SOURCES:.cpp=.o)
 
 NEditUnitTests:$(OBJECTS)
-	$(CXX) -o $@ $(OBJECTS) ../source/libsource.a ../util/libutil.a ../gtest-1.6.0/gtest.a $(LDLIBS)
+	$(CXX) $(GCOV_FLAGS) -o $@ $(OBJECTS) ../source/libsource.a ../util/libutil.a ../gtest-1.6.0/gtest.a $(LDLIBS)
 
 clean:
 	rm -f NEditUnitTests *.o
 
 %.o:%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(GCOV_FLAGS) -c -o $@ $<

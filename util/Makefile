@@ -20,5 +20,5 @@ clean:
 	rm -f libutil.a *.o
 
 %.o:%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(GCOV_FLAGS) -c -o $@ $<
 

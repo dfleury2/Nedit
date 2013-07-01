@@ -1,10 +1,10 @@
 Nedit
 =====
 
-A port of [Nedit](http://www.nedit.org) to C++ and FLTK
+A port of [Nedit](http://www.nedit.org) to C++ and [FLTK](http://www.fltk.org).
 
-This a joke project to have fun coding with C++ (at this time
-only replacing C by C++), learning FLTK and add some gtests for TDD.
+This a [joke project](http://hylvenir.free.fr/nedit/) to have fun coding with C++ (at this time
+only replacing C by C++), learning FLTK and add some gtests for [coverage](http://hylvenir.free.fr/nedit/lcov)
 
 This project contains:
  - all the original NEdit source code
@@ -21,3 +21,4 @@ There is no macros, shell commands, and help.
 
 This editor version is pretty harmfull, very unstable and immature. You should use it only for
 experimental purpose.
+

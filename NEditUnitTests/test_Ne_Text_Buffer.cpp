@@ -54,6 +54,8 @@ protected:
 
    virtual void TearDown()
    {
+      BufRemoveModifyCB(buffer, bufModifiedCB, 0);
+      BufRemovePreDeleteCB(buffer, bufPreDeleteCB, 0);
       BufFree(buffer);
    }
 
@@ -95,6 +97,13 @@ TEST_F(Ne_Text_Buffer_Test, SetGet)
    EXPECT_EQ(BufGetCharacter(buffer, 1), 'B');
    EXPECT_EQ(BufGetCharacter(buffer, 5), 'F');
    EXPECT_EQ(BufGetCharacter(buffer, 6), '\0');
+
+   BufCheckDisplay(buffer, 0, 5);
+   EXPECT_EQ(bufModifiedCBCallCount, 2);
+   EXPECT_EQ(modifiedPosition, 0);
+   EXPECT_EQ(modifiedInserted, 0);
+   EXPECT_EQ(modifiedDeleted, 0);
+   EXPECT_EQ(modifiedDeletedText, "");
 }
 
 // --------------------------------------------------------------------------
@@ -587,4 +596,47 @@ TEST_F(Ne_Text_Buffer_Test, CountNLines)
    EXPECT_EQ(BufCountBackwardNLines(buffer, 5, 5), 0);
 
    EXPECT_EQ(BufCountBackwardNLines(buffer, -5, 3), 0);
+}
+
+// --------------------------------------------------------------------------
+TEST_F(Ne_Text_Buffer_Test, GetSetSelection)
+{
+   BufSetAll(buffer,
+      "0123456789\n"
+      "1234567890\n"
+      "2345678901\n"
+      "3456789012\n"
+      "4567890123\n"
+      "5678901234\n");
+
+   char* text = BufGetSelectionText(buffer);
+   EXPECT_STREQ(text, "");
+   free__(text);
+
+   BufSelect(buffer, 5, 13);
+   text = BufGetSelectionText(buffer);
+   EXPECT_STREQ(text, "56789\n12");
+   free__(text);
+
+   BufRemoveSelected(buffer);
+   EXPECT_STREQ(BufAsString(buffer),
+      "0123434567890\n"
+      "2345678901\n"
+      "3456789012\n"
+      "4567890123\n"
+      "5678901234\n");
+   
+   text = BufGetSelectionText(buffer);
+   EXPECT_STREQ(text, "");
+   free__(text);
+
+   BufSelect(buffer, 5, 8);
+   text = BufGetSelectionText(buffer);
+   EXPECT_STREQ(text, "345");
+   free__(text);
+
+   BufUnselect(buffer);
+   text = BufGetSelectionText(buffer);
+   EXPECT_STREQ(text, "");
+   free__(text);
 }

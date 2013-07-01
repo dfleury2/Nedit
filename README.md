@@ -3,8 +3,9 @@ Nedit
 
 A port of [Nedit](http://www.nedit.org) to C++ and [FLTK](http://www.fltk.org).
 
-This a [joke project](http://hylvenir.free.fr/nedit/) to have fun coding with C++ (at this time
-only replacing C by C++), learning FLTK and add some gtests for [coverage](http://hylvenir.free.fr/nedit/lcov)
+This a [joke project](http://hylvenir.free.fr/nedit/) (with screenshots) to have fun coding in C++ (at this time
+only compiling in C++ instead of C), learning FLTK and add some gtests
+for [coverage](http://hylvenir.free.fr/nedit/lcov)
 
 This project contains:
  - all the original NEdit source code

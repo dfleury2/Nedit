@@ -50,8 +50,6 @@ static void findRectSelBoundariesForCopy(Ne_Text_Buffer* buf, int lineStartPos, 
 static char* realignTabs(const char* text, int origIndent, int newIndent, int tabDist, int useTabs, char nullSubsChar, int* newLength);
 static char* expandTabs(const char* text, int startIndent, int tabDist, char nullSubsChar, int* newLen);
 static char* unexpandTabs(const char* text, int startIndent, int tabDist, char nullSubsChar, int* newLen);
-static int max(int i1, int i2);
-static int min(int i1, int i2);
 
 static const char* ControlCodeTable[32] =
 {
@@ -1703,7 +1701,7 @@ static void deleteRectFromLine(const char* line, int rectStart, int rectEnd,
 
    /* fill in any space left by removed tabs or control characters
    which straddled the boundaries */
-   indent = max(rectStart + postRectIndent-rectEnd, preRectIndent);
+   indent = std::max(rectStart + postRectIndent-rectEnd, preRectIndent);
    addPadding(outPtr, preRectIndent, indent, tabDist, useTabs, nullSubsChar,
       &len);
    outPtr += len;
@@ -1838,8 +1836,8 @@ static void setSelection(selection* sel, int start, int end)
    sel->selected = start != end;
    sel->zeroWidth = (start == end) ? 1 : 0;
    sel->rectangular = false;
-   sel->start = min(start, end);
-   sel->end = max(start, end);
+   sel->start = std::min(start, end);
+   sel->end = std::max(start, end);
 }
 
 // --------------------------------------------------------------------------
@@ -2027,8 +2025,8 @@ static void redisplaySelection(Ne_Text_Buffer* buf, selection* oldSelection,
       (oldSelection->rectStart != newSelection->rectStart) ||
       (oldSelection->rectEnd != newSelection->rectEnd))))
    {
-      callModifyCBs(buf, min(oldStart, newStart), 0, 0,
-         max(oldEnd, newEnd) - min(oldStart, newStart), NULL);
+      callModifyCBs(buf, std::min(oldStart, newStart), 0, 0,
+         std::max(oldEnd, newEnd) - std::min(oldStart, newStart), NULL);
       return;
    }
 
@@ -2044,10 +2042,10 @@ static void redisplaySelection(Ne_Text_Buffer* buf, selection* oldSelection,
    /* Otherwise, separate into 3 separate regions: ch1, and ch2 (the two
    changed areas), and the unchanged area of their intersection,
    and update only the changed area(s) */
-   ch1Start = min(oldStart, newStart);
-   ch2End = max(oldEnd, newEnd);
-   ch1End = max(oldStart, newStart);
-   ch2Start = min(oldEnd, newEnd);
+   ch1Start = std::min(oldStart, newStart);
+   ch2End = std::max(oldEnd, newEnd);
+   ch1End = std::max(oldStart, newStart);
+   ch2Start = std::min(oldEnd, newEnd);
    if (ch1Start != ch1End)
       callModifyCBs(buf, ch1Start, 0, 0, ch1End-ch1Start, NULL);
    if (ch2Start != ch2End)
@@ -2480,16 +2478,4 @@ static char* unexpandTabs(const char* text, int startIndent, int tabDist,
    *outPtr = '\0';
    *newLen = outPtr - outStr;
    return outStr;
-}
-
-// --------------------------------------------------------------------------
-static int max(int i1, int i2)
-{
-   return i1 >= i2 ? i1 : i2;
-}
-
-// --------------------------------------------------------------------------
-static int min(int i1, int i2)
-{
-   return i1 <= i2 ? i1 : i2;
 }

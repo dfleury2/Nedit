@@ -363,7 +363,9 @@ TEST_F(Ne_Text_Buffer_Test, ExpandCharWidth)
 TEST_F(Ne_Text_Buffer_Test, CountDisplChars)
 {
    BufSetAll(buffer, "AB\tC\tD\nEFG\tH");
-   buffer->tabDist = 12;
+   EXPECT_EQ(BufGetTabDistance(buffer), 8);
+   BufSetTabDistance(buffer, 12);
+   EXPECT_EQ(BufGetTabDistance(buffer), 12);
 
    EXPECT_EQ(BufCountDispChars(buffer, 0, 0), 0);
    EXPECT_EQ(BufCountDispChars(buffer, 0, 1), 1);
@@ -466,6 +468,77 @@ TEST_F(Ne_Text_Buffer_Test, Rectangular)
       "H\n");
    EXPECT_EQ(charsInserted, 25);
    EXPECT_EQ(charsDeleted, 19);
+
+   BufReplaceRect(buffer, 0, 2, 5, 3, "a\nbb\nccc\n\nd");
+   EXPECT_STREQ(BufAsString(buffer),
+      "ABxxxa\n"
+      "     bb\n"
+      "     ccc\n"
+      "\n"
+      "     d\n"
+      "C y\n"
+      "  z\n"
+      "D uuuuu\n"
+      "EFv\n"
+      "H\n");
+
+   BufReplaceRect(buffer, 25, 32, 1, 2, "XXX\nYY\nZZZ");
+   EXPECT_STREQ(BufAsString(buffer),
+      "ABxxxa\n"
+      "     bb\n"
+      "     ccc\n"
+      "\n"
+      " XXX   d\n"
+      "CYY y\n"
+      " ZZZ\n"
+      "  z\n"
+      "D uuuuu\n"
+      "EFv\n"
+      "H\n");
+
+   BufRemoveRect(buffer, 3, 32, 1, 3);
+   EXPECT_STREQ(BufAsString(buffer),
+      "Axxa\n"
+      "   bb\n"
+      "   ccc\n"
+      "\n"
+      " X   d\n"
+      "CYY y\n"
+      " ZZZ\n"
+      "  z\n"
+      "D uuuuu\n"
+      "EFv\n"
+      "H\n");
+
+   BufClearRect(buffer, 0, 64, 2, 5);
+   EXPECT_STREQ(BufAsString(buffer),
+      "Ax\n"
+      " \n"
+      "     c\n"
+      "\n"
+      " X   d\n"
+      "CY\n"
+      " Z\n"
+      " \n"
+      "D    uu\n"
+      "EF\n"
+      "H\n");
+
+   char* text = BufGetTextInRect(buffer, 0, 64, 1, 3);
+   EXPECT_STREQ(text,
+      "x\n"
+      "\n"
+      "  \n"
+      "\n"
+      "X \n"
+      "Y\n"
+      "Z\n"
+      "\n"
+      "  \n"
+      "F\n"
+      "\n"
+      );
+   free__(text);
 
 }
 

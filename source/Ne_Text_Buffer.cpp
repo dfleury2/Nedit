@@ -73,9 +73,7 @@ Ne_Text_Buffer* BufCreate(void)
 // --------------------------------------------------------------------------
 Ne_Text_Buffer* BufCreatePreallocated(int requestedSize)
 {
-   Ne_Text_Buffer* buf;
-
-   buf = (Ne_Text_Buffer*)malloc__(sizeof(Ne_Text_Buffer));
+   Ne_Text_Buffer* buf = new Ne_Text_Buffer();
    buf->length = 0;
    buf->buf = (char*)malloc__(requestedSize + PREFERRED_GAP_SIZE + 1);
    buf->buf[requestedSize + PREFERRED_GAP_SIZE] = '\0';
@@ -124,7 +122,7 @@ void BufFree(Ne_Text_Buffer* buf)
       free__((char*)buf->preDeleteProcs);
       free__((char*)buf->preDeleteCbArgs);
    }
-   free__((char*)buf);
+   delete buf;
 }
 
 // --------------------------------------------------------------------------
@@ -1010,7 +1008,7 @@ int BufEndOfLine(Ne_Text_Buffer* buf, int pos)
 // representation (which may be several characters for a tab or a
 // control code).  Returns the number of characters written to "outStr".
 // "indent" is the number of characters from the start of the line
-// for figuring tabs.  Output string is guranteed to be shorter or
+// for figuring tabs.  Output string is guaranteed to be shorter or
 // equal in length to MAX_EXP_CHAR_LEN
 // --------------------------------------------------------------------------
 int BufGetExpandedChar(const Ne_Text_Buffer* buf, const int pos, const int indent,
@@ -1025,7 +1023,7 @@ int BufGetExpandedChar(const Ne_Text_Buffer* buf, const int pos, const int inden
 // representation (which may be several characters for a tab or a
 // control code).  Returns the number of characters added to "outStr".
 // "indent" is the number of characters from the start of the line
-// for figuring tabs.  Output string is guranteed to be shorter or
+// for figuring tabs.  Output string is guaranteed to be shorter or
 // equal in length to MAX_EXP_CHAR_LEN
 // --------------------------------------------------------------------------
 int BufExpandCharacter(const char c, const int indent, char* outStr,
@@ -1069,7 +1067,7 @@ int BufExpandCharacter(const char c, const int indent, char* outStr,
 // Return the length in displayed characters of character "c" expanded
 // for display (as discussed above in BufGetExpandedChar).  If the
 // buffer for which the character width is being measured is doing null
-// substitution, nullSubsChar should be passed as that character (or nul
+// substitution, nullSubsChar should be passed as that character (or null
 // to ignore).
 // --------------------------------------------------------------------------
 int BufCharWidth(char c, int indent, int tabDist, char nullSubsChar)

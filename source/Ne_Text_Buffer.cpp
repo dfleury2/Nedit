@@ -8,6 +8,10 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <algorithm>
+#include <utility>
+#include <iostream>
+
 #define PREFERRED_GAP_SIZE 80	/* Initial size for the buffer gap (empty space
 in the buffer where text might be inserted
 if the user is typing sequential chars) */
@@ -92,9 +96,6 @@ Ne_Text_Buffer* BufCreatePreallocated(int requestedSize)
    buf->gapEnd = PREFERRED_GAP_SIZE;
    buf->tabDist = 8;
    buf->useTabs = true;
-   buf->modifyProcs = NULL;
-   buf->cbArgs = NULL;
-   buf->nModifyProcs = 0;
    buf->preDeleteProcs = NULL;
    buf->preDeleteCbArgs = NULL;
    buf->nPreDeleteProcs = 0;
@@ -109,11 +110,6 @@ Ne_Text_Buffer* BufCreatePreallocated(int requestedSize)
 void BufFree(Ne_Text_Buffer* buf)
 {
    free__(buf->buf);
-   if (buf->nModifyProcs != 0)
-   {
-      free__((char*)buf->modifyProcs);
-      free__((char*)buf->cbArgs);
-   }
    if (buf->rangesetTable)
       RangesetTableFree(buf->rangesetTable);
    if (buf->nPreDeleteProcs != 0)
@@ -777,117 +773,29 @@ int BufGetHighlightPos(Ne_Text_Buffer* buf, int* start, int* end,
 // --------------------------------------------------------------------------
 // Add a callback routine to be called when the buffer is modified
 // --------------------------------------------------------------------------
-void BufAddModifyCB(Ne_Text_Buffer* buf, bufModifyCallbackProc bufModifiedCB,
-   void* cbArg)
+void BufAddModifyCB(Ne_Text_Buffer* buf, bufModifyCallbackProc bufModifiedCB, void* cbArg)
 {
-   bufModifyCallbackProc* newModifyProcs;
-   void** newCBArgs;
-   int i;
-
-   newModifyProcs = (bufModifyCallbackProc*)
-      malloc__(sizeof(bufModifyCallbackProc*) * (buf->nModifyProcs+1));
-   newCBArgs = (void**)malloc__(sizeof(void*) * (buf->nModifyProcs+1));
-   for (i=0; i<buf->nModifyProcs; i++)
-   {
-      newModifyProcs[i] = buf->modifyProcs[i];
-      newCBArgs[i] = buf->cbArgs[i];
-   }
-   if (buf->nModifyProcs != 0)
-   {
-      free__((char*)buf->modifyProcs);
-      free__((char*)buf->cbArgs);
-   }
-   newModifyProcs[buf->nModifyProcs] = bufModifiedCB;
-   newCBArgs[buf->nModifyProcs] = cbArg;
-   buf->nModifyProcs++;
-   buf->modifyProcs = newModifyProcs;
-   buf->cbArgs = newCBArgs;
+   buf->modifyProcs.push_back(std::make_pair(bufModifiedCB, cbArg));
 }
 
 // --------------------------------------------------------------------------
 // Similar to the above, but makes sure that the callback is called before
 // normal priority callbacks.
 // --------------------------------------------------------------------------
-void BufAddHighPriorityModifyCB(Ne_Text_Buffer* buf, bufModifyCallbackProc bufModifiedCB,
-   void* cbArg)
+void BufAddHighPriorityModifyCB(Ne_Text_Buffer* buf, bufModifyCallbackProc bufModifiedCB, void* cbArg)
 {
-   bufModifyCallbackProc* newModifyProcs;
-   void** newCBArgs;
-   int i;
-
-   newModifyProcs = (bufModifyCallbackProc*)
-      malloc__(sizeof(bufModifyCallbackProc*) * (buf->nModifyProcs+1));
-   newCBArgs = (void**)malloc__(sizeof(void*) * (buf->nModifyProcs+1));
-   for (i=0; i<buf->nModifyProcs; i++)
-   {
-      newModifyProcs[i+1] = buf->modifyProcs[i];
-      newCBArgs[i+1] = buf->cbArgs[i];
-   }
-   if (buf->nModifyProcs != 0)
-   {
-      free__((char*)buf->modifyProcs);
-      free__((char*)buf->cbArgs);
-   }
-   newModifyProcs[0] = bufModifiedCB;
-   newCBArgs[0] = cbArg;
-   buf->nModifyProcs++;
-   buf->modifyProcs = newModifyProcs;
-   buf->cbArgs = newCBArgs;
+   buf->modifyProcs.push_front(std::make_pair(bufModifiedCB, cbArg));
 }
 
 // --------------------------------------------------------------------------
 void BufRemoveModifyCB(Ne_Text_Buffer* buf, bufModifyCallbackProc bufModifiedCB, void* cbArg)
 {
-   int i, toRemove = -1;
-   bufModifyCallbackProc* newModifyProcs;
-   void** newCBArgs;
-
-   /* find the matching callback to remove */
-   for (i=0; i<buf->nModifyProcs; i++)
-   {
-      if (buf->modifyProcs[i] == bufModifiedCB && buf->cbArgs[i] == cbArg)
-      {
-         toRemove = i;
-         break;
-      }
-   }
-   if (toRemove == -1)
-   {
-      fprintf(stderr, "NEdit Internal Error: Can't find modify CB to remove\n");
-      return;
-   }
-
-   /* Allocate new lists for remaining callback procs and args (if
-   any are left) */
-   buf->nModifyProcs--;
-   if (buf->nModifyProcs == 0)
-   {
-      buf->nModifyProcs = 0;
-      free__((char*)buf->modifyProcs);
-      buf->modifyProcs = NULL;
-      free__((char*)buf->cbArgs);
-      buf->cbArgs = NULL;
-      return;
-   }
-   newModifyProcs = (bufModifyCallbackProc*)
-      malloc__(sizeof(bufModifyCallbackProc*) * (buf->nModifyProcs));
-   newCBArgs = (void**)malloc__(sizeof(void*) * (buf->nModifyProcs));
-
-   /* copy out the remaining members and free__ the old lists */
-   for (i=0; i<toRemove; i++)
-   {
-      newModifyProcs[i] = buf->modifyProcs[i];
-      newCBArgs[i] = buf->cbArgs[i];
-   }
-   for (; i<buf->nModifyProcs; i++)
-   {
-      newModifyProcs[i] = buf->modifyProcs[i+1];
-      newCBArgs[i] = buf->cbArgs[i+1];
-   }
-   free__((char*)buf->modifyProcs);
-   free__((char*)buf->cbArgs);
-   buf->modifyProcs = newModifyProcs;
-   buf->cbArgs = newCBArgs;
+   Ne_Text_Buffer::ModifyProcs::iterator found = 
+      std::find(buf->modifyProcs.begin(), buf->modifyProcs.end(), std::make_pair(bufModifiedCB, cbArg));
+   if (found == buf->modifyProcs.end())
+      std::cerr << "NEdit Internal Error: Can't find modify CB to remove" << std::endl;
+   else
+      buf->modifyProcs.erase(found);
 }
 
 // --------------------------------------------------------------------------
@@ -2139,14 +2047,10 @@ static void addPadding(char* string, int startIndent, int toIndent,
 // Call the stored modify callback procedure(s) for this buffer to update the
 // changed area(s) on the screen and any other listeners.
 // --------------------------------------------------------------------------
-static void callModifyCBs(Ne_Text_Buffer* buf, int pos, int nDeleted,
-   int nInserted, int nRestyled, const char* deletedText)
+static void callModifyCBs(Ne_Text_Buffer* buf, int pos, int nDeleted, int nInserted, int nRestyled, const char* deletedText)
 {
-   int i;
-
-   for (i=0; i<buf->nModifyProcs; i++)
-      (*buf->modifyProcs[i])(pos, nInserted, nDeleted, nRestyled,
-      deletedText, buf->cbArgs[i]);
+   for (Ne_Text_Buffer::ModifyProcs::iterator cb = buf->modifyProcs.begin(); cb != buf->modifyProcs.end(); ++cb)
+      (cb->first)(pos, nInserted, nDeleted, nRestyled, deletedText, cb->second);
 }
 
 // --------------------------------------------------------------------------
@@ -2155,9 +2059,7 @@ static void callModifyCBs(Ne_Text_Buffer* buf, int pos, int nDeleted,
 // --------------------------------------------------------------------------
 static void callPreDeleteCBs(Ne_Text_Buffer* buf, int pos, int nDeleted)
 {
-   int i;
-
-   for (i=0; i<buf->nPreDeleteProcs; i++)
+   for (int i=0; i<buf->nPreDeleteProcs; i++)
       (*buf->preDeleteProcs[i])(pos, nDeleted, buf->preDeleteCbArgs[i]);
 }
 

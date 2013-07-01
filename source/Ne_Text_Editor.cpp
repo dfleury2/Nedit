@@ -1744,7 +1744,7 @@ void TextSetBuffer(Ne_Text_Editor* textD, Ne_Text_Buffer* buffer)
 
 // TODO:    StopHandlingXSelections(w);
    TextDSetBuffer(textD, buffer);
-   if (oldBuf && oldBuf->nModifyProcs == 0)
+   if (oldBuf && oldBuf->modifyProcs.empty())
       BufFree(oldBuf);
 }
 

@@ -8,14 +8,16 @@ struct RangesetTable;
 
 struct selection
 {
-   char selected;          /* True if the selection is active */
-   char rectangular;       /* True if the selection is rectangular */
-   char zeroWidth;         /* Width 0 selections aren't "real" selections, but they can be useful when creating rectangular selections from the keyboard. */
+   selection();
+
+   bool selected;          /* True if the selection is active */
+   bool rectangular;       /* True if the selection is rectangular */
+   bool zeroWidth;         /* Width 0 selections aren't "real" selections, but they can be useful when creating rectangular selections from the keyboard. */
    int start;              /* Pos. of start of selection, or if rectangular start of line containing it. */
    int end;                /* Pos. of end of selection, or if rectangular of line containing it. */
    int rectStart;          /* Indent of left edge of rect. selection */
    int rectEnd;            /* Indent of right edge of rect. selection */
-} ;
+};
 
 typedef void (*bufModifyCallbackProc)(int pos, int nInserted, int nDeleted, int nRestyled, const char* deletedText, void* cbArg);
 typedef void (*bufPreDeleteCallbackProc)(int pos, int nDeleted, void* cbArg);

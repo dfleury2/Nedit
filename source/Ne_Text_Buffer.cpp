@@ -57,6 +57,17 @@ static const char* ControlCodeTable[32] =
    "can", "em", "sub", "esc", "fs", "gs", "rs", "us"
 };
 
+
+// --------------------------------------------------------------------------
+selection::selection()
+{
+   selected = false;
+   zeroWidth = false;
+   rectangular = false;
+   start = end = 0;
+   rectStart = rectEnd = 0;
+}
+
 // --------------------------------------------------------------------------
 // Create an empty text buffer
 // --------------------------------------------------------------------------
@@ -81,18 +92,6 @@ Ne_Text_Buffer* BufCreatePreallocated(int requestedSize)
    buf->gapEnd = PREFERRED_GAP_SIZE;
    buf->tabDist = 8;
    buf->useTabs = true;
-   buf->primary.selected = false;
-   buf->primary.zeroWidth = false;
-   buf->primary.rectangular = false;
-   buf->primary.start = buf->primary.end = 0;
-   buf->secondary.selected = false;
-   buf->secondary.zeroWidth = false;
-   buf->secondary.start = buf->secondary.end = 0;
-   buf->secondary.rectangular = false;
-   buf->highlight.selected = false;
-   buf->highlight.zeroWidth = false;
-   buf->highlight.start = buf->highlight.end = 0;
-   buf->highlight.rectangular = false;
    buf->modifyProcs = NULL;
    buf->cbArgs = NULL;
    buf->nModifyProcs = 0;

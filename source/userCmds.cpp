@@ -1112,7 +1112,7 @@ static void freeUserSubMenuList(UserMenuList* list);
 ** Dim/undim user programmable menu items which depend on there being
 ** a selection in their associated window.
 */
-void DimSelectionDepUserMenuItems(WindowInfo* window, int sensitive)
+void DimSelectionDepUserMenuItems(WindowInfo* window, bool sensitive)
 {
    if (!IsTopDocument(window))
       return;

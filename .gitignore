@@ -16,6 +16,7 @@
 *.gcno
 *.gcda
 coverage.info
+error.txt
 
 /NEdit.sdf
 /NEdit.opensdf

@@ -65,9 +65,7 @@ static const char* ControlCodeTable[32] =
 // --------------------------------------------------------------------------
 selection::selection()
 {
-   selected = false;
-   zeroWidth = false;
-   rectangular = false;
+   selected = zeroWidth = rectangular = false;
    start = end = 0;
    rectStart = rectEnd = 0;
 }
@@ -96,9 +94,6 @@ Ne_Text_Buffer* BufCreatePreallocated(int requestedSize)
    buf->gapEnd = PREFERRED_GAP_SIZE;
    buf->tabDist = 8;
    buf->useTabs = true;
-   buf->preDeleteProcs = NULL;
-   buf->preDeleteCbArgs = NULL;
-   buf->nPreDeleteProcs = 0;
    buf->nullSubsChar = '\0';
    buf->rangesetTable = NULL;
    return buf;
@@ -112,11 +107,6 @@ void BufFree(Ne_Text_Buffer* buf)
    free__(buf->buf);
    if (buf->rangesetTable)
       RangesetTableFree(buf->rangesetTable);
-   if (buf->nPreDeleteProcs != 0)
-   {
-      free__((char*)buf->preDeleteProcs);
-      free__((char*)buf->preDeleteCbArgs);
-   }
    delete buf;
 }
 
@@ -305,11 +295,8 @@ void BufRemove(Ne_Text_Buffer* buf, int start, int end)
 
    /* Make sure the arguments make sense */
    if (start > end)
-   {
-      int temp = start;
-      start = end;
-      end = temp;
-   }
+      std::swap(start, end);
+
    if (start > buf->length) start = buf->length;
    if (start < 0) start = 0;
    if (end > buf->length) end = buf->length;
@@ -801,87 +788,20 @@ void BufRemoveModifyCB(Ne_Text_Buffer* buf, bufModifyCallbackProc bufModifiedCB,
 // --------------------------------------------------------------------------
 // Add a callback routine to be called before text is deleted from the buffer.
 // --------------------------------------------------------------------------
-void BufAddPreDeleteCB(Ne_Text_Buffer* buf, bufPreDeleteCallbackProc bufPreDeleteCB,
-   void* cbArg)
+void BufAddPreDeleteCB(Ne_Text_Buffer* buf, bufPreDeleteCallbackProc bufPreDeleteCB, void* cbArg)
 {
-   bufPreDeleteCallbackProc* newPreDeleteProcs;
-   void** newCBArgs;
-   int i;
-
-   newPreDeleteProcs = (bufPreDeleteCallbackProc*)
-      malloc__(sizeof(bufPreDeleteCallbackProc*) * (buf->nPreDeleteProcs+1));
-   newCBArgs = (void**)malloc__(sizeof(void*) * (buf->nPreDeleteProcs+1));
-   for (i=0; i<buf->nPreDeleteProcs; i++)
-   {
-      newPreDeleteProcs[i] = buf->preDeleteProcs[i];
-      newCBArgs[i] = buf->preDeleteCbArgs[i];
-   }
-   if (buf->nPreDeleteProcs != 0)
-   {
-      free__((char*)buf->preDeleteProcs);
-      free__((char*)buf->preDeleteCbArgs);
-   }
-   newPreDeleteProcs[buf->nPreDeleteProcs] =  bufPreDeleteCB;
-   newCBArgs[buf->nPreDeleteProcs] = cbArg;
-   buf->nPreDeleteProcs++;
-   buf->preDeleteProcs = newPreDeleteProcs;
-   buf->preDeleteCbArgs = newCBArgs;
+   buf->preDeleteProcs.push_front(std::make_pair(bufPreDeleteCB, cbArg));
 }
 
 // --------------------------------------------------------------------------
 void BufRemovePreDeleteCB(Ne_Text_Buffer* buf, bufPreDeleteCallbackProc bufPreDeleteCB, void* cbArg)
 {
-   int i, toRemove = -1;
-   bufPreDeleteCallbackProc* newPreDeleteProcs;
-   void** newCBArgs;
-
-   /* find the matching callback to remove */
-   for (i=0; i<buf->nPreDeleteProcs; i++)
-   {
-      if (buf->preDeleteProcs[i] == bufPreDeleteCB &&
-         buf->preDeleteCbArgs[i] == cbArg)
-      {
-         toRemove = i;
-         break;
-      }
-   }
-   if (toRemove == -1)
-   {
-      fprintf(stderr, "NEdit Internal Error: Can't find pre-delete CB to remove\n");
-      return;
-   }
-
-   /* Allocate new lists for remaining callback procs and args (if
-   any are left) */
-   buf->nPreDeleteProcs--;
-   if (buf->nPreDeleteProcs == 0)
-   {
-      buf->nPreDeleteProcs = 0;
-      free__((char*)buf->preDeleteProcs);
-      buf->preDeleteProcs = NULL;
-      free__((char*)buf->preDeleteCbArgs);
-      buf->preDeleteCbArgs = NULL;
-      return;
-   }
-   newPreDeleteProcs = (bufPreDeleteCallbackProc*)
-      malloc__(sizeof(bufPreDeleteCallbackProc*) * (buf->nPreDeleteProcs));
-   newCBArgs = (void**)malloc__(sizeof(void*) * (buf->nPreDeleteProcs));
-
-   /* copy out the remaining members and free__ the old lists */
-   for (i=0; i<toRemove; i++)
-   {
-      newPreDeleteProcs[i] = buf->preDeleteProcs[i];
-      newCBArgs[i] = buf->preDeleteCbArgs[i];
-   }
-   for (; i<buf->nPreDeleteProcs; i++)
-   {
-      newPreDeleteProcs[i] = buf->preDeleteProcs[i+1];
-      newCBArgs[i] = buf->preDeleteCbArgs[i+1];
-   }
-   free__((char*)buf->preDeleteProcs);
-   free__((char*)buf->preDeleteCbArgs);
-   buf->preDeleteProcs = newPreDeleteProcs;
-   buf->preDeleteCbArgs = newCBArgs;
+   Ne_Text_Buffer::PreDeleteProcs::iterator found = 
+      std::find(buf->preDeleteProcs.begin(), buf->preDeleteProcs.end(), std::make_pair(bufPreDeleteCB, cbArg));
+   if (found == buf->preDeleteProcs.end())
+      std::cerr << "NEdit Internal Error: Can't find pre-delete CB to remove" << std::endl;
+   else
+      buf->preDeleteProcs.erase(found);
 }
 
 // --------------------------------------------------------------------------
@@ -2059,8 +1979,8 @@ static void callModifyCBs(Ne_Text_Buffer* buf, int pos, int nDeleted, int nInser
 // --------------------------------------------------------------------------
 static void callPreDeleteCBs(Ne_Text_Buffer* buf, int pos, int nDeleted)
 {
-   for (int i=0; i<buf->nPreDeleteProcs; i++)
-      (*buf->preDeleteProcs[i])(pos, nDeleted, buf->preDeleteCbArgs[i]);
+   for (Ne_Text_Buffer::PreDeleteProcs::iterator cb = buf->preDeleteProcs.begin(); cb != buf->preDeleteProcs.end(); ++cb)
+      (cb->first)(pos, nDeleted, cb->second);
 }
 
 // --------------------------------------------------------------------------

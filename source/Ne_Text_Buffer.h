@@ -26,28 +26,27 @@ typedef void (*bufPreDeleteCallbackProc)(int pos, int nDeleted, void* cbArg);
 
 struct Ne_Text_Buffer
 {
-   int length; 	        /* length of the text in the buffer (the length of the buffer itself must be calculated: gapEnd - gapStart + length) */
-   char* buf;                  /* allocated memory where the text is stored */
-   int gapStart;  	        /* points to the first character of the gap */
-   int gapEnd;                 /* points to the first char after the gap */
-   selection primary;		/* highlighted areas */
+   int length;          /* length of the text in the buffer (the length of the buffer itself must be calculated: gapEnd - gapStart + length) */
+   char* buf;           /* allocated memory where the text is stored */
+   int gapStart;  	   /* points to the first character of the gap */
+   int gapEnd;          /* points to the first char after the gap */
+   selection primary;	/* highlighted areas */
    selection secondary;
    selection highlight;
-   int tabDist;		/* equiv. number of characters in a tab */
-   int useTabs;		/* True if buffer routines are allowed to use tabs for padding in rectangular operations */
+   int tabDist;		   /* equiv. number of characters in a tab */
+   int useTabs;		   /* True if buffer routines are allowed to use tabs for padding in rectangular operations */
    
    /* procedures and args to call when buffer is modified to redisplay contents */
    typedef std::list<std::pair<bufModifyCallbackProc, void*> > ModifyProcs;
    ModifyProcs modifyProcs;
 
-   int nPreDeleteProcs;	/* number of pre-delete procs attached */
-   bufPreDeleteCallbackProc	/* procedure to call before text is deleted */
-   *preDeleteProcs;	/* from the buffer; at most one is supported. */
-   void** preDeleteCbArgs;	/* caller argument for pre-delete proc above */
+   /* procedures and args to call before text is deleted from the buffer*/
+   typedef std::list<std::pair<bufPreDeleteCallbackProc, void*> > PreDeleteProcs;
+   PreDeleteProcs preDeleteProcs;
    
-   int cursorPosHint;		/* hint for reasonable cursor position after a buffer modification operation */
-   char nullSubsChar;	    	/* NEdit is based on C null-terminated strings, so ascii-nul characters must be substituted
-				   with something else.  This is the else, but of course, things get quite messy when you use it */
+   int cursorPosHint;   /* hint for reasonable cursor position after a buffer modification operation */
+   char nullSubsChar;   /* NEdit is based on C null-terminated strings, so ascii-nul characters must be substituted
+                           with something else.  This is the else, but of course, things get quite messy when you use it */
    RangesetTable* rangesetTable;   /* current range sets */
 };
 

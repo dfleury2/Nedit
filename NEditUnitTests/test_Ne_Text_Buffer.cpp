@@ -104,6 +104,17 @@ TEST_F(Ne_Text_Buffer_Test, SetGet)
    EXPECT_EQ(modifiedInserted, 0);
    EXPECT_EQ(modifiedDeleted, 0);
    EXPECT_EQ(modifiedDeletedText, "");
+
+   BufInsert(buffer, 0,
+      "0123456789012345678901234567890123456789\n"
+      "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\n"
+      "0123456789012345678901234567890123456789\n");
+   EXPECT_EQ(buffer->length, 141);
+
+   Ne_Text_Buffer* tmp = BufCreate();
+   BufCopyFromBuf(buffer, tmp, 0, 120, 0);
+   EXPECT_EQ(tmp->length, 120);
+   BufFree(tmp);
 }
 
 // --------------------------------------------------------------------------
@@ -639,4 +650,52 @@ TEST_F(Ne_Text_Buffer_Test, GetSetSelection)
    text = BufGetSelectionText(buffer);
    EXPECT_STREQ(text, "");
    free__(text);
+
+   BufSelect(buffer, 3, 5);
+   BufReplaceSelected(buffer, "abc");
+   text = BufGetSelectionText(buffer);
+   EXPECT_STREQ(text, "");
+   free__(text);
+
+   BufSelect(buffer, 0, 7);
+   text = BufGetSelectionText(buffer);
+   EXPECT_STREQ(text, "012abc3");
+   free__(text);
+}
+
+// --------------------------------------------------------------------------
+TEST_F(Ne_Text_Buffer_Test, RectangularSelection)
+{
+   BufSetAll(buffer,
+      "0123456789\n"
+      "1234567890\n"
+      "2345678901\n"
+      "3456789012\n"
+      "4567890123\n"
+      "5678901234\n");
+
+   BufRectSelect(buffer, 5, 25, 3, 5);
+
+   char* text = BufGetSelectionText(buffer);
+   EXPECT_STREQ(text,
+      "34\n"
+      "45\n"
+      "56");
+   free__(text);
+
+   selection primary;
+   int isRect = 0;
+   EXPECT_TRUE(BufGetSelectionPos(buffer, &primary.start, &primary.end, &isRect, &primary.rectStart, &primary.rectEnd));
+   EXPECT_EQ(primary.start, 5);
+   EXPECT_EQ(primary.end, 25);
+   EXPECT_EQ(isRect, 1);
+   EXPECT_EQ(primary.rectStart, 3);
+   EXPECT_EQ(primary.rectEnd, 5);
+
+   EXPECT_TRUE(BufGetEmptySelectionPos(buffer, &primary.start, &primary.end, &isRect, &primary.rectStart, &primary.rectEnd));
+   EXPECT_EQ(primary.start, 5);
+   EXPECT_EQ(primary.end, 25);
+   EXPECT_EQ(isRect, 1);
+   EXPECT_EQ(primary.rectStart, 3);
+   EXPECT_EQ(primary.rectEnd, 5);
 }

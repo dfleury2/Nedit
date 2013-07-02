@@ -630,17 +630,16 @@ void BufRectSelect(Ne_Text_Buffer* buf, int start, int end, int rectStart, int r
 }
 
 // --------------------------------------------------------------------------
-int BufGetSelectionPos(Ne_Text_Buffer* buf, int* start, int* end,
+bool BufGetSelectionPos(Ne_Text_Buffer* buf, int* start, int* end,
    int* isRect, int* rectStart, int* rectEnd)
 {
-   return getSelectionPos(&buf->primary, start, end, isRect, rectStart,
-      rectEnd);
+   return getSelectionPos(&buf->primary, start, end, isRect, rectStart, rectEnd);
 }
 
 // --------------------------------------------------------------------------
 // Same as above, but also returns TRUE for empty selections
 // --------------------------------------------------------------------------
-int BufGetEmptySelectionPos(Ne_Text_Buffer* buf, int* start, int* end,
+bool BufGetEmptySelectionPos(Ne_Text_Buffer* buf, int* start, int* end,
    int* isRect, int* rectStart, int* rectEnd)
 {
    return getSelectionPos(&buf->primary, start, end, isRect, rectStart,

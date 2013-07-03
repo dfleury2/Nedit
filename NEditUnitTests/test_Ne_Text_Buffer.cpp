@@ -236,6 +236,14 @@ TEST_F(Ne_Text_Buffer_Test, StartEndCountOfLine)
    EXPECT_EQ(BufCountLines(buffer, 0, 5), 2);
    EXPECT_EQ(BufCountLines(buffer, 1, 3), 1);
    EXPECT_EQ(BufCountLines(buffer, -1, 100), 5);
+
+   BufSetAll(buffer, "\n\n\n\n\n");
+   EXPECT_EQ(BufCountLines(buffer, 0, 0), 0);
+   EXPECT_EQ(BufCountLines(buffer, 0, 1), 1);
+   EXPECT_EQ(BufCountLines(buffer, 0, 2), 2);
+   EXPECT_EQ(BufCountLines(buffer, 0, 5), 5);
+   EXPECT_EQ(BufCountLines(buffer, 0, 6), 5);
+   EXPECT_EQ(BufCountLines(buffer, 1, 3), 2);
 }
 
 // --------------------------------------------------------------------------

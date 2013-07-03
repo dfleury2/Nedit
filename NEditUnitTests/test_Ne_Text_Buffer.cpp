@@ -664,6 +664,60 @@ TEST_F(Ne_Text_Buffer_Test, GetSetSelection)
 }
 
 // --------------------------------------------------------------------------
+TEST_F(Ne_Text_Buffer_Test, SecondarySelection)
+{
+   BufSetAll(buffer,
+      "0123456789\n"
+      "1234567890\n"
+      "2345678901\n"
+      "3456789012\n"
+      "4567890123\n"
+      "5678901234\n");
+
+   char* text = BufGetSecSelectText(buffer);
+   EXPECT_STREQ(text, "");
+   free__(text);
+
+   BufSecondarySelect(buffer, 6, 14);
+   text = BufGetSecSelectText(buffer);
+   EXPECT_STREQ(text, "6789\n123");
+   free__(text);
+
+   BufRemoveSecSelect(buffer);
+   EXPECT_STREQ(BufAsString(buffer),
+      "0123454567890\n"
+      "2345678901\n"
+      "3456789012\n"
+      "4567890123\n"
+      "5678901234\n");
+
+   text = BufGetSecSelectText(buffer);
+   EXPECT_STREQ(text, "");
+   free__(text);
+
+   BufSecondarySelect(buffer, 5, 8);
+   text = BufGetSecSelectText(buffer);
+   EXPECT_STREQ(text, "545");
+   free__(text);
+
+   BufSecondaryUnselect(buffer);
+   text = BufGetSecSelectText(buffer);
+   EXPECT_STREQ(text, "");
+   free__(text);
+
+   BufSecondarySelect(buffer, 3, 5);
+   BufReplaceSecSelect(buffer, "abc");
+   text = BufGetSecSelectText(buffer);
+   EXPECT_STREQ(text, "");
+   free__(text);
+
+   BufSecondarySelect(buffer, 0, 7);
+   text = BufGetSecSelectText(buffer);
+   EXPECT_STREQ(text, "012abc5");
+   free__(text);
+}
+
+// --------------------------------------------------------------------------
 TEST_F(Ne_Text_Buffer_Test, RectangularSelection)
 {
    BufSetAll(buffer,
@@ -675,12 +729,19 @@ TEST_F(Ne_Text_Buffer_Test, RectangularSelection)
       "5678901234\n");
 
    BufRectSelect(buffer, 5, 25, 3, 5);
+   BufSecRectSelect(buffer, 12, 32, 2, 6);
 
    char* text = BufGetSelectionText(buffer);
    EXPECT_STREQ(text,
       "34\n"
       "45\n"
       "56");
+   free__(text);
+
+   text = BufGetSecSelectText(buffer);
+   EXPECT_STREQ(text,
+      "3456\n"
+      "4567");
    free__(text);
 
    selection primary;
@@ -691,6 +752,13 @@ TEST_F(Ne_Text_Buffer_Test, RectangularSelection)
    EXPECT_EQ(isRect, 1);
    EXPECT_EQ(primary.rectStart, 3);
    EXPECT_EQ(primary.rectEnd, 5);
+
+   EXPECT_TRUE(BufGetSecSelectPos(buffer, &primary.start, &primary.end, &isRect, &primary.rectStart, &primary.rectEnd));
+   EXPECT_EQ(primary.start, 12);
+   EXPECT_EQ(primary.end, 32);
+   EXPECT_EQ(isRect, 1);
+   EXPECT_EQ(primary.rectStart, 2);
+   EXPECT_EQ(primary.rectEnd, 6);
 
    EXPECT_TRUE(BufGetEmptySelectionPos(buffer, &primary.start, &primary.end, &isRect, &primary.rectStart, &primary.rectEnd));
    EXPECT_EQ(primary.start, 5);

@@ -5,11 +5,49 @@
 
 #define N_RANGESETS 63
 
-struct Range;
+// --------------------------------------------------------------------------
+struct Range
+{
+   int start, end;               /* range from [start-]end */
+};
+
+// --------------------------------------------------------------------------
 struct Rangeset;
-struct RangesetTable;
 struct Ne_Text_Buffer;
 
+typedef Rangeset* RangesetUpdateFn(Rangeset* p, int pos, int ins, int del);
+
+// --------------------------------------------------------------------------
+struct Rangeset
+{
+   RangesetUpdateFn* update_fn;  /* modification update function */
+   char* update_name;            /* update function name */
+   int maxpos;                   /* text buffer maxpos */
+   int last_index;               /* a place to start looking */
+   int n_ranges;                 /* how many ranges in ranges */
+   Range* ranges;                /* the ranges table */
+   unsigned char label;          /* a number 1-63 */
+
+   signed char color_set;        /* 0: unset; 1: set; -1: invalid */
+   char* color_name;             /* the name of an assigned color */
+   Fl_Color color;               /* the value of a particular color */
+   Ne_Text_Buffer* buf;          /* the text buffer of the rangeset */
+   char* name;                   /* name of rangeset */
+};
+
+// --------------------------------------------------------------------------
+struct RangesetTable
+{
+   int n_set;                          /* how many sets are active */
+   Ne_Text_Buffer* buf;                /* the text buffer of the rangeset */
+   Rangeset set[N_RANGESETS];          /* the rangeset table */
+   unsigned char order[N_RANGESETS];   /* inds of set[]s ordered by depth */
+   unsigned char active[N_RANGESETS];  /* entry true if corresp. set active */
+   unsigned char depth[N_RANGESETS];   /* depth[i]: pos of set[i] in order[] */
+   unsigned char list[N_RANGESETS + 1];/* string of labels in depth order */
+};
+
+// --------------------------------------------------------------------------
 void RangesetRefreshRange(Rangeset* rangeset, int start, int end);
 void RangesetEmpty(Rangeset* rangeset);
 void RangesetInit(Rangeset* rangeset, int label, Ne_Text_Buffer* buf);

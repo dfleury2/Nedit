@@ -48,6 +48,23 @@ struct RangesetTable
 };
 
 // --------------------------------------------------------------------------
+RangesetTable* RangesetTableAlloc(Ne_Text_Buffer* buf);
+RangesetTable* RangesetTableFree(RangesetTable* table);
+RangesetTable* RangesetTableClone(RangesetTable* srcTable, Ne_Text_Buffer* destBuffer);
+int RangesetFindIndex(RangesetTable* table, int label, int must_be_active);
+int RangesetCreate(RangesetTable* table);
+int nRangesetsAvailable(RangesetTable* table);
+Rangeset* RangesetForget(RangesetTable* table, int label);
+Rangeset* RangesetFetch(RangesetTable* table, int label);
+unsigned char* RangesetGetList(RangesetTable* table);
+void RangesetTableUpdatePos(RangesetTable* table, int pos, int n_ins, int n_del);
+void RangesetBufModifiedCB(int pos, int nInserted, int nDeleted, int nRestyled, const char* deletedText, void* cbArg);
+int RangesetIndex1ofPos(RangesetTable* table, int pos, int needs_color);
+char* RangesetTableGetColorName(RangesetTable* table, int index);
+int RangesetTableGetColorValid(RangesetTable* table, int index, Fl_Color* color);
+int RangesetTableAssignColorPixel(RangesetTable* table, int index, Fl_Color color, int ok);
+
+// --------------------------------------------------------------------------
 void RangesetRefreshRange(Rangeset* rangeset, int start, int end);
 void RangesetEmpty(Rangeset* rangeset);
 void RangesetInit(Rangeset* rangeset, int label, Ne_Text_Buffer* buf);
@@ -62,26 +79,11 @@ int RangesetRemove(Rangeset* origSet, Rangeset* minusSet);
 int RangesetRemoveBetween(Rangeset* rangeset, int start, int end);
 int RangesetGetNRanges(Rangeset* rangeset);
 void RangesetGetInfo(Rangeset* rangeset, int* defined, int* label, int* count, char** color, char** name, char** mode);
-RangesetTable* RangesetTableAlloc(Ne_Text_Buffer* buf);
-RangesetTable* RangesetTableFree(RangesetTable* table);
-RangesetTable* RangesetTableClone(RangesetTable* srcTable, Ne_Text_Buffer* destBuffer);
-int RangesetFindIndex(RangesetTable* table, int label, int must_be_active);
 int RangesetLabelOK(int label);
-int RangesetCreate(RangesetTable* table);
-int nRangesetsAvailable(RangesetTable* table);
-Rangeset* RangesetForget(RangesetTable* table, int label);
-Rangeset* RangesetFetch(RangesetTable* table, int label);
-unsigned char* RangesetGetList(RangesetTable* table);
-void RangesetTableUpdatePos(RangesetTable* table, int pos, int n_ins, int n_del);
-void RangesetBufModifiedCB(int pos, int nInserted, int nDeleted, int nRestyled, const char* deletedText, void* cbArg);
-int RangesetIndex1ofPos(RangesetTable* table, int pos, int needs_color);
 int RangesetAssignColorName(Rangeset* rangeset, char* color_name);
 int RangesetAssignColorPixel(Rangeset* rangeset, Fl_Color color, int ok);
 char* RangesetGetName(Rangeset* rangeset);
 int RangesetAssignName(Rangeset* rangeset, char* name);
 int RangesetGetColorValid(Rangeset* rangeset, Fl_Color* color);
-char* RangesetTableGetColorName(RangesetTable* table, int index);
-int RangesetTableGetColorValid(RangesetTable* table, int index, Fl_Color* color);
-int RangesetTableAssignColorPixel(RangesetTable* table, int index, Fl_Color color, int ok);
 
 #endif /* rangeset_h_DEFINED */

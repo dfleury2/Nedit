@@ -150,7 +150,7 @@ int main()
    menuBar->add("Help/Help2");
 
    Fl_Box box(0,25,win.w(), win.h()-menuBar->h());
-   box.box(FL_THIN_DOWN_BOX);
+   box.box(FL_THIN_DOWN_FRAME);
 
    win.resizable(&box);
    win.show();

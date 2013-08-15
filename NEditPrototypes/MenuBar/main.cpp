@@ -155,14 +155,15 @@ int main()
    win.resizable(&box);
    win.show();
 
-   //// Retreive Font
-   //Fl_Font f = 0;
-   //int nFonts = Fl::set_fonts("*");
-   //for(int i = 0; f == 0 && i < nFonts; ++i)
-   //   if (!strcmp("Tahoma", Fl::get_font_name(Fl_Font(i))))
-   //      f = Fl_Font(i);
+   // Retrieve Font
+   Fl_Font f = 0;
+   int nFonts = Fl::set_fonts("*");
+   for(int i = 0; f == 0 && i < nFonts; ++i)
+      if (!strcmp("Tahoma", Fl::get_font_name(Fl_Font(i))))
+         f = Fl_Font(i);
 
-   //menuBar.textfont(f);
+   if (f)
+      menuBar->textfont(f);
    menuBar->textsize(12);
 
 

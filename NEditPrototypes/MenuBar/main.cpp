@@ -15,6 +15,8 @@ class Ne_Menu_Bar : public Fl_Menu_Bar
 public:
    Ne_Menu_Bar(int x, int y, int w, int h) : Fl_Menu_Bar(x, y, w, h)
    {
+      lightColor = fl_lighter(fl_lighter(FL_BACKGROUND_COLOR));
+      darkColor = FL_BACKGROUND_COLOR;
       box(FL_NO_BOX);
    }
 
@@ -22,12 +24,14 @@ public:
    {
       for (int i = 0; i < h(); ++i)
       {
-         fl_color(fl_color_average(FL_BACKGROUND_COLOR, fl_lighter(fl_lighter(fl_lighter(FL_BACKGROUND_COLOR))), ((double)i)/h()));
+         fl_color(fl_color_average(darkColor, lightColor, ((float)i)/h()));
          fl_line(x(), y() + i , w(), y() + i);
       }
-
       Fl_Menu_Bar::draw();
    }
+
+   Fl_Color lightColor;
+   Fl_Color darkColor;
 };
 
 // --------------------------------------------------------------------------
@@ -125,11 +129,11 @@ void ClearAllCB(Fl_Widget* w, void*)
 }
 
 // --------------------------------------------------------------------------
-int main()
+int main(int argc, char* argv[])
 {
    Fl_Window win(30, 50, 600, 500, "Menu Bar Sample");
 
-   menuBar = new Ne_Menu_Bar(0,0, win.w(), 25);
+   menuBar = new Ne_Menu_Bar(0,0, win.w(), 23);
 
    menuBar->add("Menu/Add Name", FL_CTRL + 'a', AddNameCB);
    menuBar->add("Menu/Remove Last Name", FL_CTRL + 'r', RemoveLastNameCB);
@@ -149,10 +153,11 @@ int main()
    menuBar->add("Help/Help1");
    menuBar->add("Help/Help2");
 
-   Fl_Box box(0,25,win.w(), win.h()-menuBar->h());
+   Fl_Box box(0,23,win.w(), win.h()-menuBar->h());
    box.box(FL_THIN_DOWN_FRAME);
 
    win.resizable(&box);
+   //Fl::get_system_colors();
    win.show();
 
    // Retrieve Font

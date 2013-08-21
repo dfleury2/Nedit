@@ -94,9 +94,6 @@ static int countLines(const char* string);
 static int measureVisLine(Ne_Text_Display* textD, int visLineNum);
 static int emptyLinesVisible(Ne_Text_Display* textD);
 static void blankCursorProtrusions(Ne_Text_Display* textD);
-// TODO: static void allocateFixedFontGCs(Ne_Text_Display* textD, const Ne_Font& fontStruct, Fl_Color bgPixel, Fl_Color fgPixel, Fl_Color selectFGPixel, Fl_Color selectBGPixel, Fl_Color highlightFGPixel, Fl_Color highlightBGPixel, Fl_Color lineNumFGPixel);
-// TODO: static GC allocateGC(Fl_Widget* w, unsigned long valueMask, unsigned long foreground, unsigned long background, const Ne_Font& font, unsigned long dynamicMask, unsigned long dontCareMask);
-// TODO: static void releaseGC(Fl_Widget* w, GC gc);
 static void resetClipRectangles(Ne_Text_Display* textD);
 static int visLineLength(Ne_Text_Display* textD, int visLineNum);
 static void measureDeletedLines(Ne_Text_Display* textD, int pos, int nDeleted);
@@ -319,10 +316,6 @@ Ne_Text_Display* TextDCreate(int x, int y, int w, int h,
    textD->cursorFGPixel = cursorFGPixel;
    textD->wrapMargin = wrapMargin;
    textD->continuousWrap = continuousWrap;
-// TODO:    allocateFixedFontGCs(textD, fontStruct, bgPixel, fgPixel, selectFGPixel,
-// TODO:                         selectBGPixel, highlightFGPixel, highlightBGPixel, lineNumFGPixel);
-// TODO:    textD->styleGC = allocateGC(textD->w, 0, 0, 0, fontStruct->fid,
-// TODO:                                GCClipMask | GCForeground | GCBackground, GCArcMode);
    textD->lineNumWidth = lineNumWidth;
    textD->computeTextAreaSize(x, y, w, h);
    
@@ -459,14 +452,6 @@ void TextDSetColors(Ne_Text_Display* textD, Fl_Color textFgP, Fl_Color textBgP,
    textD->lineNumFGPixel = lineNoFgP;
    textD->cursorFGPixel = cursorFgP;
 
-// TODO:    releaseGC(textD->w, textD->gc);
-// TODO:    releaseGC(textD->w, textD->selectGC);
-// TODO:    releaseGC(textD->w, textD->selectBGGC);
-// TODO:    releaseGC(textD->w, textD->highlightGC);
-// TODO:    releaseGC(textD->w, textD->highlightBGGC);
-// TODO:    releaseGC(textD->w, textD->lineNumGC);
-// TODO:    allocateFixedFontGCs(textD, textD->fontStruct, textBgP, textFgP, selectFgP, selectBgP, hiliteFgP, hiliteBgP, lineNoFgP);
-
    /* Change the cursor GC (the cursor GC is not shared). */
 // TODO:    values.foreground = cursorFgP;
 // TODO:    XChangeGC(d, textD->cursorFGGC, GCForeground, &values);
@@ -541,13 +526,6 @@ void TextDSetFont(Ne_Text_Display* textD, const Ne_Font& fontStruct)
    highlightBGPixel = textD->highlightBGPixel;
 // TODO:    XGetGCValues(display, textD->lineNumGC, GCForeground, &values);
    lineNumFGPixel = textD->lineNumFGPixel;
-// TODO:    releaseGC(textD->w, textD->gc);
-// TODO:    releaseGC(textD->w, textD->selectGC);
-// TODO:    releaseGC(textD->w, textD->highlightGC);
-// TODO:    releaseGC(textD->w, textD->selectBGGC);
-// TODO:    releaseGC(textD->w, textD->highlightBGGC);
-// TODO:    releaseGC(textD->w, textD->lineNumGC);
-// TODO:    allocateFixedFontGCs(textD, fontStruct, bgPixel, fgPixel, selectFGPixel, selectBGPixel, highlightFGPixel, highlightBGPixel, lineNumFGPixel);
 // TODO:    XSetFont(display, textD->styleGC, fontStruct->fid);
 
    /* Do a full resize to force recalculation of font related parameters */
@@ -3162,70 +3140,6 @@ static void blankCursorProtrusions(Ne_Text_Display* textD)
    fl_color(textD->bgPixel);
    fl_rectf(x, cursorY, width, fontHeight);
 }
-
-// TODO: /*
-// TODO: ** Allocate shared graphics contexts used by the widget, which must be
-// TODO: ** re-allocated on a font change.
-// TODO: */
-// TODO: static void allocateFixedFontGCs(Ne_Text_Display* textD, XFontStruct* fontStruct,
-// TODO:                                  Fl_Color bgPixel, Fl_Color fgPixel, Fl_Color selectFGPixel, Fl_Color selectBGPixel,
-// TODO:                                  Fl_Color highlightFGPixel, Fl_Color highlightBGPixel, Fl_Color lineNumFGPixel)
-// TODO: {
-// TODO:    textD->gc = allocateGC(textD->w, GCFont | GCForeground | GCBackground,
-// TODO:                           fgPixel, bgPixel, fontStruct->fid, GCClipMask, GCArcMode);
-// TODO:    textD->selectGC = allocateGC(textD->w, GCFont | GCForeground | GCBackground,
-// TODO:                                 selectFGPixel, selectBGPixel, fontStruct->fid, GCClipMask,
-// TODO:                                 GCArcMode);
-// TODO:    textD->selectBGGC = allocateGC(textD->w, GCForeground, selectBGPixel, 0,
-// TODO:                                   fontStruct->fid, GCClipMask, GCArcMode);
-// TODO:    textD->highlightGC = allocateGC(textD->w, GCFont | GCForeground | GCBackground,
-// TODO:                                    highlightFGPixel, highlightBGPixel, fontStruct->fid, GCClipMask,
-// TODO:                                    GCArcMode);
-// TODO:    textD->highlightBGGC = allocateGC(textD->w, GCForeground, highlightBGPixel,
-// TODO:                                      0, fontStruct->fid, GCClipMask, GCArcMode);
-// TODO:    textD->lineNumGC = allocateGC(textD->w, GCFont | GCForeground |
-// TODO:                                  GCBackground, lineNumFGPixel, bgPixel, fontStruct->fid,
-// TODO:                                  GCClipMask, GCArcMode);
-// TODO: }
-// TODO: 
-// TODO: /*
-// TODO: ** X11R4 does not have the XtAllocateGC function for sharing graphics contexts
-// TODO: ** with changeable fields.  Unfortunately the R4 call for creating shared
-// TODO: ** graphics contexts (XtGetGC) is rarely useful because most widgets need
-// TODO: ** to be able to set and change clipping, and that makes the GC unshareable.
-// TODO: **
-// TODO: ** This function allocates and returns a gc, using XtAllocateGC if possible,
-// TODO: ** or XCreateGC on X11R4 systems where XtAllocateGC is not available.
-// TODO: */
-// TODO: static GC allocateGC(Fl_Widget* w, unsigned long valueMask,
-// TODO:                      unsigned long foreground, unsigned long background, Font font,
-// TODO:                      unsigned long dynamicMask, unsigned long dontCareMask)
-// TODO: {
-// TODO:    XGCValues gcValues;
-// TODO: 
-// TODO:    gcValues.font = font;
-// TODO:    gcValues.background = background;
-// TODO:    gcValues.foreground = foreground;
-// TODO: #if defined(XlibSpecificationRelease) && XlibSpecificationRelease > 4
-// TODO:    return XtAllocateGC(w, 0, valueMask, &gcValues, dynamicMask,
-// TODO:                        dontCareMask);
-// TODO: #else
-// TODO:    return XCreateGC(XtDisplay(w), RootWindowOfScreen(XtScreen(w)),
-// TODO:                     valueMask, &gcValues);
-// TODO: #endif
-// TODO: }
-// TODO: 
-// TODO: /*
-// TODO: ** Release a gc allocated with allocateGC above
-// TODO: */
-// TODO: static void releaseGC(Fl_Widget* w, GC gc)
-// TODO: {
-// TODO: #if defined(XlibSpecificationRelease) && XlibSpecificationRelease > 4
-// TODO:    XtReleaseGC(w, gc);
-// TODO: #else
-// TODO:    XFreeGC(XtDisplay(w), gc);
-// TODO: #endif
-// TODO: }
 
 /*
 ** resetClipRectangles sets the clipping rectangles for GCs which clip

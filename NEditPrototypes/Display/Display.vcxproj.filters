@@ -2,5 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\..\source\Ne_Text_Display.cpp" />
+    <ClCompile Include="..\..\source\Ne_Text_Buffer.cpp" />
+    <ClCompile Include="..\..\source\Ne_Text_Part.cpp" />
+    <ClCompile Include="..\..\source\Ne_Rangeset.cpp" />
   </ItemGroup>
 </Project>

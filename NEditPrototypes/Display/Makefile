@@ -17,7 +17,7 @@ Font:$(OBJECTS)
 	$(CXX) -o $@ $(OBJECTS) $(LDLIBS)
 
 clean:
-	rm -f Font *.o
+	rm -f Display *.o
 
 %.o:%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<

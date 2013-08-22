@@ -667,22 +667,16 @@ void TextDResize(Ne_Text_Display* textD, int width, int height)
 */
 void TextDRedisplayRect(Ne_Text_Display* textD, int left, int top, int width, int height)
 {
-   int fontHeight, firstLine, lastLine, line;
+   // find the line number range of the display
+   int fontHeight = textD->ascent + textD->descent;
+   int firstLine = (top - textD->top - fontHeight + 1) / fontHeight;
+   int lastLine = (top + height - textD->top) / fontHeight;
 
-   /* find the line number range of the display */
-   fontHeight = textD->ascent + textD->descent;
-   firstLine = (top - textD->top - fontHeight + 1) / fontHeight;
-   lastLine = (top + height - textD->top) / fontHeight;
-
-   /* If the graphics contexts are shared using XtAllocateGC, their
-      clipping rectangles may have changed since the last use */
-// TODO:    resetClipRectangles(textD);
-
-   /* draw the lines of text */
-   for (line = firstLine; line <= lastLine; line++)
+   // draw the lines of text
+   for (int line = firstLine; line <= lastLine; ++line)
       redisplayLine(textD, line, left, left + width, 0, INT_MAX);
 
-   /* draw the line numbers if exposed area includes them */
+   // draw the line numbers if exposed area includes them
    if (textD->lineNumWidth != 0 && left <= textD->lineNumLeft + textD->lineNumWidth)
       redrawLineNumbers(textD, false);
 }

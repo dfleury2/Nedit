@@ -45,7 +45,7 @@ class Ne_Text_Display;
 
 typedef void (*unfinishedStyleCBProc)(Ne_Text_Display*, int, void*);
 
-typedef struct _calltipStruct
+struct calltipStruct
 {
    int ID;                 /* ID of displayed calltip.  Equals zero if none is displayed. */
    bool anchored;          /* Is it anchored to a position */
@@ -53,7 +53,7 @@ typedef struct _calltipStruct
    int hAlign;             /* horizontal alignment */
    int vAlign;             /* vertical alignment */
    int alignMode;          /* Strict or sloppy alignment */
-} calltipStruct;
+} ;
 
 class Ne_Text_Display : public Fl_Group
 {

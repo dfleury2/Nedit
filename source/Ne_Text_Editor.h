@@ -86,28 +86,27 @@
 
 
 // TODO: extern WidgetClass textWidgetClass;
+// TODO: struct _TextClassRec;
+// TODO: struct _TextRec;
+// TODO: 
+// TODO: typedef struct _TextRec* TextWidget;
 
-struct _TextClassRec;
-struct _TextRec;
-
-typedef struct _TextRec* TextWidget;
-
-typedef struct
+struct dragEndCBStruct
 {
    int startPos;
    int nCharsDeleted;
    int nCharsInserted;
    char* deletedText;
-} dragEndCBStruct;
+};
 
 enum smartIndentCallbackReasons {NEWLINE_INDENT_NEEDED, CHAR_TYPED};
-typedef struct
+struct smartIndentCBStruct
 {
    int reason;
    int pos;
    int indentRequest;
    char* charsTyped;
-} smartIndentCBStruct;
+};
 
 // --------------------------------------------------------------------------
 class Ne_Text_Editor : public Ne_Text_Display
@@ -120,7 +119,6 @@ public:
    bool inWindow(int x, int y) const;
    bool mouseMoveForDrag(int x, int y) const;
    double MultiClickTime;
-
 };
 
 
@@ -166,7 +164,6 @@ XtActionsRec* TextGetActions(int* nActions);
 // TODO: void ResetCursorBlink(TextWidget textWidget, bool startsBlanked);
 bool TextSetValues(Ne_Text_Editor* current); // No delta, Ne_Text_Editor* request, Ne_Text_Editor* newWidget);
 
-
-void HandleAllPendingGraphicsExposeNoExposeEvents(TextWidget w, int event);
+// TODO: void HandleAllPendingGraphicsExposeNoExposeEvents(TextWidget w, int event);
 
 #endif /* NEDIT_TEXT_H_INCLUDED */

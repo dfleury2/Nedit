@@ -21,9 +21,8 @@
 #define NEDIT_DEFAULT_CALLTIP_BG "LemonChiffon1"
 
 // --------------------------------------------------------------------------
-Ne_Text_Part::Ne_Text_Part()
+Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
 {
-   //this->fontStruct = Ne_Font();
    this->selectBGPixel = GetColor(NEDIT_DEFAULT_SEL_FG);
    this->highlightFGPixel = GetColor(NEDIT_DEFAULT_HI_FG);
    this->highlightBGPixel = GetColor(NEDIT_DEFAULT_HI_BG);
@@ -61,6 +60,7 @@ Ne_Text_Part::Ne_Text_Part()
    // TODO:    { textNdragEndCallback, textCDragEndCallback, XmRCallback, sizeof(caddr_t), XtOffset(TextWidget, text.dragEndCB), XtRCallback, NULL },
    // TODO:    { textNsmartIndentCallback, textCSmartIndentCallback, XmRCallback, sizeof(caddr_t), XtOffset(TextWidget, text.smartIndentCB), XtRCallback, NULL },
 
+   this->textD = textDisplay;
    anchor = rectAnchor = 0;
    dragState = 0;
    multiClickState = 0;

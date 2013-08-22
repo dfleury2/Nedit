@@ -117,7 +117,7 @@ static void textDRedisplayRange(Ne_Text_Display* textD, int start, int end);
 
 // -------------------------------------------------------------------------------
 Ne_Text_Display::Ne_Text_Display(int x, int y, int w, int h, const char* l)
-   : Fl_Group(x, y, w, h, l), canRedraw(false)
+   : Fl_Group(x, y, w, h, l), canRedraw(false), text(this)
 {
    box(FL_FLAT_BOX);
 

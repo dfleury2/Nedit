@@ -23,7 +23,6 @@
 // --------------------------------------------------------------------------
 Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
 {
-   this->selectBGPixel = GetColor(NEDIT_DEFAULT_SEL_FG);
    this->highlightFGPixel = GetColor(NEDIT_DEFAULT_HI_FG);
    this->highlightBGPixel = GetColor(NEDIT_DEFAULT_HI_BG);
    this->lineNumFGPixel = GetColor(NEDIT_DEFAULT_LINENO_FG);

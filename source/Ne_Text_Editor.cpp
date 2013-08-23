@@ -1,6 +1,7 @@
 #include "Ne_Text_Editor.h"
 
 #include "../util/Ne_AppContext.h"
+#include "../util/Ne_Color.h"
 
 #include "Ne_Text_Sel.h"
 #include "Ne_Text_Drag.h"
@@ -1209,9 +1210,9 @@ void TextInitialize(Ne_Text_Editor* textD)
    textD->nStyles = 0;
    textD->bgPixel = FL_BACKGROUND_COLOR;
    textD->fgPixel = FL_FOREGROUND_COLOR;
-   textD->selectFGPixel = textD->text.selectFGPixel;
+   textD->selectFGPixel = GetColor(NEDIT_DEFAULT_SEL_FG);
    textD->highlightFGPixel = textD->text.highlightFGPixel;
-   textD->selectBGPixel = textD->text.selectBGPixel;
+   textD->selectBGPixel = GetColor(NEDIT_DEFAULT_SEL_BG);
    textD->highlightBGPixel = textD->text.highlightBGPixel;
    textD->lineNumFGPixel = textD->text.lineNumFGPixel;
    textD->cursorFGPixel = textD->text.cursorFGPixel;

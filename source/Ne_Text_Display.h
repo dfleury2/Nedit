@@ -108,9 +108,11 @@ public:
    int fixedFontWidth;			/* Font width if all current fonts are fixed and match in width, else -1 */
    Fl_Scrollbar* hScrollBar;
    Fl_Scrollbar* vScrollBar;
-   Fl_Color fgPixel, bgPixel; /* Foreground/Background colors */
-   Fl_Color selectFGPixel,    /* Foreground select color */
-            selectBGPixel;    /* Background select color */
+   
+   // Foreground/Background colors
+   Fl_Color fgPixel, bgPixel; 
+   // Foreground/Background select color
+   Fl_Color selectFGPixel, selectBGPixel;
    Fl_Color highlightFGPixel, /* Highlight colors are used when */
             highlightBGPixel; /*    flashing matching parens    */
    Fl_Color lineNumFGPixel;   /* Color for drawing line numbers */

@@ -113,8 +113,8 @@ public:
    Fl_Color fgPixel, bgPixel; 
    // Foreground/Background select color
    Fl_Color selectFGPixel, selectBGPixel;
-   Fl_Color highlightFGPixel, /* Highlight colors are used when */
-            highlightBGPixel; /*    flashing matching parens    */
+   // Highlight colors are used when flashing matching parens
+   Fl_Color highlightFGPixel, highlightBGPixel;
    Fl_Color lineNumFGPixel;   /* Color for drawing line numbers */
    Fl_Color cursorFGPixel;
    Fl_Color* bgClassPixel;		/* table of colors for each BG class */

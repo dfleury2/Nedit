@@ -51,10 +51,10 @@ struct Ne_Text_Part
    bool readOnly;
    bool hidePointer;
    int rows, columns;
+   int lineNumCols;
    int cursorBlinkRate;
    int wrapMargin;
    int emulateTabs;
-   int lineNumCols;
    std::string delimiters;
    int cursorVPadding;
 

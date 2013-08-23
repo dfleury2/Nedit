@@ -2380,5 +2380,5 @@ static void updateWindowHeight(WindowInfo* window, int oldFontHeight)
 */
 static int getFontHeight(WindowInfo* window)
 {
-   return window->textArea->fontStruct.height();
+   return window->textArea->primaryFont.height();
 }

@@ -22,8 +22,8 @@ static int max(int i1, int i2);
 void BeginBlockDrag(Ne_Text_Editor* textD)
 {
    Ne_Text_Buffer* buf = textD->buffer;
-   int fontHeight = textD->fontStruct.ascent() + textD->fontStruct.descent();
-   int fontWidth = textD->fontStruct.max_width();
+   int fontHeight = textD->primaryFont.ascent() + textD->primaryFont.descent();
+   int fontWidth = textD->primaryFont.max_width();
    selection* sel = &buf->primary;
    int nLines, mousePos, lineStart;
    int x, y, lineEnd;
@@ -120,8 +120,8 @@ void BeginBlockDrag(Ne_Text_Editor* textD)
 void BlockDragSelection(Ne_Text_Editor* textD, int x, int y, int dragType)
 {
    Ne_Text_Buffer* buf = textD->buffer;
-   int fontHeight = textD->fontStruct.ascent() + textD->fontStruct.descent();
-   int fontWidth = textD->fontStruct.max_width();
+   int fontHeight = textD->primaryFont.ascent() + textD->primaryFont.descent();
+   int fontWidth = textD->primaryFont.max_width();
    Ne_Text_Buffer* origBuf = textD->text.dragOrigBuf;
    int dragXOffset = textD->text.dragXOffset;
    Ne_Text_Buffer* tempBuf;

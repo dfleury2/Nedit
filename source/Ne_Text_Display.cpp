@@ -153,9 +153,9 @@ Ne_Text_Display::Ne_Text_Display(int x, int y, int w, int h, const char* l)
    this->absTopLineNum = 1;
    this->needAbsTopLineNum = false;
    this->horizOffset = 0;
-   this->ascent = fontStruct.ascent();
-   this->descent = fontStruct.descent();
-   this->fixedFontWidth = fontStruct.isFixed() ? fontStruct.max_width() : -1;
+   this->ascent = primaryFont.ascent();
+   this->descent = primaryFont.descent();
+   this->fixedFontWidth = primaryFont.isFixed() ? primaryFont.max_width() : -1;
    this->buffer = NULL;
    this->styleBuffer = NULL;
    this->styleTable = NULL;
@@ -249,7 +249,7 @@ void Ne_Text_Display::resize(int x, int y, int w, int h)
    int oldWidth = this->width;
    computeTextAreaSize(x, y, w, h);
 
-   int charWidth = fontStruct.max_width();
+   int charWidth = primaryFont.max_width();
 
    text.lineNumCols = lineNumWidth / charWidth;
    text.columns = (width - lineNumWidth) / charWidth;
@@ -302,7 +302,7 @@ Ne_Text_Display* TextDCreate(int x, int y, int w, int h,
    textD->needAbsTopLineNum = false;
    textD->horizOffset = 0;
 // TODO:    textD->visibility = VisibilityUnobscured;
-   textD->fontStruct = fontStruct;
+   textD->primaryFont = fontStruct;
    textD->ascent = fontStruct.ascent();
    textD->descent = fontStruct.descent();
    textD->fixedFontWidth = fontStruct.isFixed() ? fontStruct.max_width() : -1;
@@ -433,7 +433,7 @@ void TextDAttachHighlightData(Ne_Text_Display* textD, Ne_Text_Buffer* styleBuffe
 
    /* Call TextDSetFont to combine font information from style table and
       primary font, adjust font-related parameters, and then redisplay */
-   TextDSetFont(textD, textD->fontStruct);
+   TextDSetFont(textD, textD->primaryFont);
 }
 
 
@@ -514,7 +514,7 @@ void TextDSetFont(Ne_Text_Display* textD, const Ne_Font& fontStruct)
       affected GCs (they are shared with other widgets, and if the primary
       font changes, must be re-allocated to change it). Unfortunately,
       this requres recovering all of the colors from the existing GCs */
-   textD->fontStruct = fontStruct;
+   textD->primaryFont = fontStruct;
 // TODO:    XGetGCValues(display, textD->gc, GCForeground | GCBackground, &values);
    fgPixel = textD->fgPixel;
    bgPixel = textD->bgPixel;
@@ -553,7 +553,7 @@ void TextDSetFont(Ne_Text_Display* textD, const Ne_Font& fontStruct)
 
 int TextDMinFontWidth(Ne_Text_Display* textD, bool considerStyles)
 {
-   int fontWidth = textD->fontStruct.max_width();
+   int fontWidth = textD->primaryFont.max_width();
    int i;
 
    if (considerStyles)
@@ -572,7 +572,7 @@ int TextDMinFontWidth(Ne_Text_Display* textD, bool considerStyles)
 
 int TextDMaxFontWidth(Ne_Text_Display* textD, bool considerStyles)
 {
-   int fontWidth = textD->fontStruct.max_width();
+   int fontWidth = textD->primaryFont.max_width();
    int i;
 
    if (considerStyles)
@@ -1907,7 +1907,7 @@ static void redisplayLine(Ne_Text_Display* textD, int visLineNum, int leftClip, 
       changes based on character position can still occur in this region due
       to rectangular selections).  stdCharWidth must be non-zero to prevent a
       potential infinite loop if x does not advance */
-   stdCharWidth = textD->fontStruct.max_width();
+   stdCharWidth = textD->primaryFont.max_width();
    if (stdCharWidth <= 0)
    {
       fprintf(stderr, "nedit: Internal Error, bad font measurement\n");
@@ -2088,7 +2088,7 @@ static void redisplayLine(Ne_Text_Display* textD, int visLineNum, int leftClip, 
 */
 static void drawString(Ne_Text_Display* textD, int style, int x, int y, int toX, char* string, int nChars)
 {
-   Ne_Font* fs = &textD->fontStruct;
+   Ne_Font* fs = &textD->primaryFont;
    Fl_Color bground = textD->bgPixel;
    Fl_Color fground = textD->fgPixel;
    int underlineStyle = false;
@@ -2232,7 +2232,7 @@ static void clearRect(Ne_Text_Display* textD, Fl_Color color, int x, int y, int 
 static void drawCursor(Ne_Text_Display* textD, int x, int y)
 {
    int left, right, cursorWidth;
-   int fontWidth = (textD->fontStruct.max_width()+textD->fontStruct.min_width())/2;
+   int fontWidth = (textD->primaryFont.max_width()+textD->primaryFont.min_width())/2;
    int fontHeight = textD->ascent + textD->descent;
    int bot = y + fontHeight - 1;
 
@@ -2356,7 +2356,7 @@ static int stringWidth(const Ne_Text_Display* textD, const char* string,
    if (style & STYLE_LOOKUP_MASK)
       fs = &textD->styleTable[(style & STYLE_LOOKUP_MASK) - 'A'].font;
    else
-      fs = &textD->fontStruct;
+      fs = &textD->primaryFont;
    fl_font(fs->font, fs->size);
    return (int)fl_width(string, length);
 }
@@ -2445,7 +2445,7 @@ static void xyToUnconstrainedPos(Ne_Text_Display* textD, int x, int y, int* row,
                                  int* column, int posType)
 {
    int fontHeight = textD->ascent + textD->descent;
-   int fontWidth = textD->fontStruct.max_width();
+   int fontWidth = textD->primaryFont.max_width();
 
    /* Find the visible line number corresponding to the y coordinate */
    *row = (y - textD->top) / fontHeight;
@@ -2962,7 +2962,7 @@ static void redrawLineNumbers(Ne_Text_Display* textD, int clearAll)
 {
    int y, line, visLine, nCols, lineStart;
    int lineHeight = textD->ascent + textD->descent;
-   int charWidth = textD->fontStruct.max_width();
+   int charWidth = textD->primaryFont.max_width();
 
    /* Don't draw if lineNumWidth == 0 (line numbers are hidden), or widget is not yet realized */
    if (textD->lineNumWidth == 0 || !textD->canRedraw)
@@ -2997,7 +2997,7 @@ static void redrawLineNumbers(Ne_Text_Display* textD, int clearAll)
          sprintf(lineNumString, "%d", line);
          int stringWidth = (int)fl_width(lineNumString);
          fl_color(textD->lineNumFGPixel);
-         fl_font(textD->fontStruct.font, textD->fontStruct.size);
+         fl_font(textD->primaryFont.font, textD->primaryFont.size);
          //fl_draw(lineNumString, this->lineNumLeft, y + this->ascent);
          fl_draw(lineNumString, textD->lineNumLeft + textD->lineNumWidth - textD->marginWidth - stringWidth, y + textD->ascent);
          line++;
@@ -3074,7 +3074,7 @@ static int measureVisLine(Ne_Text_Display* textD, int visLineNum)
       {
          len = BufGetExpandedChar(textD->buffer, lineStartPos + i,
                                   charCount, expandedChar);
-         fl_font(textD->fontStruct.font, textD->fontStruct.size);
+         fl_font(textD->primaryFont.font, textD->primaryFont.size);
          width += (int)fl_width(expandedChar, len);
          charCount += len;
       }
@@ -3113,7 +3113,7 @@ static int emptyLinesVisible(Ne_Text_Display* textD)
 static void blankCursorProtrusions(Ne_Text_Display* textD)
 {
    int x, width, cursorX = textD->cursorX, cursorY = textD->cursorY;
-   int fontWidth = textD->fontStruct.max_width();
+   int fontWidth = textD->primaryFont.max_width();
    int fontHeight = textD->ascent + textD->descent;
    int cursorWidth, left = textD->left, right = left + textD->width;
 
@@ -3708,7 +3708,7 @@ static int wrapUsesCharacter(Ne_Text_Display* textD, int lineEndPos)
 */
 static void hideOrShowHScrollBar(Ne_Text_Display* textD)
 {
-   if (textD->continuousWrap && (textD->wrapMargin == 0 || textD->wrapMargin * textD->fontStruct.max_width() < textD->width))
+   if (textD->continuousWrap && (textD->wrapMargin == 0 || textD->wrapMargin * textD->primaryFont.max_width() < textD->width))
       textD->hScrollBar->hide();
    else
       textD->hScrollBar->show();

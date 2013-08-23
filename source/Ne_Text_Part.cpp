@@ -1,25 +1,5 @@
 #include "Ne_Text_Part.h"
 
-#include "Ne_Text_Part.h"
-
-#include "../util/Ne_Color.h"
-
-#include <FL/Fl.H>
-
-// Some default colors from nedit.h
-#define NEDIT_DEFAULT_FG        "black"
-#define NEDIT_DEFAULT_TEXT_BG   "grey90"
-#define NEDIT_DEFAULT_SEL_FG    "black"
-#define NEDIT_DEFAULT_SEL_BG    "gray80"
-#define NEDIT_DEFAULT_HI_FG     "white" // These are colors for flashing
-#define NEDIT_DEFAULT_HI_BG     "red"   // matching parens
-#define NEDIT_DEFAULT_LINENO_FG "black"
-#define NEDIT_DEFAULT_CURSOR_FG "black"
-#define NEDIT_DEFAULT_HELP_FG   "black"
-#define NEDIT_DEFAULT_HELP_BG   "gray80"
-#define NEDIT_DEFAULT_CALLTIP_FG "black"
-#define NEDIT_DEFAULT_CALLTIP_BG "LemonChiffon1"
-
 // --------------------------------------------------------------------------
 Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
 {

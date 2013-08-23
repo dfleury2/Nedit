@@ -1644,7 +1644,7 @@ void SetFonts(WindowInfo* window, const char* fontName, const char* italicName, 
       {
          strcpy(window->fontName, fontName);
          window->fontList = font;
-         window->textArea->fontStruct = font;
+         window->textArea->primaryFont = font;
          window->textArea->redraw();
       }
    }
@@ -1662,10 +1662,10 @@ void SetFonts(WindowInfo* window, const char* fontName, const char* italicName, 
    if (primaryChanged)
    {
       const Ne_Font& font = GetDefaultFontStruct(window->fontList);
-      window->textArea->fontStruct = font;
+      window->textArea->primaryFont = font;
       // TODO: XtVaSetValues(window->textArea, textNfont, font, NULL);
       for (int i=0; i<window->nPanes; i++)
-         window->textPanes[i]->fontStruct = font; // TODO: XtVaSetValues(window->textPanes[i], textNfont, font, NULL);
+         window->textPanes[i]->primaryFont = font; // TODO: XtVaSetValues(window->textPanes[i], textNfont, font, NULL);
    }
 
    /* Change the highlight fonts, even if they didn't change, because
@@ -2038,7 +2038,7 @@ static Ne_Text_Editor* createTextArea(WindowInfo* window, int rows, int cols, in
    textD->text.columns = cols;
    textD->text.lineNumCols = lineNumCols;
    textD->text.emulateTabs = emTabDist;
-   textD->fontStruct = window->fontList;
+   textD->primaryFont = window->fontList;
    textD->text.readOnly = IS_ANY_LOCKED(window->lockReasons);
    textD->text.delimiters = delimiters;
    textD->text.wrapMargin = wrapMargin;
@@ -2450,7 +2450,7 @@ static int updateGutterWidth(WindowInfo* window)
 
       newColsDiff = reqCols - maxCols;
 
-      fs = &window->textArea->fontStruct;
+      fs = &window->textArea->primaryFont;
       fontWidth = fs->max_width();
 
       int windowWidth = window->textArea->width;

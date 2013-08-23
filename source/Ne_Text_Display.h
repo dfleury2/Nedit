@@ -108,7 +108,7 @@ public:
    char unfinishedStyle;      /* Style buffer entry which triggers on-the-fly reparsing of region */
    unfinishedStyleCBProc unfinishedHighlightCB;		/* Callback to parse "unfinished" regions */
    void* highlightCBArg;      /* Arg to unfinishedHighlightCB */
-   Ne_Font fontStruct;		   /* Font structure for primary font */
+   Ne_Font primaryFont;		   /* Font structure for primary font */
    int ascent, descent;		   /* Composite ascent and descent for primary font + all-highlight fonts */
    int fixedFontWidth;			/* Font width if all current fonts are fixed and match in width, else -1 */
    Fl_Scrollbar* hScrollBar;

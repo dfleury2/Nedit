@@ -1132,7 +1132,7 @@ bool Ne_Text_Editor::mouseMoveForDrag(int x, int y) const
 // -------------------------------------------------------------------------------
 void TextInitialize(Ne_Text_Editor* textD)
 {
-   Ne_Font* fs = &textD->fontStruct;
+   Ne_Font* fs = &textD->primaryFont;
    Fl_Color white, black;
    int textLeft;
    int charWidth = fs->max_width();
@@ -1202,9 +1202,9 @@ void TextInitialize(Ne_Text_Editor* textD)
    textD->horizOffset = 0;
    // TODO:    textD->visibility = VisibilityUnobscured;
 // TODO:    textD->fontStruct = textD->text.fontStruct;
-   textD->ascent = textD->fontStruct.ascent();
-   textD->descent = textD->fontStruct.descent();
-   textD->fixedFontWidth = textD->fontStruct.isFixed() ? textD->fontStruct.max_width() : -1;
+   textD->ascent = textD->primaryFont.ascent();
+   textD->descent = textD->primaryFont.descent();
+   textD->fixedFontWidth = textD->primaryFont.isFixed() ? textD->primaryFont.max_width() : -1;
    textD->styleBuffer = NULL;
    textD->styleTable = NULL;
    textD->nStyles = 0;
@@ -1323,7 +1323,7 @@ Ne_Text_Editor* TextCreate(int x, int y, int w, int h,
    textD->needAbsTopLineNum = false;
    textD->horizOffset = 0;
 // TODO:    textD->visibility = VisibilityUnobscured;
-   textD->fontStruct = fontStruct;
+   textD->primaryFont = fontStruct;
    textD->ascent = fontStruct.ascent();
    textD->descent = fontStruct.descent();
    textD->fixedFontWidth = fontStruct.isFixed() ? fontStruct.max_width() : -1;
@@ -1627,7 +1627,7 @@ bool TextSetValues(Ne_Text_Editor* current) //, Ne_Text_Editor* request, Ne_Text
    {
 // TODO:       if (newWidget->text.lineNumCols != 0)
 // TODO:          reconfigure = True;
-      TextDSetFont(current, current->fontStruct);
+      TextDSetFont(current, current->primaryFont);
    }
 
 // TODO:    if (newWidget->text.wrapMargin != current->text.wrapMargin || newWidget->text.continuousWrap != current->text.continuousWrap)
@@ -1648,7 +1648,7 @@ bool TextSetValues(Ne_Text_Editor* current) //, Ne_Text_Editor* request, Ne_Text
 // TODO:    if (newWidget->text.lineNumCols != current->text.lineNumCols || reconfigure)
    {
       int marginWidth = current->marginWidth;
-      int charWidth = current->fontStruct.max_width();
+      int charWidth = current->primaryFont.max_width();
       int lineNumCols = current->text.lineNumCols;
       if (lineNumCols == 0)
       {
@@ -1929,7 +1929,7 @@ void TextInsertAtCursor(Ne_Text_Editor* textD, char* chars, int event, int allow
    int wrapMargin, colNum, lineStartPos, cursorPos;
    char* c, *lineStartText, *wrappedText;
    Ne_Text_Buffer* buf = textD->buffer;
-   int fontWidth = textD->fontStruct.max_width();
+   int fontWidth = textD->primaryFont.max_width();
    int replaceSel, singleLine, breakAt = 0;
 
    /* Don't wrap if auto-wrap is off or suppressed, or it's just a newline */

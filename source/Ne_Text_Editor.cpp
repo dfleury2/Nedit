@@ -1653,14 +1653,14 @@ bool TextSetValues(Ne_Text_Editor* current) //, Ne_Text_Editor* request, Ne_Text
       if (lineNumCols == 0)
       {
          TextDSetLineNumberArea(current, 0, 0, marginWidth);
-         current->text.columns = (current->width - marginWidth*2) / charWidth;
+         //current->text.columns = (current->width - marginWidth*2) / charWidth;
       }
       else
       {
          TextDSetLineNumberArea(current, marginWidth,
                                 charWidth * lineNumCols,
                                 2*marginWidth + charWidth * lineNumCols);
-         current->text.columns = (current->width - marginWidth*3 - charWidth * lineNumCols) / charWidth;
+         //current->text.columns = (current->width - marginWidth*3 - charWidth * lineNumCols) / charWidth;
       }
    }
 

@@ -50,7 +50,6 @@ struct Ne_Text_Part
    bool heavyCursor;
    bool readOnly;
    bool hidePointer;
-   int rows, columns;
    int lineNumCols;
    int cursorBlinkRate;
    int wrapMargin;

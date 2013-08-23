@@ -5,8 +5,6 @@ Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
 {
    this->backlightCharTypes = "";
    this->lineNumCols = 0;
-   this->rows = 24;
-   this->columns = 80;
    this->pendingDelete = true;
    this->autoWrap = true;
    this->continuousWrap = true;

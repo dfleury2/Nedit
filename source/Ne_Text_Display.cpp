@@ -249,11 +249,7 @@ void Ne_Text_Display::resize(int x, int y, int w, int h)
    int oldWidth = this->width;
    computeTextAreaSize(x, y, w, h);
 
-   int charWidth = primaryFont.max_width();
-
-   text.lineNumCols = lineNumWidth / charWidth;
-   text.columns = (width - lineNumWidth) / charWidth;
-   text.rows = (height) / (this->ascent + this->descent);
+   text.lineNumCols = lineNumWidth / primaryFont.max_width();
 
    // Resize the text display that the widget uses to render text
    TextDResize(this, this->width, this->height); // TODO:    resizeTextArea(width, height, oldWidth);
@@ -274,6 +270,30 @@ void Ne_Text_Display::computeTextAreaSize(int x, int y, int w, int h)
       this->left += lineNumLeft + lineNumWidth;
       this->width -= lineNumWidth + this->marginWidth;
    }
+}
+
+// -------------------------------------------------------------------------------
+int Ne_Text_Display::rows() const
+{
+   return height / primaryFont.height();
+}
+
+// -------------------------------------------------------------------------------
+int Ne_Text_Display::columns() const
+{
+   // TODO : include margin like below
+   return (width - lineNumWidth) / primaryFont.max_width();
+
+   //if (lineNumCols == 0)
+   //{
+   //   TextDSetLineNumberArea(current, 0, 0, marginWidth);
+   //   //current->text.columns = (current->width - marginWidth*2) / charWidth;
+   //}
+   //else
+   //{
+   //   TextDSetLineNumberArea(current, marginWidth, * lineNumCols, 2*marginWidth + charWidth * lineNumCols);
+   //   //current->text.columns = (current->width - marginWidth*3 - charWidth * lineNumCols) / charWidth;
+   //}
 }
 
 // -------------------------------------------------------------------------------

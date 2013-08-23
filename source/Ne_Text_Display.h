@@ -67,6 +67,9 @@ public:
    bool canRedraw;
    void computeTextAreaSize(int x, int y, int w, int h);
 
+   int rows() const;    // # of rows in the text area
+   int columns() const; // # of columns in the text area
+
    Ne_Text_Part text;
    
    // Text Drawing Area Only

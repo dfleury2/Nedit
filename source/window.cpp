@@ -2034,8 +2034,6 @@ static Ne_Text_Editor* createTextArea(WindowInfo* window, int rows, int cols, in
 
    Ne_Text_Editor* textD = new Ne_Text_Editor(x, y, w, h);
    textD->text.backlightCharTypes = window->backlightCharTypes?window->backlightCharTypes:"";
-   textD->text.rows = rows;
-   textD->text.columns = cols;
    textD->text.lineNumCols = lineNumCols;
    textD->text.emulateTabs = emTabDist;
    textD->primaryFont = window->fontList;
@@ -3113,9 +3111,9 @@ static void getTextPaneDimension(WindowInfo* window, int* nRows, int* nCols)
    Ne_Text_Display* textD = window->textArea;
 
    // width is the same for panes
-   *nCols = window->textArea->text.columns;
+   *nCols = window->textArea->columns();
 
-   *nRows = window->textArea->text.rows; // simple...
+   *nRows = window->textArea->rows(); // simple...
    /* we have to work out the height, as the text area may have been split */
 // TODO:    XtVaGetValues(window->textArea, textNhScrollBar, &hScrollBar,
 // TODO:                  textNmarginHeight, &marginHeight, textNmarginWidth, &marginWidth,

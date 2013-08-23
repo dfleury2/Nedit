@@ -1215,7 +1215,7 @@ void TextInitialize(Ne_Text_Editor* textD)
    textD->selectBGPixel = GetColor(NEDIT_DEFAULT_SEL_BG);
    textD->highlightBGPixel = GetColor(NEDIT_DEFAULT_HI_BG);
    textD->lineNumFGPixel = GetColor(NEDIT_DEFAULT_LINENO_FG);
-   textD->cursorFGPixel = textD->text.cursorFGPixel;
+   textD->cursorFGPixel = GetColor(NEDIT_DEFAULT_CURSOR_FG);
    textD->wrapMargin = textD->text.wrapMargin;
    textD->continuousWrap = textD->text.continuousWrap;
    textD->lineNumWidth = std::max(60, textLeft); // TODO: textD->width - marginWidth - textLeft;

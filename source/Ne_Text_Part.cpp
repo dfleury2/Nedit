@@ -23,7 +23,6 @@
 // --------------------------------------------------------------------------
 Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
 {
-   this->cursorFGPixel = GetColor(NEDIT_DEFAULT_CURSOR_FG);
    this->calltipFGPixel = GetColor(NEDIT_DEFAULT_CALLTIP_FG);
    this->calltipBGPixel = GetColor(NEDIT_DEFAULT_CALLTIP_BG);
    this->backlightCharTypes = "";

@@ -116,7 +116,8 @@ public:
    // Highlight colors are used when flashing matching parens
    Fl_Color highlightFGPixel, highlightBGPixel;
    // Color for drawing line numbers
-   Fl_Color lineNumFGPixel;   
+   Fl_Color lineNumFGPixel;
+   // Foreground cursor color
    Fl_Color cursorFGPixel;
    Fl_Color* bgClassPixel;		/* table of colors for each BG class */
    unsigned char* bgClass;		/* obtains index into bgClassPixel[] */

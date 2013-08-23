@@ -39,7 +39,6 @@ struct Ne_Text_Part
    Ne_Text_Part(Ne_Text_Display* textDisplay);
 
    // resources
-   Ne_Font fontStruct;
    bool pendingDelete;
    bool autoShowInsertPos;
    bool autoWrap;

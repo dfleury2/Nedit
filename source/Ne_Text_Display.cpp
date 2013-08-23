@@ -321,8 +321,6 @@ Ne_Text_Display* TextDCreate(int x, int y, int w, int h,
    
    textD->nVisibleLines = (textD->height - 1) / (textD->ascent + textD->descent);
    if (textD->nVisibleLines == 0) ++textD->nVisibleLines; // Avoid 0 array allocation
-// TODO:    gcValues.foreground = cursorFGPixel;
-// TODO:    textD->cursorFGGC = XtGetGC(widget, GCForeground, &gcValues);
    textD->lineStarts = (int*)malloc__(sizeof(int) * textD->nVisibleLines);
    textD->lineStarts[0] = 0;
 
@@ -337,7 +335,6 @@ Ne_Text_Display* TextDCreate(int x, int y, int w, int h,
    // Should be done on resize...
    calcLineStarts(textD, 0, textD->nVisibleLines);
    calcLastChar(textD);
-
 
    textD->bgClassPixel = NULL;
    textD->bgClass = NULL;

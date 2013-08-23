@@ -1132,7 +1132,7 @@ bool Ne_Text_Editor::mouseMoveForDrag(int x, int y) const
 // -------------------------------------------------------------------------------
 void TextInitialize(Ne_Text_Editor* textD)
 {
-   Ne_Font* fs = &textD->text.fontStruct;
+   Ne_Font* fs = &textD->fontStruct;
    Fl_Color white, black;
    int textLeft;
    int charWidth = fs->max_width();
@@ -1201,10 +1201,10 @@ void TextInitialize(Ne_Text_Editor* textD)
    textD->needAbsTopLineNum = false;
    textD->horizOffset = 0;
    // TODO:    textD->visibility = VisibilityUnobscured;
-   textD->fontStruct = textD->text.fontStruct;
-   textD->ascent = textD->text.fontStruct.ascent();
-   textD->descent = textD->text.fontStruct.descent();
-   textD->fixedFontWidth = textD->text.fontStruct.isFixed() ? textD->text.fontStruct.max_width() : -1;
+// TODO:    textD->fontStruct = textD->text.fontStruct;
+   textD->ascent = textD->fontStruct.ascent();
+   textD->descent = textD->fontStruct.descent();
+   textD->fixedFontWidth = textD->fontStruct.isFixed() ? textD->fontStruct.max_width() : -1;
    textD->styleBuffer = NULL;
    textD->styleTable = NULL;
    textD->nStyles = 0;
@@ -1627,7 +1627,7 @@ bool TextSetValues(Ne_Text_Editor* current) //, Ne_Text_Editor* request, Ne_Text
    {
 // TODO:       if (newWidget->text.lineNumCols != 0)
 // TODO:          reconfigure = True;
-      TextDSetFont(current, current->text.fontStruct);
+      TextDSetFont(current, current->fontStruct);
    }
 
 // TODO:    if (newWidget->text.wrapMargin != current->text.wrapMargin || newWidget->text.continuousWrap != current->text.continuousWrap)
@@ -1648,7 +1648,7 @@ bool TextSetValues(Ne_Text_Editor* current) //, Ne_Text_Editor* request, Ne_Text
 // TODO:    if (newWidget->text.lineNumCols != current->text.lineNumCols || reconfigure)
    {
       int marginWidth = current->text.marginWidth;
-      int charWidth = current->text.fontStruct.max_width();
+      int charWidth = current->fontStruct.max_width();
       int lineNumCols = current->text.lineNumCols;
       if (lineNumCols == 0)
       {

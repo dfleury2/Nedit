@@ -2038,7 +2038,7 @@ static Ne_Text_Editor* createTextArea(WindowInfo* window, int rows, int cols, in
    textD->text.columns = cols;
    textD->text.lineNumCols = lineNumCols;
    textD->text.emulateTabs = emTabDist;
-   textD->fontStruct = textD->text.fontStruct = window->fontList;
+   textD->fontStruct = window->fontList;
    textD->text.readOnly = IS_ANY_LOCKED(window->lockReasons);
    textD->text.delimiters = delimiters;
    textD->text.wrapMargin = wrapMargin;

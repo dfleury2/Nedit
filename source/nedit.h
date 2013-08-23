@@ -68,6 +68,8 @@
 #define NEDIT_DEFAULT_CURSOR_FG "black"
 #define NEDIT_DEFAULT_HELP_FG   "black"
 #define NEDIT_DEFAULT_HELP_BG   "gray80"
+#define NEDIT_DEFAULT_CALLTIP_FG "black"
+#define NEDIT_DEFAULT_CALLTIP_BG "LemonChiffon1"
 
 /* Tuning parameters */
 #define SEARCHMAX 5119          /* Maximum length of search/replace strings */

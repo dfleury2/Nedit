@@ -181,8 +181,8 @@ Ne_Text_Display::Ne_Text_Display(int x, int y, int w, int h, const char* l)
    this->calltipW = NULL;
    this->calltipShell = NULL;
    this->calltip.ID = 0;
-   this->calltipFGPixel = calltipFGPixel;
-   this->calltipBGPixel = calltipBGPixel;
+   this->calltipFGPixel = GetColor(NEDIT_DEFAULT_CALLTIP_FG);;
+   this->calltipBGPixel = GetColor(NEDIT_DEFAULT_CALLTIP_BG);;
    for (int i = 1; i < this->nVisibleLines; i++)
       this->lineStarts[i] = -1;
 

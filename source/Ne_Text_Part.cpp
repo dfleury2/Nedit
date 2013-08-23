@@ -23,8 +23,6 @@
 // --------------------------------------------------------------------------
 Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
 {
-   this->calltipFGPixel = GetColor(NEDIT_DEFAULT_CALLTIP_FG);
-   this->calltipBGPixel = GetColor(NEDIT_DEFAULT_CALLTIP_BG);
    this->backlightCharTypes = "";
    this->rows = 24;
    this->columns = 80;

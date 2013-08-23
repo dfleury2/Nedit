@@ -39,7 +39,6 @@ struct Ne_Text_Part
    Ne_Text_Part(Ne_Text_Display* textDisplay);
 
    // resources
-   Fl_Color calltipFGPixel, calltipBGPixel;
    Ne_Font fontStruct;
    bool pendingDelete;
    bool autoShowInsertPos;

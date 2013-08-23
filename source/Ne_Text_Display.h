@@ -125,8 +125,8 @@ public:
    Fl_Widget* calltipW;       /* The Label widget for the calltip */
    Fl_Widget* calltipShell;   /* The Shell that holds the calltip */
    calltipStruct calltip;     /* The info for the calltip itself */
-   Fl_Color calltipFGPixel;
-   Fl_Color calltipBGPixel;
+   // Foreground/Background calltip color
+   Fl_Color calltipFGPixel, calltipBGPixel;
    int suppressResync;			/* Suppress resynchronization of line starts during buffer updates */
    int nLinesDeleted;			/* Number of lines deleted during buffer modification (only used when resynchronization is suppressed) */
    int modifyingTabDist;		/* Whether tab distance is being modified */

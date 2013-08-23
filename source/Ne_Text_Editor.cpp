@@ -1229,8 +1229,8 @@ void TextInitialize(Ne_Text_Editor* textD)
    textD->calltipW = NULL;
    textD->calltipShell = NULL;
    textD->calltip.ID = 0;
-   textD->calltipFGPixel = textD->text.calltipFGPixel;
-   textD->calltipBGPixel = textD->text.calltipBGPixel;
+   textD->calltipFGPixel = GetColor(NEDIT_DEFAULT_CALLTIP_FG);
+   textD->calltipBGPixel = GetColor(NEDIT_DEFAULT_CALLTIP_BG);
    for (int i = 1; i < textD->nVisibleLines; i++)
       textD->lineStarts[i] = -1;
 

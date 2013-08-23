@@ -31,10 +31,6 @@
 #include "nedit.h"      /* For WindowInfo */
 #include "Ne_Text_Display.h"   /* for textDisp */
 
-#define NEDIT_DEFAULT_CALLTIP_FG "black"
-#define NEDIT_DEFAULT_CALLTIP_BG "LemonChiffon1"
-
-
 enum TipHAlignMode {TIP_LEFT, TIP_CENTER, TIP_RIGHT};
 enum TipVAlignMode {TIP_ABOVE, TIP_BELOW};
 enum TipAlignStrict {TIP_SLOPPY, TIP_STRICT};

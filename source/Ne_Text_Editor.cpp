@@ -1214,7 +1214,7 @@ void TextInitialize(Ne_Text_Editor* textD)
    textD->highlightFGPixel = GetColor(NEDIT_DEFAULT_HI_FG);
    textD->selectBGPixel = GetColor(NEDIT_DEFAULT_SEL_BG);
    textD->highlightBGPixel = GetColor(NEDIT_DEFAULT_HI_BG);
-   textD->lineNumFGPixel = textD->text.lineNumFGPixel;
+   textD->lineNumFGPixel = GetColor(NEDIT_DEFAULT_LINENO_FG);
    textD->cursorFGPixel = textD->text.cursorFGPixel;
    textD->wrapMargin = textD->text.wrapMargin;
    textD->continuousWrap = textD->text.continuousWrap;

@@ -68,11 +68,16 @@ public:
    void computeTextAreaSize(int x, int y, int w, int h);
 
    Ne_Text_Part text;
+   
+   // Text Drawing Area Only
+   int top, left, width, height;    
+   // Line Number Area
+   int lineNumLeft, lineNumWidth;   
+   // Margins between borders, and line number area and text drawing area
+   int marginWidth, marginHeight;
 
-   int top, left, width, height;    // Text Drawing Area Only
-   int lineNumLeft, lineNumWidth;   // Line Number Area
    int cursorPos;
-   int cursorOn;
+   bool cursorOn;
    int cursorX, cursorY;   /* X, Y pos. of last drawn cursor
                            Note: these are used for *drawing*
                            and are not generally reliable

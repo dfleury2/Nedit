@@ -57,7 +57,7 @@ void BeginBlockDrag(Ne_Text_Editor* textD)
    }
    mousePos = TextDXYToPosition(textD, textD->text.btnDownX, textD->text.btnDownY);
    nLines = BufCountLines(buf, sel->start, mousePos);
-   textD->text.dragYOffset = nLines * fontHeight + (((textD->text.btnDownY - textD->text.marginHeight) % fontHeight) - fontHeight/2);
+   textD->text.dragYOffset = nLines * fontHeight + (((textD->text.btnDownY - textD->marginHeight) % fontHeight) - fontHeight/2);
    textD->text.dragNLines = BufCountLines(buf, sel->start, sel->end);
 
    /* Record the current drag insert position and the information for

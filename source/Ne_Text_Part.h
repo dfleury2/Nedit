@@ -51,7 +51,6 @@ struct Ne_Text_Part
    bool readOnly;
    bool hidePointer;
    int rows, columns;
-   int marginWidth, marginHeight;
    int cursorBlinkRate;
    int wrapMargin;
    int emulateTabs;

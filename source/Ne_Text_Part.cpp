@@ -24,10 +24,9 @@
 Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
 {
    this->backlightCharTypes = "";
+   this->lineNumCols = 0;
    this->rows = 24;
    this->columns = 80;
-   this->marginWidth = 5;
-   this->marginHeight = 5;
    this->pendingDelete = true;
    this->autoWrap = true;
    this->continuousWrap = true;
@@ -39,7 +38,6 @@ Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
    this->hidePointer = false;
    this->wrapMargin = 0;
 
-   this->lineNumCols = 0;
    this->autoShowInsertPos = true;
    this->autoWrapPastedText = false;
    this->delimiters = ".,/\\`'!@#%^&*()-=+{}[]\":;<>?";

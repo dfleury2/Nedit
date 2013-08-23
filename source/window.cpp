@@ -1240,7 +1240,7 @@ void ShowLineNumbers(WindowInfo* window, bool state)
    else
    {
       windowWidth = window->mainWindow->w();
-      marginWidth = window->textArea->text.marginWidth;
+      marginWidth = window->textArea->marginWidth;
       window->mainWindow->size( windowWidth - textD->left + marginWidth, window->mainWindow->h());
 
       for (i=0; i<=window->nPanes; i++)

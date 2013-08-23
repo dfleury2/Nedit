@@ -136,6 +136,9 @@ Ne_Text_Display::Ne_Text_Display(int x, int y, int w, int h, const char* l)
 
    end();
 
+   this->marginWidth = 5;
+   this->marginHeight = 5;
+
    this->cursorOn = true;
    this->cursorPos = 0;
    this->cursorX = -100;
@@ -234,8 +237,8 @@ void Ne_Text_Display::draw()
    fl_rectf(x() + w() - vScrollBar->w(), y() + h() - hScrollBar->h(), vScrollBar->w(), hScrollBar->h());
 
    // Drawing separation between line and text
-   fl_line(this->lineNumLeft + this->lineNumWidth - text.marginWidth / 2, y(),
-      this->lineNumLeft + this->lineNumWidth - text.marginWidth / 2, y() + h() - hScrollBar->h() - 1);
+   fl_line(this->lineNumLeft + this->lineNumWidth - this->marginWidth / 2, y(),
+      this->lineNumLeft + this->lineNumWidth - this->marginWidth / 2, y() + h() - hScrollBar->h() - 1);
 
    canRedraw = false;
 }
@@ -261,15 +264,15 @@ void Ne_Text_Display::resize(int x, int y, int w, int h)
 // -------------------------------------------------------------------------------
 void Ne_Text_Display::computeTextAreaSize(int x, int y, int w, int h)
 {
-   this->left = x + text.marginWidth;
-   this->top = y + text.marginHeight;
-   this->width = w - vScrollBar->w() - 2 * text.marginWidth;
-   this->height = h - hScrollBar->h() - 2 * text.marginHeight;
+   this->left = x + this->marginWidth;
+   this->top = y + this->marginHeight;
+   this->width = w - vScrollBar->w() - 2 * this->marginWidth;
+   this->height = h - hScrollBar->h() - 2 * this->marginHeight;
    if (lineNumWidth != 0)
    {
-      lineNumLeft = x + text.marginWidth;
+      lineNumLeft = x + this->marginWidth;
       this->left += lineNumLeft + lineNumWidth;
-      this->width -= lineNumWidth + text.marginWidth;
+      this->width -= lineNumWidth + this->marginWidth;
    }
 }
 
@@ -2996,7 +2999,7 @@ static void redrawLineNumbers(Ne_Text_Display* textD, int clearAll)
          fl_color(textD->lineNumFGPixel);
          fl_font(textD->fontStruct.font, textD->fontStruct.size);
          //fl_draw(lineNumString, this->lineNumLeft, y + this->ascent);
-         fl_draw(lineNumString, textD->lineNumLeft + textD->lineNumWidth - textD->text.marginWidth - stringWidth, y + textD->ascent);
+         fl_draw(lineNumString, textD->lineNumLeft + textD->lineNumWidth - textD->marginWidth - stringWidth, y + textD->ascent);
          line++;
       }
       else

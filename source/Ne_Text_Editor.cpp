@@ -1119,7 +1119,7 @@ int Ne_Text_Editor::handle_key_button(int event)
 // --------------------------------------------------------------------------
 bool Ne_Text_Editor::inWindow(int x, int y) const
 {
-   return ((x >= this->x() && x <= this->x() + this->width + this->lineNumWidth + 2*text.marginWidth)
+   return ((x >= this->x() && x <= this->x() + this->width + this->lineNumWidth + 2*marginWidth)
       && (y >= this->top && y <= this->top + this->height));
 }
 
@@ -1136,7 +1136,7 @@ void TextInitialize(Ne_Text_Editor* textD)
    Fl_Color white, black;
    int textLeft;
    int charWidth = fs->max_width();
-   int marginWidth = textD->text.marginWidth;
+   int marginWidth = textD->marginWidth;
    int lineNumCols = textD->text.lineNumCols;
 
 // TODO:    /* Set the initial window size based on the rows and columns resources */
@@ -1168,7 +1168,7 @@ void TextInitialize(Ne_Text_Editor* textD)
    Ne_Text_Buffer* buf = BufCreate();
 
    /* Create and initialize the text-display part of the widget */
-   textLeft = textD->text.marginWidth + (lineNumCols == 0 ? 0 : marginWidth + charWidth * lineNumCols);
+   textLeft = textD->marginWidth + (lineNumCols == 0 ? 0 : marginWidth + charWidth * lineNumCols);
    
 // TODO:    newWidget->text.textD = TextDCreate((Fl_Widget*)newWidget, newWidget->text.hScrollBar,
 // TODO:       newWidget->text.vScrollBar, textLeft, newWidget->text.marginHeight,
@@ -1647,7 +1647,7 @@ bool TextSetValues(Ne_Text_Editor* current) //, Ne_Text_Editor* request, Ne_Text
       number display and the main text display */
 // TODO:    if (newWidget->text.lineNumCols != current->text.lineNumCols || reconfigure)
    {
-      int marginWidth = current->text.marginWidth;
+      int marginWidth = current->marginWidth;
       int charWidth = current->fontStruct.max_width();
       int lineNumCols = current->text.lineNumCols;
       if (lineNumCols == 0)
@@ -4421,9 +4421,9 @@ static void checkAutoScroll(Fl_Widget* w, int x, int y)
 
    /* Is the pointer in or out of the window? */
    bool  inWindow = (x >= textD->left &&
-              x < textD->width - textD->text.marginWidth &&
-              y >= textD->text.marginHeight &&
-              y < textD->height - textD->text.marginHeight);
+              x < textD->width - textD->marginWidth &&
+              y >= textD->marginHeight &&
+              y < textD->height - textD->marginHeight);
 
    /* If it's in the window, cancel the timer procedure */
    if (inWindow)

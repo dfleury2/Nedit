@@ -4,7 +4,6 @@
 Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
 {
    this->backlightCharTypes = "";
-   this->lineNumCols = 0;
    this->pendingDelete = true;
    this->autoWrap = true;
    this->autoIndent = true;

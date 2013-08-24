@@ -1246,7 +1246,7 @@ void ShowLineNumbers(WindowInfo* window, bool state)
       for (i=0; i<=window->nPanes; i++)
       {
          Ne_Text_Editor* textD = i==0 ? window->textArea : window->textPanes[i-1];
-         textD->text.lineNumCols = 0;
+         textD->lineNumCols = 0;
       }
    }
 
@@ -1263,7 +1263,7 @@ void ShowLineNumbers(WindowInfo* window, bool state)
       {
          Ne_Text_Editor* text = i==0 ? win->textArea : win->textPanes[i-1];
          /*  reqCols should really be cast here, but into what? XmRInt?  */
-         textD->text.lineNumCols = reqCols;
+         textD->lineNumCols = reqCols;
       }
    }
 
@@ -2034,7 +2034,7 @@ static Ne_Text_Editor* createTextArea(WindowInfo* window, int rows, int cols, in
 
    Ne_Text_Editor* textD = new Ne_Text_Editor(x, y, w, h);
    textD->text.backlightCharTypes = window->backlightCharTypes?window->backlightCharTypes:"";
-   textD->text.lineNumCols = lineNumCols;
+   textD->lineNumCols = lineNumCols;
    textD->text.emulateTabs = emTabDist;
    textD->primaryFont = window->fontList;
    textD->text.readOnly = IS_ANY_LOCKED(window->lockReasons);
@@ -2419,7 +2419,7 @@ static int updateGutterWidth(WindowInfo* window)
          int lineNumCols, tmpReqCols;
          Ne_Text_Editor* textD = document->textArea;
 
-         lineNumCols = document->textArea->text.lineNumCols;
+         lineNumCols = document->textArea->lineNumCols;
 
          /* Is the width of the line number area sufficient to display all the
             line numbers in the file?  If not, expand line number field, and the
@@ -2464,7 +2464,7 @@ static int updateGutterWidth(WindowInfo* window)
          int i;
          int lineNumCols;
 
-         lineNumCols = document->textArea->text.lineNumCols;
+         lineNumCols = document->textArea->lineNumCols;
 
          if (lineNumCols == reqCols)
          {
@@ -2475,7 +2475,7 @@ static int updateGutterWidth(WindowInfo* window)
          for (i = 0; i <= document->nPanes; i++)
          {
             Ne_Text_Editor* text = 0==i ? document->textArea : document->textPanes[i-1];
-            text->text.lineNumCols = reqCols;
+            text->lineNumCols = reqCols;
          }
       }
    }

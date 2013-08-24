@@ -175,6 +175,7 @@ Ne_Text_Display::Ne_Text_Display(int x, int y, int w, int h, const char* l)
    this->continuousWrap = false;
    this->lineNumLeft = 0;
    this->lineNumWidth = 0;
+   this->lineNumCols = 0;
    computeTextAreaSize(x, y, w, h);
    
    this->nVisibleLines = (this->height - 1) / (this->ascent + this->descent);
@@ -250,7 +251,7 @@ void Ne_Text_Display::resize(int x, int y, int w, int h)
    int oldWidth = this->width;
    computeTextAreaSize(x, y, w, h);
 
-   text.lineNumCols = lineNumWidth / primaryFont.max_width();
+   this->lineNumCols = lineNumWidth / primaryFont.max_width();
 
    // Resize the text display that the widget uses to render text
    TextDResize(this, this->width, this->height); // TODO:    resizeTextArea(width, height, oldWidth);
@@ -2966,7 +2967,6 @@ void TextDSetLineNumberArea(Ne_Text_Display* textD, int lineNumLeft, int lineNum
    textD->lineNumLeft = lineNumLeft;
    textD->lineNumWidth = lineNumWidth;
    textD->left = textLeft;
-// TODO:    XClearWindow(XtDisplay(textD->w), XtWindow(textD->w));
    resetAbsLineNum(textD);
    TextDResize(textD, newWidth, textD->height);
    TextDRedisplayRect(textD, 0, textD->top, INT_MAX, textD->height);

@@ -69,13 +69,15 @@ public:
 
    int rows() const;    // # of rows in the text area
    int columns() const; // # of columns in the text area
+   bool isLineNumberAreaRequired() const { return (lineNumWidth != 0); }
 
    Ne_Text_Part text;
    
    // Text Drawing Area Only
    int top, left, width, height;    
    // Line Number Area
-   int lineNumLeft, lineNumWidth;   
+   int lineNumLeft, lineNumWidth;
+   int lineNumCols;
    // Margins between borders, and line number area and text drawing area
    int marginWidth, marginHeight;
 

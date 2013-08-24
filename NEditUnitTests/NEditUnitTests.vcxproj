@@ -79,6 +79,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="test_File.cpp" />
+    <ClCompile Include="test_FileUtils.cpp" />
     <ClCompile Include="test_Ne_Rangeset.cpp" />
     <ClCompile Include="test_Ne_Text_Buffer.cpp" />
   </ItemGroup>

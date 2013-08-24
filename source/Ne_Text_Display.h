@@ -105,9 +105,9 @@ public:
    int topLineNum;			/* Line number of top displayed line of file (first line of file is 1) */
    int absTopLineNum;      /* In continuous wrap mode, the line number of the top line if the text
                               were not wrapped (note that this is only maintained as needed). */
-   int needAbsTopLineNum;		/* Externally settable flag to continue
-    					   maintaining absTopLineNum even if
-					   it isn't needed for line # display */
+   int needAbsTopLineNum;  /* Externally settable flag to continue
+    					            maintaining absTopLineNum even if
+					               it isn't needed for line # display */
    int horizOffset;			   /* Horizontal scroll pos. in pixels */
    int visibility;            /* Window visibility (see XVisibility event) */
    int nStyles;			      /* Number of entries in styleTable */

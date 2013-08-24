@@ -1,7 +1,7 @@
 #include "Ne_Text_Part.h"
 
 // --------------------------------------------------------------------------
-Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
+Ne_Text_Part::Ne_Text_Part()
 {
    this->backlightCharTypes = "";
    this->pendingDelete = true;
@@ -23,7 +23,6 @@ Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
    // TODO:    { textNdragEndCallback, textCDragEndCallback, XmRCallback, sizeof(caddr_t), XtOffset(TextWidget, text.dragEndCB), XtRCallback, NULL },
    // TODO:    { textNsmartIndentCallback, textCSmartIndentCallback, XmRCallback, sizeof(caddr_t), XtOffset(TextWidget, text.smartIndentCB), XtRCallback, NULL },
 
-   this->textD = textDisplay;
    anchor = rectAnchor = 0;
    dragState = 0;
    multiClickState = 0;

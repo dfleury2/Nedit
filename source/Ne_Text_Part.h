@@ -36,7 +36,7 @@ enum NeMultiClickStates
 
 struct Ne_Text_Part
 {
-   Ne_Text_Part(Ne_Text_Display* textDisplay);
+   Ne_Text_Part();
 
    // resources
    bool pendingDelete;
@@ -59,7 +59,6 @@ struct Ne_Text_Part
    // TODO:    XtCallbackList smartIndentCB;
 
    // private state
-   Ne_Text_Display* textD;          /* Pointer to display information */
    int anchor, rectAnchor;          /* Anchors for drag operations and rectangular drag operations */
    int dragState;                   /* Why is the mouse being dragged and what is being acquired */
    int multiClickState;             /* How long is this multi-click sequence so far */

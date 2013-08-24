@@ -13,7 +13,6 @@ Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
    this->heavyCursor = false;
    this->readOnly = false;
    this->hidePointer = false;
-   this->wrapMargin = 0;
 
    this->autoShowInsertPos = true;
    this->autoWrapPastedText = false;

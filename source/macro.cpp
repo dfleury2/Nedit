@@ -4244,7 +4244,7 @@ static int selectionRightMV(WindowInfo* window, DataValue* argList, int nArgs,
 static int wrapMarginMV(WindowInfo* window, DataValue* argList, int nArgs, DataValue* result, char** errMsg)
 {
    int margin = window->textArea->columns();
-   int nCols = window->textArea->text.wrapMargin;
+   int nCols = window->textArea->wrapMargin;
 
    result->tag = INT_TAG;
    result->val.n = margin == 0 ? nCols : margin;

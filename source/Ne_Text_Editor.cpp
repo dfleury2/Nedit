@@ -1216,7 +1216,6 @@ void TextInitialize(Ne_Text_Editor* textD)
    textD->highlightBGPixel = GetColor(NEDIT_DEFAULT_HI_BG);
    textD->lineNumFGPixel = GetColor(NEDIT_DEFAULT_LINENO_FG);
    textD->cursorFGPixel = GetColor(NEDIT_DEFAULT_CURSOR_FG);
-   textD->wrapMargin = textD->text.wrapMargin;
    textD->lineNumWidth = std::max(60, textLeft); // TODO: textD->width - marginWidth - textLeft;
    textD->computeTextAreaSize(textD->x(), textD->y(), textD->w(), textD->h());
 
@@ -1630,7 +1629,7 @@ bool TextSetValues(Ne_Text_Editor* current) //, Ne_Text_Editor* request, Ne_Text
    }
 
 // TODO:    if (newWidget->text.wrapMargin != current->text.wrapMargin || newWidget->text.continuousWrap != current->text.continuousWrap)
-      TextDSetWrapMode(current, current->continuousWrap, current->text.wrapMargin);
+      TextDSetWrapMode(current, current->continuousWrap, current->wrapMargin);
 
    /* When delimiters are changed, copy the memory, so that the caller
       doesn't have to manage it, and add mandatory delimiters blank,
@@ -1950,7 +1949,7 @@ void TextInsertAtCursor(Ne_Text_Editor* textD, char* chars, int event, int allow
       it and be done (for efficiency only, this routine is called for each
       character typed). (Of course, it may not be significantly more efficient
       than the more general code below it, so it may be a waste of time!) */
-   wrapMargin = textD->text.wrapMargin != 0 ? textD->text.wrapMargin : textD->width / fontWidth;
+   wrapMargin = textD->wrapMargin != 0 ? textD->wrapMargin : textD->width / fontWidth;
    lineStartPos = BufStartOfLine(buf, cursorPos);
    colNum = BufCountDispChars(buf, lineStartPos, cursorPos);
    for (c=chars; *c!='\0' && *c!='\n'; c++)

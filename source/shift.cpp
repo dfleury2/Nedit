@@ -299,7 +299,7 @@ void FillSelection(WindowInfo* window)
    else
    {
       nCols = window->textArea->columns();
-      wrapMargin = window->textArea->text.wrapMargin;
+      wrapMargin = window->textArea->wrapMargin;
       rightMargin = (wrapMargin == 0 ? nCols : wrapMargin);
    }
 

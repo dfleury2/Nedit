@@ -2039,7 +2039,7 @@ static Ne_Text_Editor* createTextArea(WindowInfo* window, int rows, int cols, in
    textD->primaryFont = window->fontList;
    textD->text.readOnly = IS_ANY_LOCKED(window->lockReasons);
    textD->text.delimiters = delimiters;
-   textD->text.wrapMargin = wrapMargin;
+   textD->wrapMargin = wrapMargin;
    textD->text.autoIndent = window->indentStyle == AUTO_INDENT;
    textD->text.smartIndent = window->indentStyle == SMART_INDENT;
    textD->text.autoWrap = window->wrapMode == NEWLINE_WRAP;

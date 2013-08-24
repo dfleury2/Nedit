@@ -93,15 +93,7 @@ ParseFilename(const char* fullname, char* filename, char* pathname)
    int fullLen = strlen(fullname);
    int i, pathLen, fileLen;
 
-   const char* viewExtendPath;
-   int scanStart;
-
-   /* For clearcase version extended paths, slash characters after the "@@/"
-      should be considered part of the file name, rather than the path */
-   if ((viewExtendPath = strstr(fullname, "@@/")) != NULL)
-      scanStart = viewExtendPath - fullname - 1;
-   else
-      scanStart = fullLen - 1;
+   int scanStart = fullLen - 1;
 
    /* find the last slash */
    for (i=scanStart; i>=0; i--)

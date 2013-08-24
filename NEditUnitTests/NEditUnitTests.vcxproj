@@ -82,6 +82,7 @@
     <ClCompile Include="test_FileUtils.cpp" />
     <ClCompile Include="test_Ne_Rangeset.cpp" />
     <ClCompile Include="test_Ne_Text_Buffer.cpp" />
+    <ClCompile Include="test_Utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

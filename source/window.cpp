@@ -1752,11 +1752,11 @@ void SetAutoWrap(WindowInfo* window, int state)
    int autoWrap = state == NEWLINE_WRAP, contWrap = state == CONTINUOUS_WRAP;
 
    window->textArea->text.autoWrap = autoWrap;
-   window->textArea->text.continuousWrap = contWrap;
+   window->textArea->continuousWrap = contWrap;
    for (i=0; i<window->nPanes; i++)
    {
       window->textPanes[i]->text.autoWrap = autoWrap;
-      window->textPanes[i]->text.continuousWrap = contWrap;
+      window->textPanes[i]->continuousWrap = contWrap;
    }
    window->wrapMode = state;
 
@@ -2043,7 +2043,7 @@ static Ne_Text_Editor* createTextArea(WindowInfo* window, int rows, int cols, in
    textD->text.autoIndent = window->indentStyle == AUTO_INDENT;
    textD->text.smartIndent = window->indentStyle == SMART_INDENT;
    textD->text.autoWrap = window->wrapMode == NEWLINE_WRAP;
-   textD->text.continuousWrap = window->wrapMode == CONTINUOUS_WRAP;
+   textD->continuousWrap = window->wrapMode == CONTINUOUS_WRAP;
    textD->text.overstrike = window->overstrike;
    textD->text.hidePointer = GetPrefTypingHidesPointer();
    textD->text.cursorVPadding = GetVerticalAutoScroll();

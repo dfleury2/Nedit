@@ -149,6 +149,7 @@ Ne_Text_Display::Ne_Text_Display(int x, int y, int w, int h, const char* l)
    this->cursorBlinkRate = 500;
    this->firstChar = 0;
    this->lastChar = 0;
+   this->continuousWrap = true;
    this->nBufferLines = 0;
    this->topLineNum = 1;
    this->absTopLineNum = 1;

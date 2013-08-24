@@ -97,7 +97,7 @@ public:
    Ne_Text_Buffer* styleBuffer;  /* Optional parallel buffer containing color and font information */
    int firstChar, lastChar;		/* Buffer positions of first and last displayed character (lastChar points
     					                  either to a newline or one character beyond the end of the buffer) */
-   int continuousWrap;     /* Wrap long lines when displaying */
+   bool continuousWrap;    /* Wrap long lines when displaying */
    int wrapMargin;         /* Margin in # of char positions for wrapping in continuousWrap mode */
    int* lineStarts;
    int topLineNum;			/* Line number of top displayed line of file (first line of file is 1) */

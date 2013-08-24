@@ -1217,7 +1217,6 @@ void TextInitialize(Ne_Text_Editor* textD)
    textD->lineNumFGPixel = GetColor(NEDIT_DEFAULT_LINENO_FG);
    textD->cursorFGPixel = GetColor(NEDIT_DEFAULT_CURSOR_FG);
    textD->wrapMargin = textD->text.wrapMargin;
-   textD->continuousWrap = textD->text.continuousWrap;
    textD->lineNumWidth = std::max(60, textLeft); // TODO: textD->width - marginWidth - textLeft;
    textD->computeTextAreaSize(textD->x(), textD->y(), textD->w(), textD->h());
 
@@ -1631,7 +1630,7 @@ bool TextSetValues(Ne_Text_Editor* current) //, Ne_Text_Editor* request, Ne_Text
    }
 
 // TODO:    if (newWidget->text.wrapMargin != current->text.wrapMargin || newWidget->text.continuousWrap != current->text.continuousWrap)
-      TextDSetWrapMode(current, current->text.continuousWrap, current->text.wrapMargin);
+      TextDSetWrapMode(current, current->continuousWrap, current->text.wrapMargin);
 
    /* When delimiters are changed, copy the memory, so that the caller
       doesn't have to manage it, and add mandatory delimiters blank,
@@ -2013,7 +2012,7 @@ char* TextGetWrapped(Ne_Text_Editor* textD, int startPos, int endPos, int* outLe
    int fromPos, toPos, outPos;
    char c, *outString;
 
-   if (!textD->text.continuousWrap || startPos == endPos)
+   if (!textD->continuousWrap || startPos == endPos)
    {
       *outLen = endPos - startPos;
       return BufGetRange(buf, startPos, endPos);

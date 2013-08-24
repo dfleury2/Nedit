@@ -7,7 +7,6 @@ Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
    this->lineNumCols = 0;
    this->pendingDelete = true;
    this->autoWrap = true;
-   this->continuousWrap = true;
    this->autoIndent = true;
    this->smartIndent = false;
    this->overstrike = false;

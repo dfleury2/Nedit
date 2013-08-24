@@ -43,7 +43,6 @@ struct Ne_Text_Part
    bool autoShowInsertPos;
    bool autoWrap;
    bool autoWrapPastedText;
-   bool continuousWrap;
    bool autoIndent;
    bool smartIndent;
    bool overstrike;

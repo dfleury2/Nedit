@@ -3504,7 +3504,7 @@ static void reapplyLanguageMode(WindowInfo* window, int mode, int forceDefaults)
       otherwise, leave it alone */
    wrapModeIsDef = window->wrapMode == GetPrefWrap(oldMode);
    tabDistIsDef = BufGetTabDistance(window->buffer) == GetPrefTabDist(oldMode);
-   oldEmTabDist = window->textArea->text.emulateTabs;
+   oldEmTabDist = window->textArea->emulateTabs;
    emTabDistIsDef = oldEmTabDist == GetPrefEmTabDist(oldMode);
    indentStyleIsDef = window->indentStyle == GetPrefAutoIndent(oldMode) ||
                       (GetPrefAutoIndent(oldMode) == SMART_INDENT &&

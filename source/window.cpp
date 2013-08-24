@@ -1310,10 +1310,10 @@ void SetEmTabDist(WindowInfo* window, int emTabDist)
 {
    int i;
 
-   window->textArea->text.emulateTabs = emTabDist;
+   window->textArea->emulateTabs = emTabDist;
    for (i = 0; i < window->nPanes; ++i)
    {
-      window->textPanes[i]->text.emulateTabs = emTabDist;
+      window->textPanes[i]->emulateTabs = emTabDist;
    }
 }
 
@@ -2035,7 +2035,7 @@ static Ne_Text_Editor* createTextArea(WindowInfo* window, int rows, int cols, in
    Ne_Text_Editor* textD = new Ne_Text_Editor(x, y, w, h);
    textD->text.backlightCharTypes = window->backlightCharTypes?window->backlightCharTypes:"";
    textD->lineNumCols = lineNumCols;
-   textD->text.emulateTabs = emTabDist;
+   textD->emulateTabs = emTabDist;
    textD->primaryFont = window->fontList;
    textD->text.readOnly = IS_ANY_LOCKED(window->lockReasons);
    textD->delimiters = delimiters;

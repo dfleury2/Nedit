@@ -49,7 +49,6 @@ struct Ne_Text_Part
    bool heavyCursor;
    bool readOnly;
    bool hidePointer;
-   int emulateTabs;
    int cursorVPadding;
 
    // TODO:    XtCallbackList focusInCB;

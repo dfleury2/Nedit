@@ -2862,13 +2862,13 @@ static void newlineAndIndentAP(Fl_Widget* w, int event, const char** args, int* 
    simpleInsertAtCursor(w, indentStr, event, true);
    free__(indentStr);
 
-   if (textD->text.emulateTabs > 0)
+   if (textD->emulateTabs > 0)
    {
       /*  If emulated tabs are on, make the inserted indent deletable by
           tab. Round this up by faking the column a bit to the right to
           let the user delete half-tabs with one keypress.  */
-      column += textD->text.emulateTabs - 1;
-      textD->text.emTabsBeforeCursor = column / textD->text.emulateTabs;
+      column += textD->emulateTabs - 1;
+      textD->text.emTabsBeforeCursor = column / textD->emulateTabs;
    }
 
    BufUnselect(buf);
@@ -2879,7 +2879,7 @@ static void processTabAP(Fl_Widget* w, int event, const char** args, int* nArgs)
    Ne_Text_Editor* textD = (Ne_Text_Editor*)w;
    Ne_Text_Buffer* buf = textD->buffer;
    selection* sel = &buf->primary;
-   int emTabDist = textD->text.emulateTabs;
+   int emTabDist = textD->emulateTabs;
    int emTabsBeforeCursor = textD->text.emTabsBeforeCursor;
    int insertPos, indent, startIndent, toIndent, lineStart, tabWidth;
    char* outStr, *outPtr;
@@ -4187,7 +4187,7 @@ static int deleteEmulatedTab(Fl_Widget* w, int event)
 {
    Ne_Text_Editor* textD = (Ne_Text_Editor*)w;
    Ne_Text_Buffer* buf = textD->buffer;
-   int emTabDist = textD->text.emulateTabs;
+   int emTabDist = textD->emulateTabs;
    int emTabsBeforeCursor = textD->text.emTabsBeforeCursor;
    int startIndent, toIndent, insertPos, startPos, lineStart;
    int pos, indent, startPosIndent;

@@ -4555,7 +4555,7 @@ static int tabDistMV(WindowInfo* window, DataValue* argList, int nArgs, DataValu
 
 static int emTabDistMV(WindowInfo* window, DataValue* argList, int nArgs, DataValue* result, char** errMsg)
 {
-   int dist = window->textArea->text.emulateTabs;
+   int dist = window->textArea->emulateTabs;
    result->tag = INT_TAG;
    result->val.n = dist;
    return true;

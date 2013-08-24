@@ -67,7 +67,7 @@ typedef union
    Inst* inst;
    int nArgs;
 } YYSTYPE;
-#line 76 "y.tab.c"
+
 #define YYERRCODE 256
 #define NUMBER 257
 #define STRING 258
@@ -1126,7 +1126,7 @@ static int yyerror(char* s)
    ErrMsg = s;
    return 0;
 }
-#line 1079 "y.tab.c"
+
 /* allocate initial stack or double stack size, up to YYMAXDEPTH */
 static int yygrowstack()
 {
@@ -2040,7 +2040,6 @@ yyreduce:
       ADD_BR_OFF(0);
    }
    break;
-#line 1868 "y.tab.c"
    }
    yyssp -= yym;
    yystate = *yyssp;

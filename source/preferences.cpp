@@ -3495,9 +3495,9 @@ static void reapplyLanguageMode(WindowInfo* window, int mode, int forceDefaults)
       delimiters = GetPrefDelimiters();
    else
       delimiters = LanguageModes[mode]->delimiters;
-   window->textArea->text.delimiters = delimiters;
+   window->textArea->delimiters = delimiters;
    for (i=0; i<window->nPanes; i++)
-      window->textPanes[i]->text.delimiters = delimiters;
+      window->textPanes[i]->delimiters = delimiters;
 
    /* Decide on desired values for language-specific parameters.  If a
       parameter was set to its default value, set it to the new default,

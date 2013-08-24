@@ -197,6 +197,7 @@ Ne_Text_Display::Ne_Text_Display(int x, int y, int w, int h, const char* l)
    this->nLinesDeleted = 0;
    this->modifyingTabDist = 0;
    this->pointerHidden = false;
+   this->delimiters = ".,/\\`'!@#%^&*()-=+{}[]\":;<>?";
 }
 
 /*

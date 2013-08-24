@@ -143,6 +143,7 @@ public:
    int nLinesDeleted;			/* Number of lines deleted during buffer modification (only used when resynchronization is suppressed) */
    int modifyingTabDist;		/* Whether tab distance is being modified */
    bool pointerHidden;        /* true if the mouse pointer is hidden */
+   std::string delimiters;
 };
 
 Ne_Text_Display* TextDCreate( int x, int y, int w, int h,

@@ -1248,7 +1248,7 @@ void TextInitialize(Ne_Text_Editor* textD)
    delimiters.  The memory use scheme here is that new values are
    always copied, and can therefore be safely freed on subsequent
    set-values calls or destroy */
-   textD->text.delimiters += " \t\n";
+   textD->delimiters += " \t\n";
 
    /* Start with the cursor blanked (widgets don't have focus on creation,
    the initial FocusIn event will unblank it and get blinking started) */
@@ -1636,7 +1636,7 @@ bool TextSetValues(Ne_Text_Editor* current) //, Ne_Text_Editor* request, Ne_Text
       tab, and newline to the list */
 // TODO:    if (newWidget->text.delimiters != current->text.delimiters)
    {
-      current->text.delimiters += " \t\n";
+      current->delimiters += " \t\n";
    }
 
    /* Setting the lineNumCols resource tells the text widget to hide or
@@ -3025,7 +3025,7 @@ static void deletePreviousWordAP(Fl_Widget* w, int event, const char** args, int
    Ne_Text_Editor* textD = (Ne_Text_Editor*)w;
    int insertPos = TextDGetInsertPosition(textD);
    int pos, lineStart = BufStartOfLine(textD->buffer, insertPos);
-   const std::string& delimiters = textD->text.delimiters;
+   const std::string& delimiters = textD->delimiters;
    bool silent = hasKey("nobell", args, nArgs);
 
    cancelDrag(w);
@@ -3064,7 +3064,7 @@ static void deleteNextWordAP(Fl_Widget* w, int event, const char** args, int* nA
    Ne_Text_Editor* textD = (Ne_Text_Editor*)w;
    int insertPos = TextDGetInsertPosition(textD);
    int pos, lineEnd = BufEndOfLine(textD->buffer, insertPos);
-   const std::string& delimiters = textD->text.delimiters;
+   const std::string& delimiters = textD->delimiters;
    bool silent = hasKey("nobell", args, nArgs);
 
    cancelDrag(w);
@@ -3198,7 +3198,7 @@ static void forwardWordAP(Fl_Widget* w, int event, const char** args,
    Ne_Text_Editor* textD = (Ne_Text_Editor*)w;
    Ne_Text_Buffer* buf = textD->buffer;
    int pos, insertPos = TextDGetInsertPosition(textD);
-   const std::string& delimiters = textD->text.delimiters;
+   const std::string& delimiters = textD->delimiters;
    bool silent = hasKey("nobell", args, nArgs);
 
    cancelDrag(w);
@@ -3250,7 +3250,7 @@ static void backwardWordAP(Fl_Widget* w, int event, const char** args,
    Ne_Text_Editor* textD = (Ne_Text_Editor*)w;
    Ne_Text_Buffer* buf = textD->buffer;
    int pos, insertPos = TextDGetInsertPosition(textD);
-   const std::string& delimiters = textD->text.delimiters;
+   const std::string& delimiters = textD->delimiters;
    bool silent = hasKey("nobell", args, nArgs);
 
    cancelDrag(w);
@@ -4281,7 +4281,7 @@ static int startOfWord(Fl_Widget* w, int pos)
 
    int startPos;
    Ne_Text_Buffer* buf = textD->buffer;
-   const std::string& delimiters=textD->text.delimiters;
+   const std::string& delimiters=textD->delimiters;
    char c = BufGetCharacter(buf, pos);
 
    if (c == ' ' || c== '\t')
@@ -4308,7 +4308,7 @@ static int endOfWord(Fl_Widget* w, int pos)
    Ne_Text_Editor* textD = (Ne_Text_Editor*)w;
    int endPos;
    Ne_Text_Buffer* buf = textD->buffer;
-   const std::string& delimiters = textD->text.delimiters;
+   const std::string& delimiters = textD->delimiters;
    char c = BufGetCharacter(buf, pos);
 
    if (c == ' ' || c== '\t')

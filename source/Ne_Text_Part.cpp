@@ -15,7 +15,6 @@ Ne_Text_Part::Ne_Text_Part(Ne_Text_Display* textDisplay)
 
    this->autoShowInsertPos = true;
    this->autoWrapPastedText = false;
-   this->delimiters = ".,/\\`'!@#%^&*()-=+{}[]\":;<>?";
    this->emulateTabs = 0;
 
    // TODO:    { textNfocusCallback, textCFocusCallback, XmRCallback, sizeof(caddr_t), XtOffset(TextWidget, text.focusInCB), XtRCallback, NULL },

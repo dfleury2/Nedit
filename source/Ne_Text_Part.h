@@ -50,7 +50,6 @@ struct Ne_Text_Part
    bool readOnly;
    bool hidePointer;
    int emulateTabs;
-   std::string delimiters;
    int cursorVPadding;
 
    // TODO:    XtCallbackList focusInCB;

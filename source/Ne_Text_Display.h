@@ -89,6 +89,8 @@ public:
    int cursorToHint;       /* Tells the buffer modified callback where to move the cursor, to reduce the number of redraw calls */
    int cursorStyle;        /* One of enum cursorStyles above */
    int cursorPreferredCol; /* Column for vert. cursor movement */
+   int cursorBlinkRate;
+   
    int nVisibleLines;      /* # of visible (displayed) lines */
    int nBufferLines;			/* # of newlines in the buffer */
    Ne_Text_Buffer* buffer; /* Contains text to be displayed */

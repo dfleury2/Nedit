@@ -146,6 +146,7 @@ Ne_Text_Display::Ne_Text_Display(int x, int y, int w, int h, const char* l)
    this->cursorToHint = NO_HINT;
    this->cursorStyle = NE_NORMAL_CURSOR;
    this->cursorPreferredCol = -1;
+   this->cursorBlinkRate = 500;
    this->firstChar = 0;
    this->lastChar = 0;
    this->nBufferLines = 0;

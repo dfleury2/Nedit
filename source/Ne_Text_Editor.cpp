@@ -3952,10 +3952,10 @@ static void focusInAP(Fl_Widget* widget, int event, const char** unused1, int* u
       we don't have focus, but keep looking for the real answer */
 
    /* If the timer is not already started, start it */
-   if (textD->text.cursorBlinkRate != 0 && textD->text.cursorBlinkProcID == 0)
+   if (textD->cursorBlinkRate != 0 && textD->text.cursorBlinkProcID == 0)
    {
       textD->text.cursorBlinkProcID = 1;
-      Fl::add_timeout(textD->text.cursorBlinkRate/1000.0, cursorBlinkTimerProc, textD);
+      Fl::add_timeout(textD->cursorBlinkRate/1000.0, cursorBlinkTimerProc, textD);
    }
 
    /* Change the cursor to active style */
@@ -4912,7 +4912,7 @@ static void cursorBlinkTimerProc(void* data)
 
    /* re-establish or not the timer proc (this routine) to continue processing */
    if (textD->text.cursorBlinkProcID)
-      Fl::add_timeout(textD->text.cursorBlinkRate/1000.0, cursorBlinkTimerProc, textD);
+      Fl::add_timeout(textD->cursorBlinkRate/1000.0, cursorBlinkTimerProc, textD);
    else
       TextDUnblankCursor(textD);
 }

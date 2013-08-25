@@ -14,4 +14,8 @@ const char* FormatWindowTitle(const char* filename,
 
 void EditCustomTitleFormat(WindowInfo* window);
 
+// Unit test purpose only
+std::string CompressWindowTitle(const std::string& t);
+
+
 #endif

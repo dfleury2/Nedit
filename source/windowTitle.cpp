@@ -73,44 +73,11 @@ static struct CustomizeWindowTitleDialog
             };
 
 // --------------------------------------------------------------------------
-static char* removeSequence(char* sourcePtr, char c)
+static void RemoveAllSequence(std::string& str, const char* seq)
 {
-   while (*sourcePtr == c)
-   {
-      sourcePtr++;
-   }
-   return(sourcePtr);
-}
-
-// --------------------------------------------------------------------------
-// Two functions for performing safe insertions into a finite
-// size buffer so that we don't get any memory overruns.
-// --------------------------------------------------------------------------
-static char* safeStrCpy(char* dest, char* destEnd, const char* source)
-{
-   int len = (int)strlen(source);
-   if (len <= (destEnd - dest))
-   {
-      strcpy(dest, source);
-      return(dest + len);
-   }
-   else
-   {
-      strncpy(dest, source, destEnd - dest);
-      *destEnd = '\0';
-      return(destEnd);
-   }
-}
-
-// --------------------------------------------------------------------------
-static char* safeCharAdd(char* dest, char* destEnd, char c)
-{
-   if (destEnd - dest > 0)
-   {
-      *dest++ = c;
-      *dest = '\0';
-   }
-   return(dest);
+   std::string::size_type found = 0;
+   while((found = str.find(seq, found)) != std::string::npos)
+      str.erase(found, strlen(seq));
 }
 
 // --------------------------------------------------------------------------
@@ -118,84 +85,13 @@ static char* safeCharAdd(char* dest, char* destEnd, char c)
 // with one space.
 // Also remove leading and trailing spaces and dashes.
 // --------------------------------------------------------------------------
-static void compressWindowTitle(char* title)
+std::string CompressWindowTitle(const std::string& title)
 {
-   /* Compress the title */
-   bool modified;
-   do
-   {
-      char* sourcePtr = title;
-      char* destPtr   = sourcePtr;
-      char c = *sourcePtr++;
-
-      modified = false;
-
-      /* Remove leading spaces and dashes */
-      while (c == ' ' || c == '-')
-      {
-         c = *sourcePtr++;
-      }
-
-      /* Remove empty constructs */
-      while (c != '\0')
-      {
-         switch (c)
-         {
-            /* remove sequences */
-         case ' ':
-         case '-':
-            sourcePtr = removeSequence(sourcePtr, c);
-            *destPtr++ = c; /* leave one */
-            break;
-
-            /* remove empty paranthesis pairs */
-         case '(':
-            if (*sourcePtr == ')')
-            {
-               modified = true;
-               sourcePtr++;
-            }
-            else *destPtr++ = c;
-            sourcePtr = removeSequence(sourcePtr, ' ');
-            break;
-
-         case '[':
-            if (*sourcePtr == ']')
-            {
-               modified = true;
-               sourcePtr++;
-            }
-            else *destPtr++ = c;
-            sourcePtr = removeSequence(sourcePtr, ' ');
-            break;
-
-         case '{':
-            if (*sourcePtr == '}')
-            {
-               modified = true;
-               sourcePtr++;
-            }
-            else *destPtr++ = c;
-            sourcePtr = removeSequence(sourcePtr, ' ');
-            break;
-
-         default:
-            *destPtr++ = c;
-            break;
-         }
-         c = *sourcePtr++;
-         *destPtr = '\0';
-      }
-
-      /* Remove trailing spaces and dashes */
-      while (destPtr-- > title)
-      {
-         if (*destPtr != ' ' && *destPtr != '-')
-            break;
-         *destPtr = '\0';
-      }
-   }
-   while (modified == true);
+   std::string compressed = title;
+   RemoveAllSequence(compressed, "()");
+   RemoveAllSequence(compressed, "{}");
+   RemoveAllSequence(compressed, "[]");
+   return Trim(compressed, " -");
 }
 
 // --------------------------------------------------------------------------
@@ -222,15 +118,11 @@ const char* FormatWindowTitle(const char* filename,
                         int fileChanged,
                         const char* titleFormat)
 {
-   static char title[WINDOWTITLE_MAX_LEN];
-   //title.clear();
-   char* titlePtr = title;
-   char* titleEnd = title + WINDOWTITLE_MAX_LEN - 1;
+   static std::string title;
+   title.clear();
 
    // Flags to suppress one of these if both are specified and they are identical
-   int serverNameSeen = false;
-   int clearCaseViewTagSeen = false;
-
+   bool serverNameSeen = false;
    bool fileNamePresent = false;
    bool hostNamePresent = false;
    bool userNamePresent = false;
@@ -240,9 +132,7 @@ const char* FormatWindowTitle(const char* filename,
    int noOfComponents = -1;
    bool shortStatus = false;
 
-   *titlePtr = '\0';  /* always start with an empty string */
-
-   while (*titleFormat != '\0' && titlePtr < titleEnd)
+   while (*titleFormat != '\0')
    {
       char c = *titleFormat++;
       if (c == '%')
@@ -250,29 +140,29 @@ const char* FormatWindowTitle(const char* filename,
          c = *titleFormat++;
          if (c == '\0')
          {
-            titlePtr = safeCharAdd(titlePtr, titleEnd, '%');
+            title += '%';
             break;
          }
          switch (c)
          {
          case 's': /* server name */
             serverNamePresent = true;
-            if (isServer && serverName[0] != '\0')   /* only applicable for servers */
+            if (isServer && serverName[0] != '\0')   // only applicable for servers
             {
-               titlePtr = safeStrCpy(titlePtr, titleEnd, serverName);
+               title += serverName;
                serverNameSeen = true;
             }
             break;
 
-         case 'd': /* directory without any limit to no. of components */
+         case 'd': // directory without any limit to no. of components
             dirNamePresent = true;
             if (filenameSet)
             {
-               titlePtr = safeStrCpy(titlePtr, titleEnd, path);
+               title += path;
             }
             break;
 
-         case '0': /* directory with limited no. of components */
+         case '0': // directory with limited no. of components
          case '1':
          case '2':
          case '3':
@@ -286,96 +176,92 @@ const char* FormatWindowTitle(const char* filename,
             {
                dirNamePresent = true;
                noOfComponents = c - '0';
-               titleFormat++; /* delete the argument */
+               ++titleFormat; // delete the argument
 
                if (filenameSet)
                {
-                  const char* trailingPath = GetTrailingPathComponents(path,
-                                             noOfComponents);
+                  const char* trailingPath = GetTrailingPathComponents(path, noOfComponents);
 
-                  /* prefix with ellipsis if components were skipped */
+                  // prefix with ellipsis if components were skipped
                   if (trailingPath > path)
-                  {
-                     titlePtr = safeStrCpy(titlePtr, titleEnd, "...");
-                  }
-                  titlePtr = safeStrCpy(titlePtr, titleEnd, trailingPath);
+                     title += "...";
+
+                  title += trailingPath;
                }
             }
             break;
 
-         case 'f': /* file name */
+         case 'f': // file name
             fileNamePresent = true;
-            titlePtr = safeStrCpy(titlePtr, titleEnd, filename);
+            title += filename;
             break;
 
          case 'h': /* host name */
             hostNamePresent = true;
-            titlePtr = safeStrCpy(titlePtr, titleEnd, GetNameOfHost());
+            title += GetNameOfHost();
             break;
 
          case 'S': /* file status */
             fileStatusPresent = true;
             if (IS_ANY_LOCKED_IGNORING_USER(lockReasons) && fileChanged)
-               titlePtr = safeStrCpy(titlePtr, titleEnd, "read only, modified");
+               title += "read only, modified";
             else if (IS_ANY_LOCKED_IGNORING_USER(lockReasons))
-               titlePtr = safeStrCpy(titlePtr, titleEnd, "read only");
+               title += "read only";
             else if (IS_USER_LOCKED(lockReasons) && fileChanged)
-               titlePtr = safeStrCpy(titlePtr, titleEnd, "locked, modified");
+               title += "locked, modified";
             else if (IS_USER_LOCKED(lockReasons))
-               titlePtr = safeStrCpy(titlePtr, titleEnd, "locked");
+               title += "locked";
             else if (fileChanged)
-               titlePtr = safeStrCpy(titlePtr, titleEnd, "modified");
+               title += "modified";
             break;
 
          case 'c': // Clearcase... not supported
-            titlePtr = safeStrCpy(titlePtr, titleEnd, "");
+            title += "";
             break;
 
-         case 'u': /* user name */
+         case 'u': // user name
             userNamePresent = true;
-            titlePtr = safeStrCpy(titlePtr, titleEnd, NeGetUserName());
+            title += NeGetUserName();
             break;
 
-         case '%': /* escaped % */
-            titlePtr = safeCharAdd(titlePtr, titleEnd, '%');
+         case '%': // escaped %
+            title += '%';
             break;
 
-         case '*': /* short file status ? */
+         case '*': // short file status ?
             fileStatusPresent = true;
             if (*titleFormat && *titleFormat == 'S')
             {
                ++titleFormat;
                shortStatus = true;
                if (IS_ANY_LOCKED_IGNORING_USER(lockReasons) && fileChanged)
-                  titlePtr = safeStrCpy(titlePtr, titleEnd, "RO*");
+                  title += "RO*";
                else if (IS_ANY_LOCKED_IGNORING_USER(lockReasons))
-                  titlePtr = safeStrCpy(titlePtr, titleEnd, "RO");
+                  title += "RO";
                else if (IS_USER_LOCKED(lockReasons) && fileChanged)
-                  titlePtr = safeStrCpy(titlePtr, titleEnd, "LO*");
+                  title += "LO*";
                else if (IS_USER_LOCKED(lockReasons))
-                  titlePtr = safeStrCpy(titlePtr, titleEnd, "LO");
+                  title += "LO";
                else if (fileChanged)
-                  titlePtr = safeStrCpy(titlePtr, titleEnd, "*");
+                  title += "*";
                break;
             }
-            /* fall-through */
+            // fall-through
          default:
-            titlePtr = safeCharAdd(titlePtr, titleEnd, c);
+            title += c;
             break;
          }
       }
       else
       {
-         titlePtr = safeCharAdd(titlePtr, titleEnd, c);
+         title += c;
       }
    }
 
-   compressWindowTitle(title);
+   title = CompressWindowTitle(title);
 
-   if (title[0] == 0)
-   {
-      sprintf(&title[0], "<empty>"); /* For preview purposes only */
-   }
+   if (title.empty())
+      title = "<empty>"; // For preview purposes only
 
    if (etDialog.form)
    {
@@ -428,7 +314,7 @@ const char* FormatWindowTitle(const char* filename,
       etDialog.suppressFormatUpdate = false;
    }
 
-   return title;
+   return title.c_str();
 }
 
 // --------------------------------------------------------------------------

@@ -200,7 +200,7 @@ static void compressWindowTitle(char* title)
 
 // --------------------------------------------------------------------------
 // Format the windows title using a printf like formatting string.
-// The following flags are recognised:
+// The following flags are recognized:
 //  %s    : server name
 //  %[n]d : directory, with one optional digit specifying the max number
 //          of trailing directory components to display. Skipped components are
@@ -226,8 +226,7 @@ char* FormatWindowTitle(const char* filename,
    char* titlePtr = title;
    char* titleEnd = title + WINDOWTITLE_MAX_LEN - 1;
 
-
-   /* Flags to supress one of these if both are specified and they are identical */
+   // Flags to suppress one of these if both are specified and they are identical
    int serverNameSeen = false;
    int clearCaseViewTagSeen = false;
 
@@ -428,7 +427,7 @@ char* FormatWindowTitle(const char* filename,
       etDialog.suppressFormatUpdate = false;
    }
 
-   return(title);
+   return title;
 }
 
 // --------------------------------------------------------------------------

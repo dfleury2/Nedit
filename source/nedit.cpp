@@ -75,6 +75,7 @@
 #include <iostream>
 
 WindowInfo* WindowList = NULL;
+WindowManager windowManager;
 char* ArgV0 = NULL;
 bool IsServer = false;
 Ne_AppContext AppContext(APP_NAME);

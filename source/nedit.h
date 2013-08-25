@@ -500,7 +500,10 @@ struct WindowInfo
    UserBGMenuCache  userBGMenuCache;   /* shell & macro menu are shared over all "tabbed" documents, while each document has its own background menu. */
 };
 
+class WindowManager;
+
 extern WindowInfo* WindowList;
+extern WindowManager windowManager;
 extern char* ArgV0;
 extern bool IsServer;
 extern Ne_AppContext AppContext;

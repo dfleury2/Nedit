@@ -3,9 +3,28 @@
 
 #include "nedit.h"
 
+#include <list>
+
+typedef std::list<WindowInfo*> Windows;
+
+// --------------------------------------------------------------------------
+// Manage Windows
+// --------------------------------------------------------------------------
+class WindowManager
+{
+public:
+   Windows windows;
+};
+
+// Returns the number of open windows
+Windows::size_type NWindows();
+// Returns the number of documents (ie. tabs) for a window (or a doc belonging to the window)
+Windows::size_type NDocuments(WindowInfo* window);
+// Returns the WindowInfo of the widget
+WindowInfo* WidgetToWindow(Fl_Widget* w);
+
 WindowInfo* CreateNeWindow(const char* title, char* geometry, int iconic);
 void CloseWindow(WindowInfo* window);
-int NWindows();
 void UpdateWindowTitle(const WindowInfo* window);
 void UpdateWindowReadOnly(WindowInfo* window);
 void UpdateStatsLine(WindowInfo* window);
@@ -37,7 +56,6 @@ void TempShowISearch(WindowInfo* window, int state);
 void ShowLineNumbers(WindowInfo* window, bool state);
 void SetModeMessage(WindowInfo* window, const char* message);
 // TODO: void ClearModeMessage(WindowInfo* window);
-WindowInfo* WidgetToWindow(Fl_Widget* w);
 // TODO: void AddSmallIcon(Fl_Widget* shell);
 void SetTabDist(WindowInfo* window, int tabDist);
 void SetEmTabDist(WindowInfo* window, int emTabDist);
@@ -52,7 +70,6 @@ WindowInfo* MarkActiveDocument(WindowInfo* window);
 // TODO: void NextDocument(WindowInfo* window);
 // TODO: void PreviousDocument(WindowInfo* window);
 // TODO: void LastDocument(WindowInfo* window);
-int NDocuments(WindowInfo* window);
 // TODO: WindowInfo* MoveDocument(WindowInfo* toWindow, WindowInfo* window);
 // TODO: WindowInfo* DetachDocument(WindowInfo* window);
 // TODO: void MoveDocumentDialog(WindowInfo* window);

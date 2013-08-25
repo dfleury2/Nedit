@@ -486,7 +486,7 @@ WindowInfo* CreateNeWindow(const char* name, char* geometry, int iconic)
 // TODO:       finicky about the kinds of widgets they are attached to)) */
 // TODO:    window->bgMenuPane = CreateBGMenu(window);
 
-   /* cache user menus: init. user background menu cache */
+   // cache user menus: init. user background menu cache
    InitUserBGMenuCache(&window->userBGMenuCache);
 
    // Create the text buffer rather than using the one created automatically
@@ -496,7 +496,7 @@ WindowInfo* CreateNeWindow(const char* name, char* geometry, int iconic)
    window->buffer = BufCreate();
    BufAddModifyCB(window->buffer, SyntaxHighlightModifyCB, window);
 
-   /* Attach the buffer to the text widget, and add callbacks for modify */
+   // Attach the buffer to the text widget, and add callbacks for modify
    TextSetBuffer(window->textArea, window->buffer);
    BufAddModifyCB(window->buffer, modifiedCB, window);
 
@@ -819,7 +819,7 @@ void CloseWindow(WindowInfo* window)
       }
    }
 
-   /* remove the window from the global window list, update window menus */
+   // remove the window from the global window list, update window menus
    removeFromWindowList(window);
    InvalidateWindowMenus();
    CheckCloseDim(); /* Close of window running a macro may have been disabled. */
@@ -916,8 +916,7 @@ WindowInfo* FindWindowWithFile(const char* name, const char* path)
 {
    WindowInfo* window;
 
-   /* I don't think this algorithm will work on vms so I am
-      disabling it for now */
+   /* I don't think this algorithm will work on vms so I am disabling it for now */
    if (!GetPrefHonorSymlinks())
    {
       char fullname[MAXPATHLEN + 1];
@@ -1460,16 +1459,12 @@ void SetModeMessage(WindowInfo* window, const char* message)
 // TODO:    UpdateStatsLine(window);
 // TODO: }
  
-/*
-** Count the windows
-*/
-int NWindows()
+// --------------------------------------------------------------------------
+// Count the windows
+// --------------------------------------------------------------------------
+Windows::size_type NWindows()
 {
-   WindowInfo* win;
-   int n;
-
-   for (win=WindowList, n=0; win!=NULL; win=win->next, n++);
-   return n;
+   return windowManager.windows.size();
 }
 
 /*
@@ -1713,21 +1708,18 @@ void SetAutoScroll(WindowInfo* window, int margin)
 // TODO:       XtVaSetValues(window->textPanes[i], textNcursorVPadding, margin, NULL);
 }
 
-/*
-** Recover the window pointer from any widget in the window, by searching
-** up the widget hierarcy for the top level container widget where the
-** window pointer is stored in the userData field. In a tabbed window,
-** this is the window pointer of the top (active) document, which is
-** returned if w is 'shell-level' widget - menus, find/replace dialogs, etc.
-**
-** To support action routine in tabbed windows, a copy of the window
-** pointer is also store in the splitPane widget.
-*/
+// --------------------------------------------------------------------------
+// Recover the WindowInfo pointer from any widget in the window, by searching
+// up the widget hierarchy for the top level container widget.
+// In a tabbed window, this is the window pointer of the top (active) document,
+// which is returned if w is 'shell-level' widget - menus, find/replace dialogs, etc.
+//
+// To support action routine in tabbed windows, a copy of the window
+// pointer is also store in the splitPane widget.
+// --------------------------------------------------------------------------
 WindowInfo* WidgetToWindow(Fl_Widget* w)
 {
    Fl_Widget* parent = WidgetToMainWindow(w);
-
-// TODO:       /* make sure it is not a dialog shell */
 
    WindowInfo* window = NULL;
    for (window=WindowList; window!=NULL; window=window->next)
@@ -2285,28 +2277,28 @@ int IsIconic(WindowInfo* window)
    return result;
 }
 
-/*
-** Add a window to the the window list.
-*/
+// --------------------------------------------------------------------------
+// Add a window to the the window list.
+// --------------------------------------------------------------------------
 static void addToWindowList(WindowInfo* window)
 {
    WindowInfo* temp = WindowList;
    WindowList = window;
    window->next = temp;
+
+   windowManager.windows.push_back(window);
 }
 
-/*
-** Remove a window from the list of windows
-*/
+// --------------------------------------------------------------------------
+// Remove a window from the list of windows
+// --------------------------------------------------------------------------
 static void removeFromWindowList(WindowInfo* window)
 {
-   WindowInfo* temp;
-
    if (WindowList == window)
       WindowList = window->next;
    else
    {
-      for (temp = WindowList; temp != NULL; temp = temp->next)
+      for (WindowInfo* temp = WindowList; temp != NULL; temp = temp->next)
       {
          if (temp->next == window)
          {
@@ -2315,6 +2307,8 @@ static void removeFromWindowList(WindowInfo* window)
          }
       }
    }
+
+   windowManager.windows.remove(window);
 }
 
 // TODO: /*
@@ -3842,20 +3836,16 @@ static void deleteDocument(WindowInfo* window)
 // TODO:    XtDestroyWidget(window->splitPane);
 }
 
-/*
-** return the number of documents owned by this shell window
-*/
-int NDocuments(WindowInfo* window)
+// --------------------------------------------------------------------------
+// return the number of documents owned by this shell window
+// --------------------------------------------------------------------------
+Windows::size_type NDocuments(WindowInfo* window)
 {
-   WindowInfo* win;
-   int nDocument = 0;
-
-   for (win = WindowList; win; win = win->next)
-   {
-      if (win->mainWindow == window->mainWindow)
-         nDocument++;
-   }
-
+   Windows::size_type nDocument = 0;
+   for(Windows::const_iterator win = windowManager.windows.begin(); win != windowManager.windows.end(); ++win)
+      if ((*win)->mainWindow == window->mainWindow)
+         ++nDocument;
+   
    return nDocument;
 }
 

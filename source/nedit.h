@@ -53,6 +53,7 @@
 #include <FL/Fl_Browser.H>
 
 #include <iostream>
+#include <list>
 
 #define NEDIT_VERSION           5
 #define NEDIT_REVISION          5

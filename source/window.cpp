@@ -1,35 +1,3 @@
-/*******************************************************************************
-*                                                                              *
-* window.c -- Nirvana Editor window creation/deletion                          *
-*                                                                              *
-* Copyright (C) 1999 Mark Edel                                                 *
-*                                                                              *
-* This is free__ software; you can redistribute it and/or modify it under the    *
-* terms of the GNU General Public License as published by the Free Software    *
-* Foundation; either version 2 of the License, or (at your option) any later   *
-* version. In addition, you may distribute version of this program linked to   *
-* Motif or Open Motif. See README for details.                                 *
-*                                                                              *
-* This software is distributed in the hope that it will be useful, but WITHOUT *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License        *
-* for more details.                                                            *
-*                                                                              *
-* You should have received a copy of the GNU General Public License along with *
-* software; if not, write to the Free Software Foundation, Inc., 59 Temple     *
-* Place, Suite 330, Boston, MA  02111-1307 USA                                 *
-*                                                                              *
-* Nirvana Text Editor                                                          *
-* May 10, 1991                                                                 *
-*                                                                              *
-* Written by Mark Edel                                                         *
-*                                                                              *
-*******************************************************************************/
-
-#ifdef HAVE_CONFIG_H
-#include "../config.h"
-#endif
-
 #include "window.h"
 #include "resource.h"
 #include "Ne_Text_Buffer.h"
@@ -50,8 +18,6 @@
 #include "highlight.h"
 #include "smartIndent.h"
 #include "userCmds.h"
-//#include "nedit.bm"
-//#include "n.bm"
 #include "windowTitle.h"
 #include "interpret.h"
 #include "Ne_Rangeset.h"
@@ -73,7 +39,6 @@
 #include <sys/stat.h>
 #ifndef WIN32
 #include <sys/param.h>
-
 #endif
 #include <limits.h>
 #include <math.h>
@@ -83,9 +48,6 @@
 #include <sys/time.h>
 #endif
 
-#ifdef HAVE_DEBUG_H
-#include "../debug.h"
-#endif
 
 /* Initial minimum height of a pane.  Just a fallback in case setPaneMinHeight
    (which may break in a future release) is not available */
@@ -123,8 +85,7 @@ static unsigned char isrcClear_bits[] =
 };
 
 // TODO: static void hideTooltip(Fl_Widget* tab);
-// TODO: static Pixmap createBitmapWithDepth(Fl_Widget* w, char* data, unsigned int width,
-// TODO:                                     unsigned int height);
+// TODO: static Pixmap createBitmapWithDepth(Fl_Widget* w, char* data, unsigned int width, unsigned int height);
 static WindowInfo* getNextTabWindow(WindowInfo* window, int direction, int crossWin, int wrap);
 // TODO: static Fl_Widget* addTab(Fl_Widget* folder, const char* string);
 static int compareWindowNames(const void* windowA, const void* windowB);
@@ -171,12 +132,9 @@ static int DoneWithMoveDocumentDialog;
 static void deleteDocument(WindowInfo* window);
 static void cancelTimeOut(int* timer);
 
-// From Xt, Shell.c, "BIGSIZE"
-static const int XT_IGNORE_PPOSITION = 32767;
-
-/*
-** Create a new editor window
-*/
+// --------------------------------------------------------------------------
+// Create a new editor window
+// --------------------------------------------------------------------------
 WindowInfo* CreateNeWindow(const char* name, char* geometry, int iconic)
 {
 // TODO:    Fl_Widget* winShell, *mainWin, *menuBar, *pane, *text, *stats, *statsAreaForm;
@@ -353,11 +311,6 @@ WindowInfo* CreateNeWindow(const char* name, char* geometry, int iconic)
 // TODO: 
 // TODO:          ((WMShellWidget)winShell)->mainWindow.client_specified &= ~_XtShellPPositionOK;
 // TODO:        */
-// TODO: 
-// TODO:       XtSetArg(al[ac], XtNx, XT_IGNORE_PPOSITION);
-// TODO:       ac++;
-// TODO:       XtSetArg(al[ac], XtNy, XT_IGNORE_PPOSITION);
-// TODO:       ac++;
 // TODO:    }
 // TODO: 
 
@@ -2304,22 +2257,6 @@ void AllWindowEventCB(Fl_Widget* w, void* data)
 // TODO:       free__(argv[i]);
 // TODO:    free__((char*)argv);
 // TODO: }
-// TODO: 
-// TODO: void AttachSessionMgrHandler(Fl_Widget* appShell)
-// TODO: {
-// TODO:    static Atom wmpAtom, syAtom = 0;
-// TODO: 
-// TODO:    /* Add wm protocol callback for making nedit restartable by session
-// TODO:       managers.  Doesn't yet handle multiple-desktops or iconifying right. */
-// TODO:    if (syAtom == 0)
-// TODO:    {
-// TODO:       wmpAtom = XmInternAtom(TheDisplay, "WM_PROTOCOLS", false);
-// TODO:       syAtom = XmInternAtom(TheDisplay, "WM_SAVE_YOURSELF", false);
-// TODO:    }
-// TODO:    XmAddProtocolCallback(appShell, wmpAtom, syAtom,
-// TODO:                          (XtCallbackProc)saveYourselfCB, (XtPointer)appShell);
-// TODO: }
-// TODO: #endif /* NO_SESSION_RESTART */
 
 /*
 ** Returns true if window is iconic (as determined by the WM_STATE property
@@ -3107,22 +3044,18 @@ static void getTextPaneDimension(WindowInfo* window, int* nRows, int* nCols)
 // TODO:    *nRows = totalHeight/fontHeight;
 }
 
-/*
-** Create a new document in the shell window.
-** Document are created in 'background' so that the user
-** menus, ie. the Macro/Shell/BG menus, will not be updated
-** unnecessarily; hence speeding up the process of opening
-** multiple files.
-*/
+// --------------------------------------------------------------------------
+// Create a new document in the shell window.
+// Document are created in 'background' so that the user
+// menus, ie. the Macro/Shell/BG menus, will not be updated
+// unnecessarily; hence speeding up the process of opening
+// multiple files.
+// --------------------------------------------------------------------------
 WindowInfo* CreateDocument(WindowInfo* shellWindow, const char* name)
 {
-   WindowInfo* window;
-
    // Allocate some memory for the new window data structure
    // and inherit settings and later reset those required
-   window = new WindowInfo(*shellWindow);
-// TODO:    memcpy(window, shellWindow, sizeof(WindowInfo));
-
+   WindowInfo* window = new WindowInfo(*shellWindow);
    window->type = WindowInfo::Document;
 
 #if 0
@@ -3227,10 +3160,8 @@ WindowInfo* CreateDocument(WindowInfo* shellWindow, const char* name)
    window->bgMenuUndoItem = 0;
    window->bgMenuRedoItem = 0;
 
-
 // TODO:    if (window->fontList == NULL)
-// TODO:       XtVaGetValues(shellWindow->statsLine, XmNfontList,
-// TODO:                     &window->fontList,NULL);
+// TODO:       XtVaGetValues(shellWindow->statsLine, XmNfontList, &window->fontList,NULL);
 // TODO: 
 
    int nRows, nCols;
@@ -3266,7 +3197,7 @@ WindowInfo* CreateDocument(WindowInfo* shellWindow, const char* name)
       GetPrefWrapMargin(), window->showLineNumbers?MIN_LINE_NUM_COLS:0);
    window->lastFocus = window->textArea;
 
-   /* Set the initial colors from the globals. */
+   // Set the initial colors from the globals.
    SetColors(window,
              GetPrefColorName(TEXT_FG_COLOR),
              GetPrefColorName(TEXT_BG_COLOR),
@@ -3284,7 +3215,7 @@ WindowInfo* CreateDocument(WindowInfo* shellWindow, const char* name)
 // TODO:       finicky about the kinds of widgets they are attached to)) */
 // TODO:    window->bgMenuPane = CreateBGMenu(window);
 
-   /* cache user menus: init. user background menu cache */
+   // cache user menus: init. user background menu cache
    InitUserBGMenuCache(&window->userBGMenuCache);
 
    /* Create the text buffer rather than using the one created automatically
@@ -3311,12 +3242,6 @@ WindowInfo* CreateDocument(WindowInfo* shellWindow, const char* name)
    // add the window to the global window list, update the Windows menus
    addToWindowList(window);
    InvalidateWindowMenus();
-
-// TODO:    /* return the shell ownership to previous tabbed doc */
-// TODO:    XtVaSetValues(window->mainWin, XmNworkWindow, shellWindow->splitPane, NULL);
-// TODO:    XLowerWindow(TheDisplay, XtWindow(window->splitPane));
-// TODO:    XtUnmanageChild(window->splitPane);
-// TODO:    XtVaSetValues(window->splitPane, XmNmappedWhenManaged, true, NULL);
 
    return window;
 }

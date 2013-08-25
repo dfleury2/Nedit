@@ -109,9 +109,9 @@ std::string CompressWindowTitle(const std::string& title)
 //  if the ClearCase view tag and server name are identical, only the first one
 //  specified in the formatting string will be displayed.
 // --------------------------------------------------------------------------
-const char* FormatWindowTitle(const char* filename,
-                        const char* path,
-                        const char* serverName,
+const char* FormatWindowTitle(const std::string& filename,
+                        const std::string& path,
+                        const std::string& serverName,
                         int isServer,
                         int filenameSet,
                         int lockReasons,
@@ -180,7 +180,7 @@ const char* FormatWindowTitle(const char* filename,
 
                if (filenameSet)
                {
-                  const char* trailingPath = GetTrailingPathComponents(path, noOfComponents);
+                  const char* trailingPath = GetTrailingPathComponents(path.c_str(), noOfComponents);
 
                   // prefix with ellipsis if components were skipped
                   if (trailingPath > path)

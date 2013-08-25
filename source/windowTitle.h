@@ -3,9 +3,9 @@
 
 #include "nedit.h"
 
-const char* FormatWindowTitle(const char* filename,
-                        const char* path,
-                        const char* serverName,
+const char* FormatWindowTitle(const std::string& filename,
+                        const std::string& path,
+                        const std::string& serverName,
                         int isServer,
                         int filenameSet,
                         int lockReasons,

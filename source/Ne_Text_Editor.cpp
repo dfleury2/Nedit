@@ -1137,7 +1137,7 @@ void TextInitialize(Ne_Text_Editor* textD)
    int textLeft;
    int charWidth = fs->max_width();
    int marginWidth = textD->marginWidth;
-   int lineNumCols = textD->lineNumCols;
+   bool lineNumCols = textD->isLineNumCols();
 
 // TODO:    /* Set the initial window size based on the rows and columns resources */
 // TODO:    if (request->core.width == 0)
@@ -1647,8 +1647,8 @@ bool TextSetValues(Ne_Text_Editor* current) //, Ne_Text_Editor* request, Ne_Text
    {
       int marginWidth = current->marginWidth;
       int charWidth = current->primaryFont.max_width();
-      int lineNumCols = current->lineNumCols;
-      if (lineNumCols == 0)
+      bool lineNumCols = current->isLineNumCols();
+      if (!lineNumCols)
       {
          TextDSetLineNumberArea(current, 0, 0, marginWidth);
          //current->text.columns = (current->width - marginWidth*2) / charWidth;

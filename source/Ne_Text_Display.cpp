@@ -175,7 +175,7 @@ Ne_Text_Display::Ne_Text_Display(int x, int y, int w, int h, const char* l)
    this->continuousWrap = false;
    this->lineNumLeft = 0;
    this->lineNumWidth = 0;
-   this->lineNumCols = 0;
+   this->lineNumCols = false;
    computeTextAreaSize(x, y, w, h);
    
    this->nVisibleLines = (this->height - 1) / (this->ascent + this->descent);
@@ -241,6 +241,7 @@ void Ne_Text_Display::draw()
    fl_rectf(x() + w() - vScrollBar->w(), y() + h() - hScrollBar->h(), vScrollBar->w(), hScrollBar->h());
 
    // Drawing separation between line and text
+   if (isLineNumCols())
    fl_line(this->lineNumLeft + this->lineNumWidth - this->marginWidth / 2, y(),
       this->lineNumLeft + this->lineNumWidth - this->marginWidth / 2, y() + h() - hScrollBar->h() - 1);
 
@@ -253,7 +254,7 @@ void Ne_Text_Display::resize(int x, int y, int w, int h)
    int oldWidth = this->width;
    computeTextAreaSize(x, y, w, h);
 
-   this->lineNumCols = lineNumWidth / primaryFont.max_width();
+   //this->lineNumCols = lineNumWidth / primaryFont.max_width();
 
    // Resize the text display that the widget uses to render text
    TextDResize(this, this->width, this->height); // TODO:    resizeTextArea(width, height, oldWidth);
@@ -268,11 +269,22 @@ void Ne_Text_Display::computeTextAreaSize(int x, int y, int w, int h)
    this->top = y + this->marginHeight;
    this->width = w - vScrollBar->w() - 2 * this->marginWidth;
    this->height = h - hScrollBar->h() - 2 * this->marginHeight;
-   if (lineNumWidth != 0)
+
+   if (isLineNumCols())
    {
-      lineNumLeft = x + this->marginWidth;
+// TODO:       tmpReqCols = textD->nBufferLines < 1
+// TODO:          ? 1
+// TODO:          : (int) log10((double) textD->nBufferLines + 1) + 1;
+// TODO:  * font.max_width()
+      this->lineNumWidth = 60;
+      this->lineNumLeft = x + this->marginWidth;
       this->left += lineNumLeft + lineNumWidth;
       this->width -= lineNumWidth + this->marginWidth;
+   }
+   else
+   {
+      this->lineNumWidth = 0;
+      this->lineNumLeft = 0;
    }
 }
 
@@ -298,6 +310,13 @@ int Ne_Text_Display::columns() const
    //   TextDSetLineNumberArea(current, marginWidth, * lineNumCols, 2*marginWidth + charWidth * lineNumCols);
    //   //current->text.columns = (current->width - marginWidth*3 - charWidth * lineNumCols) / charWidth;
    //}
+}
+
+// -------------------------------------------------------------------------------
+void Ne_Text_Display::setLineNumCols(bool visible)
+{
+   lineNumCols = visible;
+   computeTextAreaSize(x(), y(), w(), h());
 }
 
 // -------------------------------------------------------------------------------
@@ -701,7 +720,7 @@ void TextDRedisplayRect(Ne_Text_Display* textD, int left, int top, int width, in
       redisplayLine(textD, line, left, left + width, 0, INT_MAX);
 
    // draw the line numbers if exposed area includes them
-   if (textD->lineNumWidth != 0 && left <= textD->lineNumLeft + textD->lineNumWidth)
+   if (textD->isLineNumCols() && left <= textD->lineNumLeft + textD->lineNumWidth)
       redrawLineNumbers(textD, false);
 }
 

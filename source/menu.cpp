@@ -3552,7 +3552,7 @@ void ACTION_BOOL_PARAM_OR_TOGGLE(bool& newState, int numArgs, const char** argvV
         }
     }
     else {
-        (newState) = !(oValue);
+        newState = !oValue;
     }
 }
 
@@ -3585,10 +3585,9 @@ static void setShowLineNumbersAP(Fl_Widget* w, int, const char** args, int* nArg
    WindowInfo* window = WidgetToWindow(w);
    bool newState = false;
 
-   /* line numbers panel is a shell-level item, so we toggle the button
-      state regardless of it's 'topness' */
+   // line numbers panel is a shell-level item, so we toggle the button
+   // state regardless of it's 'topness'
    ACTION_BOOL_PARAM_OR_TOGGLE(newState, *nArgs, args, window->showLineNumbers, "set_show_line_numbers");
-   //NeToggleButtonSetState(window->lineNumsItem, newState, false);
    ShowLineNumbers(window, newState);
 }
 

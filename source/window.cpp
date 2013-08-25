@@ -166,8 +166,8 @@ static void refreshMenuBar(WindowInfo* window);
 static WindowInfo* inFocusDocument = NULL;  	/* where we are now */
 static WindowInfo* lastFocusDocument = NULL;	    	/* where we came from */
 static int DoneWithMoveDocumentDialog;
-static int updateLineNumDisp(WindowInfo* window);
-static int updateGutterWidth(WindowInfo* window);
+// TODO: static int updateLineNumDisp(WindowInfo* window);
+// TODO: static int updateGutterWidth(WindowInfo* window);
 static void deleteDocument(WindowInfo* window);
 static void cancelTimeOut(int* timer);
 
@@ -825,7 +825,7 @@ void CloseWindow(WindowInfo* window)
       UpdateStatsLine(window);
       DetermineLanguageMode(window, true);
       RefreshTabState(window);
-      updateLineNumDisp(window);
+// TODO:       updateLineNumDisp(window);
       return;
    }
 
@@ -879,12 +879,12 @@ void CloseWindow(WindowInfo* window)
    if (nextBuf)
    {
       ShowWindowTabBar(nextBuf);
-      updateLineNumDisp(nextBuf);
+// TODO:       updateLineNumDisp(nextBuf);
    }
    else if (topBuf)
    {
       ShowWindowTabBar(topBuf);
-      updateLineNumDisp(topBuf);
+// TODO:       updateLineNumDisp(topBuf);
    }
 
    /* dim/undim Detach_Tab menu items */
@@ -1214,63 +1214,45 @@ int WidgetToPaneIndex(WindowInfo* window, Fl_Widget* w)
 // TODO:                    wmSizeUpdateProc, window);
 // TODO: }
 
-/*
-** Turn on and off the display of line numbers
-*/
+// --------------------------------------------------------------------------
+// Turn on and off the display of line numbers
+// --------------------------------------------------------------------------
 void ShowLineNumbers(WindowInfo* window, bool state)
 {
-   int i, marginWidth;
-   unsigned reqCols = 0;
-   int windowWidth;
-   WindowInfo* win;
-   Ne_Text_Editor* textD = window->textArea;
-
-   if (window->showLineNumbers == state)
-      return;
    window->showLineNumbers = state;
 
-   /* Just setting window->showLineNumbers is sufficient to tell
-      updateLineNumDisp() to expand the line number areas and the window
-      size for the number of lines required.  To hide the line number
-      display, set the width to zero, and contract the window width. */
-   if (state)
+   // Text and Split Areas
+   for (int i = 0; i <= window->nPanes; ++i)
    {
-      reqCols = updateLineNumDisp(window);
-   }
-   else
-   {
-      windowWidth = window->mainWindow->w();
-      marginWidth = window->textArea->marginWidth;
-      window->mainWindow->size( windowWidth - textD->left + marginWidth, window->mainWindow->h());
-
-      for (i=0; i<=window->nPanes; i++)
-      {
-         Ne_Text_Editor* textD = i==0 ? window->textArea : window->textPanes[i-1];
-         textD->lineNumCols = 0;
-      }
+      Ne_Text_Editor* textD = (i==0 ? window->textArea : window->textPanes[i-1]);
+      textD->setLineNumCols(state);
+      textD->redraw();
    }
 
-   /* line numbers panel is shell-level, hence other
-      tabbed documents in the window should synch */
-   for (win=WindowList; win; win=win->next)
+   // line numbers panel is shell-level, hence other
+   // tabbed documents in the window should synch
+   for (WindowInfo* win = WindowList; win; win = win->next)
    {
       if (win->mainWindow != window->mainWindow || win == window)
          continue;
 
       win->showLineNumbers = state;
 
-      for (i=0; i<=win->nPanes; i++)
+      // Text and Split Areas
+      for (int i = 0; i <= win->nPanes; ++i)
       {
-         Ne_Text_Editor* text = i==0 ? win->textArea : win->textPanes[i-1];
-         /*  reqCols should really be cast here, but into what? XmRInt?  */
-         textD->lineNumCols = reqCols;
+         Ne_Text_Editor* textD = i==0 ? win->textArea : win->textPanes[i-1];
+         textD->setLineNumCols(stat);
+         textD->redraw();
       }
    }
 
-   /* Tell WM that the non-expandable part of the window has changed size */
-   UpdateWMSizeHints(window);
+// TODO:    window->textArea->redraw();
+// TODO:    // Tell WM that the non-expandable part of the window has changed size
+// TODO:    UpdateWMSizeHints(window);
 }
 
+// --------------------------------------------------------------------------
 void SetTabDist(WindowInfo* window, int tabDist)
 {
    if (window->buffer->tabDist != tabDist)
@@ -2034,7 +2016,7 @@ static Ne_Text_Editor* createTextArea(WindowInfo* window, int rows, int cols, in
 
    Ne_Text_Editor* textD = new Ne_Text_Editor(x, y, w, h);
    textD->text.backlightCharTypes = window->backlightCharTypes?window->backlightCharTypes:"";
-   textD->lineNumCols = lineNumCols;
+   textD->setLineNumCols(lineNumCols != 0);
    textD->emulateTabs = emTabDist;
    textD->primaryFont = window->fontList;
    textD->text.readOnly = IS_ANY_LOCKED(window->lockReasons);
@@ -2145,8 +2127,8 @@ static void modifiedCB(int pos, int nInserted, int nDeleted, int nRestyled, cons
    if (window->ignoreModify || (nDeleted == 0 && nInserted == 0))
       return;
 
-   /* Make sure line number display is sufficient for new data */
-   updateLineNumDisp(window);
+// TODO:    /* Make sure line number display is sufficient for new data */
+// TODO:    updateLineNumDisp(window);
 
    // Save information for undoing this operation (this call also counts
    // characters and editing operations for triggering autosave
@@ -2398,90 +2380,14 @@ static void removeFromWindowList(WindowInfo* window)
    }
 }
 
-/*
-**  Set the new gutter width in the window. Sadly, the only way to do this is
-**  to set it on every single document, so we have to iterate over them.
-**
-**  (Iteration taken from NDocuments(); is there a better way to do it?)
-*/
-static int updateGutterWidth(WindowInfo* window)
-{
-   WindowInfo* document;
-   int reqCols = MIN_LINE_NUM_COLS;
-   int newColsDiff = 0;
-   int maxCols = 0;
-
-   for (document = WindowList; NULL != document; document = document->next)
-   {
-      if (document->mainWindow == window->mainWindow)
-      {
-         /*  We found ourselves a document from this window.  */
-         int lineNumCols, tmpReqCols;
-         Ne_Text_Editor* textD = document->textArea;
-
-         lineNumCols = document->textArea->lineNumCols;
-
-         /* Is the width of the line number area sufficient to display all the
-            line numbers in the file?  If not, expand line number field, and the
-            window width. */
-
-         if (lineNumCols > maxCols)
-         {
-            maxCols = lineNumCols;
-         }
-
-         tmpReqCols = textD->nBufferLines < 1
-                      ? 1
-                      : (int) log10((double) textD->nBufferLines + 1) + 1;
-
-         if (tmpReqCols > reqCols)
-         {
-            reqCols = tmpReqCols;
-         }
-      }
-   }
-
-   if (reqCols != maxCols)
-   {
-      Ne_Font* fs;
-      short fontWidth;
-
-      newColsDiff = reqCols - maxCols;
-
-      fs = &window->textArea->primaryFont;
-      fontWidth = fs->max_width();
-
-      int windowWidth = window->textArea->width;
-      window->mainWindow->size( windowWidth + (newColsDiff * fontWidth) , window->mainWindow->h());
-
-      UpdateWMSizeHints(window);
-   }
-
-   for (document = WindowList; NULL != document; document = document->next)
-   {
-      if (document->mainWindow == window->mainWindow)
-      {
-         int i;
-         int lineNumCols;
-
-         lineNumCols = document->textArea->lineNumCols;
-
-         if (lineNumCols == reqCols)
-         {
-            continue;
-         }
-
-         /*  Update all panes of this document.  */
-         for (i = 0; i <= document->nPanes; i++)
-         {
-            Ne_Text_Editor* text = 0==i ? document->textArea : document->textPanes[i-1];
-            text->lineNumCols = reqCols;
-         }
-      }
-   }
-
-   return reqCols;
-// TODO: 
+// TODO: /*
+// TODO: **  Set the new gutter width in the window. Sadly, the only way to do this is
+// TODO: **  to set it on every single document, so we have to iterate over them.
+// TODO: **
+// TODO: **  (Iteration taken from NDocuments(); is there a better way to do it?)
+// TODO: */
+// TODO: static int updateGutterWidth(WindowInfo* window)
+// TODO: {
 // TODO:    WindowInfo* document;
 // TODO:    int reqCols = MIN_LINE_NUM_COLS;
 // TODO:    int newColsDiff = 0;
@@ -2493,89 +2399,165 @@ static int updateGutterWidth(WindowInfo* window)
 // TODO:       {
 // TODO:          /*  We found ourselves a document from this window.  */
 // TODO:          int lineNumCols, tmpReqCols;
-// TODO: // TODO:          document->textArea->position_to_linecol(document->textArea->insert_position(), &lineNumCols, &tmpReqCols);
+// TODO:          Ne_Text_Editor* textD = document->textArea;
 // TODO: 
-// TODO:          // Is the width of the line number area sufficient to display all the
-// TODO:          // line numbers in the file?  If not, expand line number field, and the
-// TODO:          // window width.
+// TODO:          lineNumCols = document->textArea->lineNumCols;
+// TODO: 
+// TODO:          /* Is the width of the line number area sufficient to display all the
+// TODO:             line numbers in the file?  If not, expand line number field, and the
+// TODO:             window width. */
+// TODO: 
 // TODO:          if (lineNumCols > maxCols)
 // TODO:          {
 // TODO:             maxCols = lineNumCols;
 // TODO:          }
 // TODO: 
-// TODO: // TODO:          tmpReqCols = textD->nBufferLines < 1
-// TODO: // TODO:                       ? 1
-// TODO: // TODO:                       : (int) log10((double) textD->nBufferLines + 1) + 1;
-// TODO: // TODO: 
-// TODO: // TODO:          if (tmpReqCols > reqCols)
-// TODO: // TODO:          {
-// TODO: // TODO:             reqCols = tmpReqCols;
-// TODO: // TODO:          }
+// TODO:          tmpReqCols = textD->nBufferLines < 1
+// TODO:                       ? 1
+// TODO:                       : (int) log10((double) textD->nBufferLines + 1) + 1;
+// TODO: 
+// TODO:          if (tmpReqCols > reqCols)
+// TODO:          {
+// TODO:             reqCols = tmpReqCols;
+// TODO:          }
 // TODO:       }
 // TODO:    }
 // TODO: 
 // TODO:    if (reqCols != maxCols)
 // TODO:    {
-// TODO: // TODO:       XFontStruct* fs;
-// TODO: // TODO:       int windowWidth;
-// TODO: // TODO:       short fontWidth;
-// TODO: // TODO: 
-// TODO: // TODO:       newColsDiff = reqCols - maxCols;
-// TODO: // TODO: 
-// TODO: // TODO:       XtVaGetValues(window->textArea, textNfont, &fs, NULL);
-// TODO: // TODO:       fontWidth = fs->max_bounds.width;
-// TODO: // TODO: 
-// TODO: // TODO:       XtVaGetValues(window->mainWindow, XmNwidth, &windowWidth, NULL);
-// TODO: // TODO:       XtVaSetValues(window->mainWindow,
-// TODO: // TODO:                     XmNwidth, (int) windowWidth + (newColsDiff * fontWidth),
-// TODO: // TODO:                     NULL);
-// TODO: // TODO: 
-// TODO: // TODO:       UpdateWMSizeHints(window);
+// TODO:       Ne_Font* fs;
+// TODO:       short fontWidth;
+// TODO: 
+// TODO:       newColsDiff = reqCols - maxCols;
+// TODO: 
+// TODO:       fs = &window->textArea->primaryFont;
+// TODO:       fontWidth = fs->max_width();
+// TODO: 
+// TODO:       int windowWidth = window->textArea->width;
+// TODO:       window->mainWindow->size( windowWidth + (newColsDiff * fontWidth) , window->mainWindow->h());
+// TODO: 
+// TODO:       UpdateWMSizeHints(window);
 // TODO:    }
 // TODO: 
 // TODO:    for (document = WindowList; NULL != document; document = document->next)
 // TODO:    {
 // TODO:       if (document->mainWindow == window->mainWindow)
 // TODO:       {
-// TODO:          Fl_Widget* text;
 // TODO:          int i;
 // TODO:          int lineNumCols;
 // TODO: 
-// TODO: // TODO:          XtVaGetValues(document->textArea,
-// TODO: // TODO:                        textNlineNumCols, &lineNumCols, NULL);
-// TODO: // TODO: 
-// TODO: // TODO:          if (lineNumCols == reqCols)
-// TODO: // TODO:          {
-// TODO: // TODO:             continue;
-// TODO: // TODO:          }
-// TODO: // TODO: 
-// TODO: // TODO:          /*  Update all panes of this document.  */
-// TODO: // TODO:          for (i = 0; i <= document->nPanes; i++)
-// TODO: // TODO:          {
-// TODO: // TODO:             text = 0==i ? document->textArea : document->textPanes[i-1];
-// TODO: // TODO:             XtVaSetValues(text, textNlineNumCols, reqCols, NULL);
-// TODO: // TODO:          }
+// TODO:          lineNumCols = document->textArea->lineNumCols;
+// TODO: 
+// TODO:          if (lineNumCols == reqCols)
+// TODO:          {
+// TODO:             continue;
+// TODO:          }
+// TODO: 
+// TODO:          /*  Update all panes of this document.  */
+// TODO:          for (i = 0; i <= document->nPanes; i++)
+// TODO:          {
+// TODO:             Ne_Text_Editor* text = 0==i ? document->textArea : document->textPanes[i-1];
+// TODO:             text->lineNumCols = reqCols;
+// TODO:          }
 // TODO:       }
 // TODO:    }
 // TODO: 
 // TODO:    return reqCols;
-}
+// TODO: // TODO: 
+// TODO: // TODO:    WindowInfo* document;
+// TODO: // TODO:    int reqCols = MIN_LINE_NUM_COLS;
+// TODO: // TODO:    int newColsDiff = 0;
+// TODO: // TODO:    int maxCols = 0;
+// TODO: // TODO: 
+// TODO: // TODO:    for (document = WindowList; NULL != document; document = document->next)
+// TODO: // TODO:    {
+// TODO: // TODO:       if (document->mainWindow == window->mainWindow)
+// TODO: // TODO:       {
+// TODO: // TODO:          /*  We found ourselves a document from this window.  */
+// TODO: // TODO:          int lineNumCols, tmpReqCols;
+// TODO: // TODO: // TODO:          document->textArea->position_to_linecol(document->textArea->insert_position(), &lineNumCols, &tmpReqCols);
+// TODO: // TODO: 
+// TODO: // TODO:          // Is the width of the line number area sufficient to display all the
+// TODO: // TODO:          // line numbers in the file?  If not, expand line number field, and the
+// TODO: // TODO:          // window width.
+// TODO: // TODO:          if (lineNumCols > maxCols)
+// TODO: // TODO:          {
+// TODO: // TODO:             maxCols = lineNumCols;
+// TODO: // TODO:          }
+// TODO: // TODO: 
+// TODO: // TODO: // TODO:          tmpReqCols = textD->nBufferLines < 1
+// TODO: // TODO: // TODO:                       ? 1
+// TODO: // TODO: // TODO:                       : (int) log10((double) textD->nBufferLines + 1) + 1;
+// TODO: // TODO: // TODO: 
+// TODO: // TODO: // TODO:          if (tmpReqCols > reqCols)
+// TODO: // TODO: // TODO:          {
+// TODO: // TODO: // TODO:             reqCols = tmpReqCols;
+// TODO: // TODO: // TODO:          }
+// TODO: // TODO:       }
+// TODO: // TODO:    }
+// TODO: // TODO: 
+// TODO: // TODO:    if (reqCols != maxCols)
+// TODO: // TODO:    {
+// TODO: // TODO: // TODO:       XFontStruct* fs;
+// TODO: // TODO: // TODO:       int windowWidth;
+// TODO: // TODO: // TODO:       short fontWidth;
+// TODO: // TODO: // TODO: 
+// TODO: // TODO: // TODO:       newColsDiff = reqCols - maxCols;
+// TODO: // TODO: // TODO: 
+// TODO: // TODO: // TODO:       XtVaGetValues(window->textArea, textNfont, &fs, NULL);
+// TODO: // TODO: // TODO:       fontWidth = fs->max_bounds.width;
+// TODO: // TODO: // TODO: 
+// TODO: // TODO: // TODO:       XtVaGetValues(window->mainWindow, XmNwidth, &windowWidth, NULL);
+// TODO: // TODO: // TODO:       XtVaSetValues(window->mainWindow,
+// TODO: // TODO: // TODO:                     XmNwidth, (int) windowWidth + (newColsDiff * fontWidth),
+// TODO: // TODO: // TODO:                     NULL);
+// TODO: // TODO: // TODO: 
+// TODO: // TODO: // TODO:       UpdateWMSizeHints(window);
+// TODO: // TODO:    }
+// TODO: // TODO: 
+// TODO: // TODO:    for (document = WindowList; NULL != document; document = document->next)
+// TODO: // TODO:    {
+// TODO: // TODO:       if (document->mainWindow == window->mainWindow)
+// TODO: // TODO:       {
+// TODO: // TODO:          Fl_Widget* text;
+// TODO: // TODO:          int i;
+// TODO: // TODO:          int lineNumCols;
+// TODO: // TODO: 
+// TODO: // TODO: // TODO:          XtVaGetValues(document->textArea,
+// TODO: // TODO: // TODO:                        textNlineNumCols, &lineNumCols, NULL);
+// TODO: // TODO: // TODO: 
+// TODO: // TODO: // TODO:          if (lineNumCols == reqCols)
+// TODO: // TODO: // TODO:          {
+// TODO: // TODO: // TODO:             continue;
+// TODO: // TODO: // TODO:          }
+// TODO: // TODO: // TODO: 
+// TODO: // TODO: // TODO:          /*  Update all panes of this document.  */
+// TODO: // TODO: // TODO:          for (i = 0; i <= document->nPanes; i++)
+// TODO: // TODO: // TODO:          {
+// TODO: // TODO: // TODO:             text = 0==i ? document->textArea : document->textPanes[i-1];
+// TODO: // TODO: // TODO:             XtVaSetValues(text, textNlineNumCols, reqCols, NULL);
+// TODO: // TODO: // TODO:          }
+// TODO: // TODO:       }
+// TODO: // TODO:    }
+// TODO: // TODO: 
+// TODO: // TODO:    return reqCols;
+// TODO: }
 
-/*
-**  If necessary, enlarges the window and line number display area to make
-**  room for numbers.
-*/
-static int updateLineNumDisp(WindowInfo* window)
-{
-   if (!window->showLineNumbers)
-   {
-      return 0;
-   }
-
-   /* Decide how wide the line number field has to be to display all
-      possible line numbers */
-   return updateGutterWidth(window);
-}
+// TODO: /*
+// TODO: **  If necessary, enlarges the window and line number display area to make
+// TODO: **  room for numbers.
+// TODO: */
+// TODO: static int updateLineNumDisp(WindowInfo* window)
+// TODO: {
+// TODO:    if (!window->showLineNumbers)
+// TODO:    {
+// TODO:       return 0;
+// TODO:    }
+// TODO: 
+// TODO:    /* Decide how wide the line number field has to be to display all
+// TODO:       possible line numbers */
+// TODO:    return updateGutterWidth(window);
+// TODO: }
 
 /*
 ** Update the optional statistics line.
@@ -4001,7 +3983,7 @@ void RefreshWindowStates(WindowInfo* window)
 // TODO:    XmUpdateDisplay(window->statsLine);
    refreshMenuBar(window);
 
-   updateLineNumDisp(window);
+// TODO:    updateLineNumDisp(window);
 }
 
 // TODO: static void cloneTextPanes(WindowInfo* window, WindowInfo* orgWin)

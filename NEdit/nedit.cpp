@@ -38,11 +38,6 @@
 
 #include <iostream>
 
-//WindowInfo* WindowList = NULL;
-//char* ArgV0 = NULL;
-//bool IsServer = false;
-//Ne_AppContext AppContext(APP_NAME);
-
 /* Reasons for choice of default font qualifications:
 
 iso8859 appears to be necessary for newer versions of XFree86 that

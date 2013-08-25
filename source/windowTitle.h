@@ -3,7 +3,7 @@
 
 #include "nedit.h"
 
-char* FormatWindowTitle(const char* filename,
+const char* FormatWindowTitle(const char* filename,
                         const char* path,
                         const char* serverName,
                         int isServer,

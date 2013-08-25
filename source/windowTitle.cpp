@@ -213,7 +213,7 @@ static void compressWindowTitle(char* title)
 //  if the ClearCase view tag and server name are identical, only the first one
 //  specified in the formatting string will be displayed.
 // --------------------------------------------------------------------------
-char* FormatWindowTitle(const char* filename,
+const char* FormatWindowTitle(const char* filename,
                         const char* path,
                         const char* serverName,
                         int isServer,
@@ -223,6 +223,7 @@ char* FormatWindowTitle(const char* filename,
                         const char* titleFormat)
 {
    static char title[WINDOWTITLE_MAX_LEN];
+   //title.clear();
    char* titlePtr = title;
    char* titleEnd = title + WINDOWTITLE_MAX_LEN - 1;
 
@@ -458,7 +459,7 @@ static void formatChangedCB(Fl_Widget* w, void* data)
 
    std::string serverName = NeToggleButtonGetState(etDialog.oServerNameW) ? etDialog.serverName : "";
 
-   char* title = FormatWindowTitle(
+   const char* title = FormatWindowTitle(
       etDialog.filename.c_str(),
       etDialog.filenameSet == true ? etDialog.path.c_str() : "/a/very/long/path/used/as/example/",
       serverName.c_str(),

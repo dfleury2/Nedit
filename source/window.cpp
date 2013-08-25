@@ -1765,12 +1765,12 @@ void SetWindowModified(WindowInfo* window, int modified)
 */
 void UpdateWindowTitle(const WindowInfo* window)
 {
-   char* iconTitle, *title;
+   char* iconTitle;
 
    if (!IsTopDocument(window))
       return;
 
-   title = FormatWindowTitle(window->filename,
+   const char* title = FormatWindowTitle(window->filename,
                              window->path,
                              GetPrefServerName(),
                              IsServer,

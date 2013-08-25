@@ -1,37 +1,5 @@
-static const char CVSID[] = "$Id: windowTitle.c,v 1.16 2007/12/31 11:12:44 yooden Exp $";
-/*******************************************************************************
-*                                                                              *
-* windowTitle.c -- Nirvana Editor window title customization                   *
-*                                                                              *
-* Copyright (C) 2001, Arne Forlie                                              *
-*                                                                              *
-* This is free__ software; you can redistribute it and/or modify it under the    *
-* terms of the GNU General Public License as published by the Free Software    *
-* Foundation; either version 2 of the License, or (at your option) any later   *
-* version. In addition, you may distribute versions of this program linked to  *
-* Motif or Open Motif. See README for details.                                 *
-*                                                                              *
-* This software is distributed in the hope that it will be useful, but WITHOUT *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for    *
-* more details.                                                                *
-*                                                                              *
-* You should have received a copy of the GNU General Public License along with *
-* software; if not, write to the Free Software Foundation, Inc., 59 Temple     *
-* Place, Suite 330, Boston, MA  02111-1307 USA                                 *
-*                                                                              *
-* Nirvana Text Editor                                                          *
-* July 31, 2001                                                                *
-*                                                                              *
-* Written by Arne Forlie, http://arne.forlie.com                               *
-*                                                                              *
-*******************************************************************************/
-
-#ifdef HAVE_CONFIG_H
-#include "../config.h"
-#endif
-
 #include "windowTitle.h"
+
 #include "Ne_Text_Buffer.h"
 #include "nedit.h"
 #include "preferences.h"
@@ -60,14 +28,11 @@ static const char CVSID[] = "$Id: windowTitle.c,v 1.16 2007/12/31 11:12:44 yoode
 #include <sys/param.h>
 #endif
 
-#ifdef HAVE_DEBUG_H
-#include "../debug.h"
-#endif
-
-
 #define WINDOWTITLE_MAX_LEN 500
 
+// --------------------------------------------------------------------------
 // Customize window title dialog information
+// --------------------------------------------------------------------------
 static struct CustomizeWindowTitleDialog
 {
    WindowInfo*    window;
@@ -107,7 +72,7 @@ static struct CustomizeWindowTitleDialog
              "","","",false,false,0,false,false
             };
 
-
+// --------------------------------------------------------------------------
 static char* removeSequence(char* sourcePtr, char c)
 {
    while (*sourcePtr == c)
@@ -117,11 +82,10 @@ static char* removeSequence(char* sourcePtr, char c)
    return(sourcePtr);
 }
 
-
-/*
-** Two functions for performing safe insertions into a finite
-** size buffer so that we don't get any memory overruns.
-*/
+// --------------------------------------------------------------------------
+// Two functions for performing safe insertions into a finite
+// size buffer so that we don't get any memory overruns.
+// --------------------------------------------------------------------------
 static char* safeStrCpy(char* dest, char* destEnd, const char* source)
 {
    int len = (int)strlen(source);
@@ -138,6 +102,7 @@ static char* safeStrCpy(char* dest, char* destEnd, const char* source)
    }
 }
 
+// --------------------------------------------------------------------------
 static char* safeCharAdd(char* dest, char* destEnd, char c)
 {
    if (destEnd - dest > 0)
@@ -148,11 +113,11 @@ static char* safeCharAdd(char* dest, char* destEnd, char c)
    return(dest);
 }
 
-/*
-** Remove empty paranthesis pairs and multiple spaces in a row
-** with one space.
-** Also remove leading and trailing spaces and dashes.
-*/
+// --------------------------------------------------------------------------
+// Remove empty parenthesis pairs and multiple spaces in a row
+// with one space.
+// Also remove leading and trailing spaces and dashes.
+// --------------------------------------------------------------------------
 static void compressWindowTitle(char* title)
 {
    /* Compress the title */
@@ -233,22 +198,21 @@ static void compressWindowTitle(char* title)
    while (modified == true);
 }
 
-
-/*
-** Format the windows title using a printf like formatting string.
-** The following flags are recognised:
-**  %s    : server name
-**  %[n]d : directory, with one optional digit specifying the max number
-**          of trailing directory components to display. Skipped components are
-**          replaced by an ellipsis (...).
-**  %f    : file name
-**  %h    : host name
-**  %S    : file status
-**  %u    : user name
-**
-**  if the ClearCase view tag and server name are identical, only the first one
-**  specified in the formatting string will be displayed.
-*/
+// --------------------------------------------------------------------------
+// Format the windows title using a printf like formatting string.
+// The following flags are recognised:
+//  %s    : server name
+//  %[n]d : directory, with one optional digit specifying the max number
+//          of trailing directory components to display. Skipped components are
+//          replaced by an ellipsis (...).
+//  %f    : file name
+//  %h    : host name
+//  %S    : file status
+//  %u    : user name
+//
+//  if the ClearCase view tag and server name are identical, only the first one
+//  specified in the formatting string will be displayed.
+// --------------------------------------------------------------------------
 char* FormatWindowTitle(const char* filename,
                         const char* path,
                         const char* serverName,
@@ -467,7 +431,9 @@ char* FormatWindowTitle(const char* filename,
    return(title);
 }
 
+// --------------------------------------------------------------------------
 // a utility that sets the values of all toggle buttons
+// --------------------------------------------------------------------------
 static void setToggleButtons()
 {
    NeToggleButtonSetState(etDialog.oDirW, etDialog.filenameSet == true, false);
@@ -480,6 +446,7 @@ static void setToggleButtons()
    NeToggleButtonSetState(etDialog.oServerNameW, etDialog.isServer, false);
 }
 
+// --------------------------------------------------------------------------
 static void formatChangedCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -507,6 +474,7 @@ static void formatChangedCB(Fl_Widget* w, void* data)
    etDialog.previewW->redraw_label();
 }
 
+// --------------------------------------------------------------------------
 static void serverNameCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -514,6 +482,7 @@ static void serverNameCB(Fl_Widget* w, void* data)
    formatChangedCB(w, data);
 }
 
+// --------------------------------------------------------------------------
 static void fileChangedCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -521,6 +490,7 @@ static void fileChangedCB(Fl_Widget* w, void* data)
    formatChangedCB(w, data);
 }
 
+// --------------------------------------------------------------------------
 static void fileLockedCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -528,6 +498,7 @@ static void fileLockedCB(Fl_Widget* w, void* data)
    formatChangedCB(w, data);
 }
 
+// --------------------------------------------------------------------------
 static void fileReadOnlyCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -535,6 +506,7 @@ static void fileReadOnlyCB(Fl_Widget* w, void* data)
    formatChangedCB(w, data);
 }
 
+// --------------------------------------------------------------------------
 static void applyCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -549,24 +521,28 @@ static void applyCB(Fl_Widget* w, void* data)
    delete[] format;
 }
 
+// --------------------------------------------------------------------------
 static void closeCB(Fl_Widget* w, void* data)
 {
    TRACE();
    WidgetToMainWindow(w)->hide();
 }
 
+// --------------------------------------------------------------------------
 static void restoreCB(Fl_Widget* w, void* data)
 {
    TRACE();
    NeTextSetString(etDialog.formatW, "[%s] %f (%S) - %d");
 }
 
+// --------------------------------------------------------------------------
 static void helpCB(Fl_Widget* w, void* data)
 {
    TRACE();
    Help(HELP_CUSTOM_TITLE_DIALOG);
 }
 
+// --------------------------------------------------------------------------
 static void wtDestroyCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -575,6 +551,7 @@ static void wtDestroyCB(Fl_Widget* w, void* data)
    etDialog.form = NULL;
 }
 
+// --------------------------------------------------------------------------
 static void appendToFormat(const char* string)
 {
    char* format = NeTextGetString(etDialog.formatW);
@@ -586,6 +563,7 @@ static void appendToFormat(const char* string)
    delete[] buf;
 }
 
+// --------------------------------------------------------------------------
 static void removeFromFormat(const char* string)
 {
    char* format = NeTextGetString(etDialog.formatW);
@@ -650,7 +628,7 @@ static void removeFromFormat(const char* string)
    delete[] format;
 }
 
-
+// --------------------------------------------------------------------------
 static void toggleFileCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -660,6 +638,7 @@ static void toggleFileCB(Fl_Widget* w, void* data)
       removeFromFormat("%f");
 }
 
+// --------------------------------------------------------------------------
 static void toggleServerCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -669,6 +648,7 @@ static void toggleServerCB(Fl_Widget* w, void* data)
       removeFromFormat("%s");
 }
 
+// --------------------------------------------------------------------------
 static void toggleHostCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -678,6 +658,7 @@ static void toggleHostCB(Fl_Widget* w, void* data)
       removeFromFormat("%h");
 }
 
+// --------------------------------------------------------------------------
 static void toggleStatusCB(Fl_Widget* w, void* date)
 {
    TRACE();
@@ -695,6 +676,7 @@ static void toggleStatusCB(Fl_Widget* w, void* date)
    }
 }
 
+// --------------------------------------------------------------------------
 static void toggleShortStatusCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -744,6 +726,7 @@ static void toggleShortStatusCB(Fl_Widget* w, void* data)
    delete[] format;
 }
 
+// --------------------------------------------------------------------------
 static void toggleUserCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -753,6 +736,7 @@ static void toggleUserCB(Fl_Widget* w, void* data)
       removeFromFormat("%u");
 }
 
+// --------------------------------------------------------------------------
 static void toggleDirectoryCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -792,6 +776,7 @@ static void toggleDirectoryCB(Fl_Widget* w, void* data)
    }
 }
 
+// --------------------------------------------------------------------------
 static void enterMaxDirCB(Fl_Widget* w, void* data)
 {
    TRACE();
@@ -888,6 +873,7 @@ static void enterMaxDirCB(Fl_Widget* w, void* data)
    delete[] value;
 }
 
+// --------------------------------------------------------------------------
 static void createEditTitleDialog()
 {
    etDialog.form = new Fl_Window(30, 50, 400, 450, "Customize Window Title");
@@ -984,6 +970,7 @@ static void createEditTitleDialog()
    etDialog.suppressFormatUpdate = false;
 }
 
+// --------------------------------------------------------------------------
 void EditCustomTitleFormat(WindowInfo* window)
 {
    // copy attributes from current window so that we can use as many

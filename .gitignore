@@ -18,9 +18,9 @@
 coverage.info
 error.txt
 
-/NEdit.sdf
-/NEdit.opensdf
-/NEdit.suo
+/*.sdf
+/*.opensdf
+/*.suo
 Release
 Debug
 /ipch/

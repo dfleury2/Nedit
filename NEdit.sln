@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "util", "util\util.vcxproj", "{9F475A86-B9FC-4220-AD41-31D89B5A48B3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "source", "source\source.vcxproj", "{5ED2FFF8-D83A-433A-8D80-5F223C00EA48}"
@@ -13,8 +13,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NEdit++", "NEdit++", "{4AF741DC-3E51-4BAC-9397-B5D25A9E0F46}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MenuBar", "NEditPrototypes\MenuBar\MenuBar.vcxproj", "{0DC6E3AE-009A-4A7B-B8ED-B92437DDC0C6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9F475A86-B9FC-4220-AD41-31D89B5A48B3} = {9F475A86-B9FC-4220-AD41-31D89B5A48B3}
+		{5ED2FFF8-D83A-433A-8D80-5F223C00EA48} = {5ED2FFF8-D83A-433A-8D80-5F223C00EA48}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tabs", "NEditPrototypes\Tabs\Tabs.vcxproj", "{F5B07B02-1A43-4447-A479-DE8AB2A6FA11}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9F475A86-B9FC-4220-AD41-31D89B5A48B3} = {9F475A86-B9FC-4220-AD41-31D89B5A48B3}
+		{5ED2FFF8-D83A-433A-8D80-5F223C00EA48} = {5ED2FFF8-D83A-433A-8D80-5F223C00EA48}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NEdit", "NEdit\NEdit.vcxproj", "{B3E4188D-DC5B-40AE-8350-32E69A0D9EE8}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -33,9 +41,14 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Font", "NEditPrototypes\Font\Font.vcxproj", "{F515F273-E748-4E5F-B8F5-C077CD5CAA94}"
 	ProjectSection(ProjectDependencies) = postProject
 		{9F475A86-B9FC-4220-AD41-31D89B5A48B3} = {9F475A86-B9FC-4220-AD41-31D89B5A48B3}
+		{5ED2FFF8-D83A-433A-8D80-5F223C00EA48} = {5ED2FFF8-D83A-433A-8D80-5F223C00EA48}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Display", "NEditPrototypes\Display\Display.vcxproj", "{2DBA2868-6DD7-4312-BE4B-FCB2E91A38D4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9F475A86-B9FC-4220-AD41-31D89B5A48B3} = {9F475A86-B9FC-4220-AD41-31D89B5A48B3}
+		{5ED2FFF8-D83A-433A-8D80-5F223C00EA48} = {5ED2FFF8-D83A-433A-8D80-5F223C00EA48}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

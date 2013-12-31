@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <FLTK_HOME>X:\Tools\fltk-1.3.x</FLTK_HOME>
+    <FLTK_INC>$(FLTK_HOME)</FLTK_INC>
+    <FLTK_LIB>$(FLTK_HOME)\lib</FLTK_LIB>
+    <FLTK_DEBUG_SUFFIX Condition="'$(Configuration)'=='Debug'">d</FLTK_DEBUG_SUFFIX>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(FLTK_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>
+      </PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(FLTK_LIB);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>fltk$(FLTK_DEBUG_SUFFIX).lib;;fltkimages$(FLTK_DEBUG_SUFFIX).lib;fltkpng$(FLTK_DEBUG_SUFFIX).lib;fltkzlib$(FLTK_DEBUG_SUFFIX).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <PostBuildEvent />
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="FLTK_HOME">
+      <Value>$(FLTK_HOME)</Value>
+    </BuildMacro>
+    <BuildMacro Include="FLTK_INC">
+      <Value>$(FLTK_INC)</Value>
+    </BuildMacro>
+    <BuildMacro Include="FLTK_LIB">
+      <Value>$(FLTK_LIB)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <algorithm>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifndef WIN32

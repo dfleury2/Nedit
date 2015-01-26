@@ -4,4 +4,4 @@ CXX=g++
 FLTK_HOME=/home/dfleury/Tools/fltk-1.3.3
 
 CXXFLAGS=--std=c++11 -fpermissive -Wwrite-strings -Dlinux -O2 $(shell $(FLTK_HOME)/bin/fltk-config --cxxflags)
-LDLIBS=$(shell $(FLTK_HOME)/bin/fltk-config --ldflags --use-images)
+LDLIBS=$(shell $(FLTK_HOME)/bin/fltk-config --ldflags )

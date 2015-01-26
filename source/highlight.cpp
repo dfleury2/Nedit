@@ -1560,7 +1560,7 @@ static int parseBufferRange(highlightDataRec* pass1Patterns,
                &prevChar, false, delimiters, string, NULL);
 
    /* On non top-level patterns, parsing can end early */
-   endParse = min(endParse, stringPtr-string + beginSafety);
+   endParse = min((long)endParse, stringPtr-string + beginSafety);
 
    /* If there are no pass 2 patterns, we're done */
    if (pass2Patterns == NULL)

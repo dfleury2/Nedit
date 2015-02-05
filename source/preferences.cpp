@@ -3170,7 +3170,7 @@ void ChooseFonts(WindowInfo* window, int forWindow)
 
    buttonLine->end();
 
-   form->resizable(resizableBox);
+   form->resizable(form);
 
    // Set initial values
    if (forWindow)

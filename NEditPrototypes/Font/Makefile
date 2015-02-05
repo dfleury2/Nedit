@@ -2,19 +2,15 @@
 # Makefile générique pour les .cpp
 #
 
-#CXX=clang
-CXX=g++
-
-FLTK_HOME=/opt/fltk-1.3.2
-
-CXXFLAGS=--std=c++11 -fpermissive -Wwrite-strings -Dlinux -O2 $(shell $(FLTK_HOME)/bin/fltk-config --cxxflags)
-LDLIBS=../../util/libutil.a $(shell $(FLTK_HOME)/bin/fltk-config --ldflags --use-images)
+include ../../Makefile.common
 
 SOURCES:= $(shell ls *.cpp)
 OBJECTS:=$(SOURCES:.cpp=.o)
 
+LIBS=../../libNUtil.a
+
 Font:$(OBJECTS)
-	$(CXX) -o $@ $(OBJECTS) $(LDLIBS)
+	$(CXX) -o $@ $(OBJECTS) $(LIBS) $(LDLIBS) 
 
 clean:
 	rm -f Font *.o

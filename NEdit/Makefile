@@ -7,7 +7,7 @@ include ../Makefile.common
 SOURCES:= $(shell ls *.cpp)
 OBJECTS:=$(SOURCES:.cpp=.o)
 
-nedit++:$(OBJECTS)
+nedit++:$(OBJECTS) ../source/libsource.a ../util/libutil.a
 	$(CXX) -o $@ $(OBJECTS) ../source/libsource.a ../util/libutil.a $(LDLIBS)
 
 clean:
